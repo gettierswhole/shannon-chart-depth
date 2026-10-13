@@ -6,7 +6,6 @@
 <meta name="description" content="Live Shannon water levels against CSIG chart datum, with lake forecasts, lock times, marine notices and places to eat ashore.">
 </head>
 <body>
-
 <title>Shannon Chart Depth</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -235,7 +234,7 @@ a { color: var(--water); }
               <p class="today-main" id="sun-main"></p>
             </div>
           </div>
-          <svg id="sun-bar" viewBox="0 0 320 110" role="img" aria-label="A 24-hour dial: night, twilight and daylight, the moon's phase, and the crew's day aboard, with now marked"></svg>
+          <svg id="sun-bar" viewBox="0 0 320 120" role="img" aria-label="Today as a boat seen from above: the crew's day room by room from bow to stern, glazed with the sky's colour at each hour, with the moon's phase and now marked"></svg>
           <p class="fine" id="sun-note"></p>
         </div>
         <div class="today-row">
@@ -978,213 +977,223 @@ a { color: var(--water); }
     $("sun-main").textContent = main;
     $("sun-note").textContent = "The next 24 hours, from night through twilight to daylight. The marker is now.";
 
-    // The complication: a rolling 24-hour dial in a bezel. Sky colours follow the real sun (night, three twilights,
-    // daylight); the moon shows its real phase; and the crew's day plays out along it in stick figures.
+    // The complication: the Shannon Star's hull seen from above, bow at midnight and stern at the next midnight,
+    // glazed like a Harry Clarke window. Each room is one part of the crew's day, its glass tinted with the real
+    // sky for those hours (night, twilight, day); the moon shows its real phase; the room lit gold is now.
     var svg = $("sun-bar"); svg.textContent = "";
-    var t0 = nowMs - 3 * 3600e3, t1 = nowMs + 21 * 3600e3, L = 6, R = 314, TOP = 22, BOT = 94, MID = (TOP + BOT) / 2;
-    var X = function (ms) { return L + (Math.max(t0, Math.min(t1, ms)) - t0) / (t1 - t0) * (R - L); };
-    var NSV = "http://www.w3.org/2000/svg", defs = document.createElementNS(NSV, "defs");
-    var clip = document.createElementNS(NSV, "clipPath"); clip.setAttribute("id", "dial-clip");
-    clip.appendChild(el("rect", { x: L, y: TOP, width: R - L, height: BOT - TOP, rx: 12 })); defs.appendChild(clip); svg.appendChild(defs);
-    var dial = document.createElementNS(NSV, "g"); dial.setAttribute("clip-path", "url(#dial-clip)"); svg.appendChild(dial);
-    var add = function (tag, a, txt) { var n = el(tag, a, txt); dial.appendChild(n); return n; };
-    add("rect", { x: L, y: TOP, width: R - L, height: BOT - TOP, fill: "#1b2540" });
-    // a few stars in the night sky
-    for (var st = 0; st < 40; st++) add("circle", { cx: L + ((st * 73) % 308), cy: TOP + 3 + ((st * 37) % 30), r: st % 5 ? 0.5 : 0.8, fill: "#c8d0f0" });
-    var bands = [[-18, "#2c3a5e"], [-12, "#4d6290"], [-6, "#a9c8d6"], [-0.833, "#f3e3bd"]], marks = [], days = [];
-    for (var off = -1; off <= 2; off++) {
-      var base = noon(off);
-      days.push({ rise: (sunTimes(base, lat, lon, -0.833) || {}).rise, set: (sunTimes(base, lat, lon, -0.833) || {}).set, noon: base });
-      bands.forEach(function (b) {
-        var s = sunTimes(base, lat, lon, b[0]);
-        if (!s || s.set < t0 || s.rise > t1) return;
-        add("rect", { x: X(s.rise), y: TOP, width: Math.max(0, X(s.set) - X(s.rise)), height: BOT - TOP, fill: b[1] });
-        if (b[0] === -0.833) { marks.push(s.rise); marks.push(s.set); }
-      });
-    }
-    var isDay = function (ms) { return days.some(function (d) { return d.rise && ms > d.rise && ms < d.set; }); };
-    var LEAD = "#120c1c", GOLD = "#e3bf5c", JEWELS = ["#1d4e89", "#8c1c3e", "#1f6b4a", "#c9a227", "#5b2a86", "#0f7a8a", "#b4461f"];
+    var NSV = "http://www.w3.org/2000/svg", LEAD = "#07060c", GOLD = "#e7c25a", PALE = "#f3e6d0";
+    var XA = 8, XB = 312, HT = 24, HB = 96, FY = 89;
+    var tz = (function () { var hs = hhmm(noon(0)).split(":"); return +hs[0] - 12 + +hs[1] / 60; })();
+    var day0 = noon(0) + (-12 - tz) * 3600e3, msH = function (h) { return day0 + h * 3600e3; };
+    var nowH = ((nowMs - day0) / 3600e3 % 24 + 24) % 24;
+    var X = function (h) { return XA + h / 24 * (XB - XA); }, H = function (x) { return (x - XA) / (XB - XA) * 24; };
+    var sb = {}; [-18, -12, -6, -0.833].forEach(function (a) { sb[a] = sunTimes(noon(0), lat, lon, a); });
+    var sky = function (h) { var ms = msH(h), k = 0; [-18, -12, -6, -0.833].forEach(function (a, i) { var s = sb[a]; if (s && ms > s.rise && ms < s.set) k = i + 1; }); return k; };
+    var GLASS = [["#0b1f6b", "#13298a", "#1b3fb0", "#0a1650", "#24168a", "#102a7a"],   // night: Clarke cobalt
+      ["#1c2a8c", "#3a2290", "#13298a", "#2a1a6e", "#0f3a8f"], ["#4b2a8c", "#7a2a7a", "#2a3fa0", "#5b2a86", "#8c1c5e"],
+      ["#b0507a", "#d9733a", "#6a5ac0", "#c74f4f", "#3b5bb0"], ["#f0a830", "#f6cf4a", "#3fb8a8", "#e07a28", "#ffe07a", "#d4a017", "#7fd0e0", "#c8402a"]];
+    var JEWEL = ["#d4202c", "#f2c230", "#1fa37a", "#e86a1c", "#b06fd0", "#ffffff", "#2fb7e0"];
     var rnd = function (n) { var s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
-    var tX = function (px) { return t0 + (px - L) / (R - L) * (t1 - t0); };
-    // Leaded glass: a jittered triangulation over the sky, each pane tinted a jewel colour, black lead between.
-    var cw = 13, rh = 11, gx = Math.ceil((R - L) / cw) + 1, gy = Math.ceil((BOT - 14 - TOP) / rh) + 1, pt = [];
-    for (var i = 0; i <= gx; i++) { pt[i] = []; for (var j = 0; j <= gy; j++) pt[i][j] = [L + i * cw + (i && i < gx ? (rnd(i * 31 + j) - 0.5) * 8 : 0), TOP + j * rh + (j && j < gy ? (rnd(i * 7 + j * 13) - 0.5) * 7 : 0)]; }
-    for (i = 0; i < gx; i++) for (j = 0; j < gy; j++) {
-      var a = pt[i][j], b = pt[i + 1][j], c = pt[i + 1][j + 1], d = pt[i][j + 1], flip = rnd(i * 3 + j * 17) > 0.5;
-      (flip ? [[a, b, c], [a, c, d]] : [[a, b, d], [b, c, d]]).forEach(function (tri, k) {
-        var night = !isDay(tX((tri[0][0] + tri[1][0] + tri[2][0]) / 3));
-        add("path", { d: "M" + tri.map(function (q) { return q[0].toFixed(1) + " " + q[1].toFixed(1); }).join(" L") + " Z",
-          fill: JEWELS[Math.floor(rnd(i * 11 + j * 5 + k) * JEWELS.length)], "fill-opacity": night ? 0.36 : 0.3, stroke: LEAD, "stroke-width": 0.7, "stroke-opacity": 0.55 });
-      });
-    }
-    // triskeles scattered through the sky
-    function triskele(x, y, r, c, w) {
-      for (var k = 0; k < 3; k++) {
-        var dd = "M" + x + " " + y;
-        for (var s = 1; s <= 24; s++) { var th = s / 24 * 2.6 * Math.PI, rr = r * s / 24, an = th + k * 2 * Math.PI / 3; dd += " L" + (x + rr * Math.cos(an)).toFixed(2) + " " + (y + rr * Math.sin(an)).toFixed(2); }
-        add("path", { d: dd, fill: "none", stroke: c, "stroke-width": w || 0.9, "stroke-linecap": "round" });
+    var calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function E(parent, tag, a, txt) { var n = el(tag, a, txt); parent.appendChild(n); return n; }
+    function G(parent, a) { var g = document.createElementNS(NSV, "g"); for (var k in a) g.setAttribute(k, a[k]); parent.appendChild(g); return g; }
+    function anim(node, a) { if (calm) return; var n = document.createElementNS(NSV, a.type ? "animateTransform" : "animate"); for (var k in a) n.setAttribute(k === "type" ? "type" : k, a[k]); if (a.type) n.setAttribute("attributeName", "transform"); n.setAttribute("repeatCount", "indefinite"); node.appendChild(n); }
+    function panes(parent, x0, y0, x1, y1, cw, rh, colourAt, seed, op) {
+      var gx = Math.ceil((x1 - x0) / cw), gy = Math.ceil((y1 - y0) / rh), pt = [], i, j;
+      for (i = 0; i <= gx; i++) { pt[i] = []; for (j = 0; j <= gy; j++) pt[i][j] = [x0 + i * cw + (i && i < gx ? (rnd(seed + i * 31 + j) - 0.5) * cw * 0.6 : 0), y0 + j * rh + (j && j < gy ? (rnd(seed + i * 7 + j * 13) - 0.5) * rh * 0.6 : 0)]; }
+      for (i = 0; i < gx; i++) for (j = 0; j < gy; j++) {
+        var a = pt[i][j], b = pt[i + 1][j], c = pt[i + 1][j + 1], d = pt[i][j + 1];
+        (rnd(seed + i * 3 + j * 17) > 0.5 ? [[a, b, c], [a, c, d]] : [[a, b, d], [b, c, d]]).forEach(function (tri, k) {
+          var cx = (tri[0][0] + tri[1][0] + tri[2][0]) / 3, pal = colourAt(cx);
+          E(parent, "path", { d: "M" + tri.map(function (q) { return q[0].toFixed(1) + " " + q[1].toFixed(1); }).join(" L") + " Z",
+            fill: pal[Math.floor(rnd(seed + i * 11 + j * 5 + k) * pal.length)], "fill-opacity": op, stroke: LEAD, "stroke-width": 0.75 });
+        });
       }
     }
-    for (var tx = L + 18, tn = 0; tx < R - 10; tx += 31, tn++) {
-      var ty = TOP + 13 + (tn % 2) * 14, nt = !isDay(tX(tx));
-      triskele(tx, ty, 4 + (tn % 3), nt ? GOLD : "#8c1c3e", nt ? 0.9 : 0.7);
-      add("circle", { cx: tx + 9, cy: ty + 8, r: 1.2, fill: JEWELS[tn % JEWELS.length], stroke: LEAD, "stroke-width": 0.4 });
+    function spiral(parent, x, y, r, c, w, turns) {
+      var dd = "M" + x + " " + y;
+      for (var s = 1; s <= 30; s++) { var th = s / 30 * (turns || 2.4) * Math.PI, rr = r * s / 30; dd += " L" + (x + rr * Math.cos(th)).toFixed(2) + " " + (y + rr * Math.sin(th)).toFixed(2); }
+      return E(parent, "path", { d: dd, fill: "none", stroke: c, "stroke-width": w || 0.8, "stroke-linecap": "round" });
     }
-    // the sun at midday: a rose window of red and gold rays
-    days.forEach(function (dy) {
-      if (dy.noon < t0 + 1800e3 || dy.noon > t1 - 1800e3) return;
-      var sx = X(dy.noon), sy = TOP + 20;
-      for (var k = 0; k < 16; k++) {
-        var a1 = k / 16 * 2 * Math.PI, a2 = (k + 1) / 16 * 2 * Math.PI, ro = k % 2 ? 11 : 15;
-        add("path", { d: "M" + sx + " " + sy + " L" + (sx + ro * Math.cos(a1)).toFixed(1) + " " + (sy + ro * Math.sin(a1)).toFixed(1) + " L" + (sx + ro * Math.cos(a2)).toFixed(1) + " " + (sy + ro * Math.sin(a2)).toFixed(1) + " Z", fill: k % 2 ? "#c9a227" : "#b4461f", stroke: LEAD, "stroke-width": 0.5 });
+    function triskele(parent, x, y, r, c, w, spin) {
+      var g = G(parent, {});
+      for (var k = 0; k < 3; k++) spiral(G(g, { transform: "rotate(" + k * 120 + " " + x + " " + y + ")" }), x, y, r, c, w, 2.6);
+      if (spin) anim(g, { type: "rotate", from: "0 " + x + " " + y, to: (spin > 0 ? 360 : -360) + " " + x + " " + y, dur: Math.abs(spin) + "s" });
+      return g;
+    }
+    function speckle(parent, x0, y0, x1, y1, n, seed, cols, tw) {
+      for (var i = 0; i < n; i++) {
+        var c = E(parent, "circle", { cx: x0 + rnd(seed + i * 2.1) * (x1 - x0), cy: y0 + rnd(seed + i * 3.7) * (y1 - y0), r: 0.35 + rnd(seed + i) * 0.55, fill: cols[i % cols.length] });
+        if (tw && i % 5 === 0) anim(c, { attributeName: "opacity", values: "1;0.15;1", dur: (2 + rnd(i) * 4).toFixed(1) + "s", begin: (rnd(i * 9) * 3).toFixed(1) + "s" });
       }
-      add("circle", { cx: sx, cy: sy, r: 6.5, fill: "#f6d36b", stroke: LEAD, "stroke-width": 0.9 });
-      triskele(sx, sy, 4.5, "#8c1c3e", 0.8);
-    });
-    // the river: deep glass with spiral waves
-    add("rect", { x: L, y: BOT - 14, width: R - L, height: 8, fill: "#163a5c" });
-    for (var wx = L + 2, wn = 0; wx < R; wx += 7, wn++) add("path", { d: "M" + wx + " " + (BOT - 7) + " q1 -5 5 -4 q2 1 0 3 q-1.5 1 -2 -0.5", fill: "none", stroke: wn % 2 ? "#7fc4d8" : "#3f8fb0", "stroke-width": 0.8 });
+    }
 
-    // Moon phase: days since a known new moon (6 Jan 2000, 18:14 UTC), synodic month 29.530589 days.
+    // --- the river around the boat: deep cobalt glass, speckled, with Celtic spiral waves
+    var bezel = E(svg, "rect", { x: 2, y: 16, width: 316, height: 88, rx: 9, fill: "#061238" });
+    var clipR = document.createElementNS(NSV, "clipPath"); clipR.setAttribute("id", "river-clip");
+    E(clipR, "rect", { x: 2, y: 16, width: 316, height: 88, rx: 9 }); var defs = E(svg, "defs", {}); defs.appendChild(clipR);
+    var river = G(svg, { "clip-path": "url(#river-clip)" });
+    panes(river, 2, 16, 318, 104, 11, 8, function () { return ["#0b1f6b", "#13298a", "#0a1650", "#1b3fb0", "#0f2f7f"]; }, 900, 1);
+    speckle(river, 2, 16, 318, 104, 140, 77, ["#9fd3ff", "#ffffff", "#f2c230", "#2fb7e0"], true);
+    for (var wx = 6, wn = 0; wx < 316; wx += 9, wn++) { spiral(river, wx, 19.5, 2.6, wn % 2 ? "#7fc4d8" : GOLD, 0.7); spiral(river, wx + 4, 100.5, 2.6, wn % 2 ? GOLD : "#7fc4d8", 0.7); }
+
+    // --- the hull, from the deck plan: pointed bow (midnight) to square stern (midnight)
+    var hullD = "M" + XA + " 60 C 9 38, 15 " + HT + ", 31 " + HT + " L 299 " + HT + " Q " + XB + " " + HT + " " + XB + " 37 L " + XB + " 83 Q " + XB + " " + HB + " 299 " + HB + " L 31 " + HB + " C 15 " + HB + ", 9 82, " + XA + " 60 Z";
+    E(svg, "path", { d: hullD, fill: "#0b1f6b" });
+    var clipH = document.createElementNS(NSV, "clipPath"); clipH.setAttribute("id", "hull-clip");
+    E(clipH, "path", { d: hullD }); defs.appendChild(clipH);
+    var hull = G(svg, { "clip-path": "url(#hull-clip)" });
+    panes(hull, XA, HT, XB, HB, 8, 7, function (x) { return GLASS[sky(Math.max(0, Math.min(23.99, H(x))))]; }, 300, 0.95);
+    for (var sx = XA; sx < XB; sx += 6) { var nt = sky(Math.max(0, H(sx))) < 2; speckle(hull, sx, HT, sx + 6, FY - 4, nt ? 4 : 2, sx * 13, nt ? ["#ffffff", "#f2c230", "#9fd3ff"] : ["#d4202c", "#1fa37a", "#ffffff"], nt); }
+    for (var cx = XA; cx < XB; cx += 3) E(hull, "rect", { x: cx, y: FY, width: 3, height: 3, fill: (cx / 3) % 2 < 1 ? "#8c1c3e" : "#e7c25a", stroke: LEAD, "stroke-width": 0.3 });  // chequered sole
+    for (cx = XA + 1.5; cx < XB; cx += 3) E(hull, "rect", { x: cx, y: FY + 3, width: 3, height: 3, fill: (cx / 3) % 2 < 1 ? "#13298a" : "#d4202c", stroke: LEAD, "stroke-width": 0.3 });
+
+    // --- the rooms
+    var ROOMS = [[0, 3, "Drinking like very drunk ancient Greeks", revels], [3, 10, "Asleep", sleep], [10, 12, "Rising to a mess aboard", wake],
+      [12, 14, "Breakfast", breakfast], [14, 18, "Under way", underway], [18, 21, "Cooking", cooking], [21, 23, "Dining like ancient Greeks", dining],
+      [23, 24, "Drinking like very drunk ancient Greeks", revelsStart]];
+    var nowRoom = ROOMS.filter(function (r) { return nowH >= r[0] && nowH < r[1]; })[0];
+    var people = G(svg, {});
+    ROOMS.forEach(function (rm, i) {
+      var x0 = X(rm[0]), x1 = X(rm[1]), cxr = (x0 + x1) / 2, night = sky((rm[0] + rm[1]) / 2) < 3, here = rm === nowRoom;
+      if (!here) E(hull, "rect", { x: x0, y: HT, width: x1 - x0, height: HB - HT, fill: "rgba(4,4,18,0.22)" });
+      else { var glow = E(hull, "rect", { x: x0, y: HT, width: x1 - x0, height: HB - HT, fill: "rgba(255,214,110,0.22)" }); anim(glow, { attributeName: "opacity", values: "0.6;1;0.6", dur: "4s" }); }
+      if (i) { E(svg, "line", { x1: x0, x2: x0, y1: HT + 1, y2: HB - 1, stroke: LEAD, "stroke-width": 2.6 }); E(svg, "line", { x1: x0, x2: x0, y1: HT + 1, y2: HB - 1, stroke: GOLD, "stroke-width": 0.7 }); }
+      var g = G(people, { "clip-path": "url(#hull-clip)" });
+      E(g, "title", {}, rm[2]);
+      rm[3](g, cxr, FY, night, x1 - x0, here);
+    });
+
+    E(svg, "path", { d: hullD, fill: "none", stroke: LEAD, "stroke-width": 5 });          // gunwale: lead, cream rubbing strake, lead
+    E(svg, "path", { d: hullD, fill: "none", stroke: "#f4ead2", "stroke-width": 2.6 });
+    E(svg, "path", { d: hullD, fill: "none", stroke: GOLD, "stroke-width": 0.6, "stroke-dasharray": "1.2 1.4" });
+    // --- figures, after Clarke: long pale faces, dotted haloes, patterned jewel robes
+    function L2(g, x1, y1, x2, y2, c, w) { E(g, "line", { x1: x1, y1: y1, x2: x2, y2: y2, stroke: LEAD, "stroke-width": (w || 1) + 1.1, "stroke-linecap": "round" }); E(g, "line", { x1: x1, y1: y1, x2: x2, y2: y2, stroke: c || PALE, "stroke-width": w || 1, "stroke-linecap": "round" }); }
+    function headAt(g, x, y, hair, wreath) {
+      var halo = E(g, "circle", { cx: x, cy: y, r: 4.8, fill: "none", stroke: GOLD, "stroke-width": 0.9, "stroke-dasharray": "0.5 1.1" });
+      if (!calm) anim(halo, { type: "rotate", from: "0 " + x + " " + y, to: "360 " + x + " " + y, dur: "12s" });
+      E(g, "ellipse", { cx: x, cy: y, rx: 2.2, ry: 2.9, fill: PALE, stroke: LEAD, "stroke-width": 0.7 });
+      E(g, "path", { d: "M" + (x - 2.4) + " " + (y - 0.4) + " Q" + (x - 2.6) + " " + (y - 4.2) + " " + x + " " + (y - 3.6) + " Q" + (x + 2.8) + " " + (y - 4) + " " + (x + 2.4) + " " + (y - 0.2) + " Q" + x + " " + (y - 2.2) + " " + (x - 2.4) + " " + (y - 0.4) + " Z", fill: hair || "#c8562a", stroke: LEAD, "stroke-width": 0.5 });
+      E(g, "circle", { cx: x - 0.8, cy: y - 0.2, r: 0.3, fill: LEAD }); E(g, "circle", { cx: x + 0.8, cy: y - 0.2, r: 0.3, fill: LEAD });
+      if (wreath) for (var k = -3; k <= 3; k++) E(g, "ellipse", { cx: x + k * 0.9, cy: y - 3.4 + Math.abs(k) * 0.5, rx: 0.9, ry: 0.5, fill: "#3fae4a", stroke: LEAD, "stroke-width": 0.2, transform: "rotate(" + k * 20 + " " + (x + k * 0.9) + " " + (y - 3.4) + ")" });
+    }
+    function robe(g, x, y, top, w, col, seed) {
+      E(g, "path", { d: "M" + (x - 1.8) + " " + top + " L" + (x + 1.8) + " " + top + " L" + (x + w / 2) + " " + (y - 1) + " L" + (x - w / 2) + " " + (y - 1) + " Z", fill: col, stroke: LEAD, "stroke-width": 0.7 });
+      for (var k = 0; k < 7; k++) E(g, "circle", { cx: x + (rnd(seed + k) - 0.5) * (w * (0.3 + 0.6 * k / 7)), cy: top + 2 + k / 7 * (y - top - 3), r: 0.45, fill: k % 2 ? GOLD : "#ffffff" });
+      E(g, "line", { x1: x - w / 2, x2: x + w / 2, y1: y - 1.6, y2: y - 1.6, stroke: GOLD, "stroke-width": 0.6, "stroke-dasharray": "1 0.6" });
+    }
+    function person(g, x, y, o) { // standing, y = feet
+      o = o || {};
+      L2(g, x - 1.2, y - 2, x - 1.6, y, PALE, 0.8); L2(g, x + 1.2, y - 2, x + 1.6, y, PALE, 0.8);
+      robe(g, x, y, y - 21, o.w || 9, o.col || "#1b3fb0", x * 7);
+      L2(g, x - 1.6, y - 19.5, x + (o.la || -4), y - (o.lay || 11), PALE, 0.9); L2(g, x + 1.6, y - 19.5, x + (o.ra || 4), y - (o.ray || 11), PALE, 0.9);
+      headAt(g, x + (o.lean || 0), y - 24.5, o.hair, o.wreath);
+    }
+    function recliner(g, x, y, col, tilt, hair) { // a Greek propped on an elbow, facing right, y = couch top
+      E(g, "path", { d: "M" + (x - 6) + " " + (y - 3 + tilt) + " Q" + x + " " + (y - 6) + " " + (x + 9) + " " + (y - 2.5) + " L" + (x + 9) + " " + y + " L" + (x - 6) + " " + y + " Z", fill: col, stroke: LEAD, "stroke-width": 0.6 });
+      for (var k = 0; k < 4; k++) E(g, "circle", { cx: x - 3 + k * 3, cy: y - 2 - (k % 2), r: 0.4, fill: GOLD });
+      L2(g, x - 5, y - 4 + tilt, x - 8, y - 1, PALE, 0.8);
+      headAt(g, x - 7, y - 7.5 + tilt, hair, true);
+    }
+    function couch(g, x, y, w) { E(g, "rect", { x: x - w / 2, y: y, width: w, height: 2.6, fill: "#8a3b1a", stroke: LEAD, "stroke-width": 0.6 }); L2(g, x - w / 2 + 1, y + 2, x - w / 2 + 1, FY, "#8a3b1a", 0.8); L2(g, x + w / 2 - 1, y + 2, x + w / 2 - 1, FY, "#8a3b1a", 0.8); E(g, "path", { d: "M" + (x - w / 2) + " " + y + " q-2 -4 1 -6", fill: "none", stroke: "#8a3b1a", "stroke-width": 1.6 }); }
+    function bottle(g, x, y, tip) {
+      var t = tip ? "rotate(" + tip + " " + x + " " + y + ")" : "";
+      E(g, "path", { d: "M" + (x - 1.4) + " " + y + " v-5.5 q0 -1.4 1 -1.8 v-2.2 h0.8 v2.2 q1 0.4 1 1.8 v5.5 Z", fill: "#1f8a4a", stroke: LEAD, "stroke-width": 0.5, transform: t });
+      E(g, "rect", { x: x - 1, y: y - 4.5, width: 2, height: 1.6, fill: GOLD, transform: t });
+    }
+    function amphora(g, x, y, tip) { E(g, "path", { d: "M" + x + " " + (y - 11) + " h2 q0 2 2 3 q2 3 -1 7 l-1 1 l-1 -1 q-3 -4 -1 -7 q2 -1 0 -3 Z", fill: "#c4622d", stroke: LEAD, "stroke-width": 0.6, transform: "rotate(" + (tip || 0) + " " + (x + 1) + " " + y + ")" }); }
+    function zzz(g, x, y) { ["z", "z", "Z"].forEach(function (z, i) { var t = E(g, "text", { x: x + i * 4, y: y - i * 4, "font-size": 5 + i * 1.6, fill: GOLD, "font-family": "Georgia, serif", "font-style": "italic", stroke: LEAD, "stroke-width": 0.25 }, z); anim(t, { attributeName: "opacity", values: "0;1;0", dur: "3s", begin: (i * 0.6) + "s" }); }); }
+
+    function sleep(g, x, y) {     // the forward double, as on the plan, under the moon
+      E(g, "rect", { x: x - 22, y: y - 12, width: 30, height: 10, rx: 2, fill: "#2a49b8", stroke: LEAD, "stroke-width": 0.8 });
+      for (var k = 0; k < 10; k++) E(g, "circle", { cx: x - 18 + k * 2.8, cy: y - 7 + (k % 2) * 2, r: 0.5, fill: GOLD });
+      E(g, "rect", { x: x - 22, y: y - 15, width: 9, height: 4, rx: 1.5, fill: PALE, stroke: LEAD, "stroke-width": 0.5 });
+      headAt(g, x - 17, y - 15, "#c8562a"); headAt(g, x - 11, y - 14.5, "#f0d060");
+      E(g, "rect", { x: x + 12, y: y - 8, width: 18, height: 6, rx: 1.5, fill: "#d9733a", stroke: LEAD, "stroke-width": 0.7 }); headAt(g, x + 15, y - 10, "#3a2a1a");
+      zzz(g, x - 4, y - 22); zzz(g, x + 20, y - 17);
+    }
+    function wake(g, x, y) {
+      person(g, x - 3, y, { col: "#8c1c5e", la: -6, lay: 30, ra: 5, ray: 30, hair: "#f0d060" });
+      bottle(g, x + 5, y, 80); bottle(g, x + 9, y, -20); amphora(g, x - 10, y, 95);
+      E(g, "text", { x: x + 3, y: y - 28, "font-size": 7, fill: GOLD, stroke: LEAD, "stroke-width": 0.3, "font-family": "Georgia, serif" }, "?!");
+    }
+    function breakfast(g, x, y) {  // the galley: a four-ring hob, as on the plan
+      E(g, "rect", { x: x + 1, y: y - 11, width: 9, height: 11, fill: "#9aa0a6", stroke: LEAD, "stroke-width": 0.6 });
+      [[3, -9], [7, -9], [3, -5], [7, -5]].forEach(function (q) { E(g, "circle", { cx: x + q[0], cy: y + q[1], r: 1.3, fill: "none", stroke: LEAD, "stroke-width": 0.5 }); });
+      person(g, x - 5, y, { col: "#1f8a6a", ra: 3, ray: 13, hair: "#c8562a" });
+      E(g, "ellipse", { cx: x + 5, cy: y - 14, rx: 3.4, ry: 1.1, fill: LEAD }); E(g, "circle", { cx: x + 5, cy: y - 15, r: 1.2, fill: "#f6c445", stroke: "#fff", "stroke-width": 0.5 });
+    }
+    function underway(g, x, y, night, w, here) {  // the saloon with its inside steering position
+      E(g, "rect", { x: x - w / 2 + 3, y: HT + 4, width: w - 6, height: 11, fill: "#8cc7e0", stroke: LEAD, "stroke-width": 0.8 });  // windscreen onto the river
+      for (var k = 0; k < 5; k++) spiral(g, x - w / 2 + 7 + k * 9, HT + 11, 2.2, "#13298a", 0.6);
+      E(g, "rect", { x: x + 4, y: y - 9, width: 10, height: 9, fill: "#5a3a1a", stroke: LEAD, "stroke-width": 0.6 });
+      var wheel = G(g, {});
+      E(wheel, "circle", { cx: x + 9, cy: y - 14, r: 4, fill: "none", stroke: GOLD, "stroke-width": 1.2 });
+      for (k = 0; k < 8; k++) L2(wheel, x + 9, y - 14, x + 9 + 5.6 * Math.cos(k * Math.PI / 4), y - 14 + 5.6 * Math.sin(k * Math.PI / 4), GOLD, 0.5);
+      anim(wheel, { type: "rotate", values: "-30 " + (x + 9) + " " + (y - 14) + ";30 " + (x + 9) + " " + (y - 14) + ";-30 " + (x + 9) + " " + (y - 14), dur: "5s" });
+      person(g, x + 1, y, { col: "#1b3fb0", ra: 7, ray: 15, la: 6, lay: 16, hair: "#f0d060" });
+      var p = here ? (nowH - 14) / 4 : nowH > 18 || nowH < 3 ? 1 : 0.5, n = Math.round(1 + p * 4);   // bottles pile up towards 18:00
+      for (k = 0; k < n; k++) bottle(g, x - w / 2 + 5 + k * 3.4, y);
+    }
+    function cooking(g, x, y) {
+      E(g, "rect", { x: x - 2, y: y - 9, width: 16, height: 9, fill: "#9aa0a6", stroke: LEAD, "stroke-width": 0.6 });
+      E(g, "rect", { x: x + 2, y: y - 15, width: 8, height: 6, fill: "#2a2a30", stroke: LEAD, "stroke-width": 0.6 });
+      L2(g, x + 1, y - 9, x + 11, y - 9, "#ff7a2a", 1);
+      for (var s = 0; s < 3; s++) { var st = E(g, "path", { d: "M" + (x + 3.5 + s * 2.5) + " " + (y - 16) + " q2 -3 0 -6 q-2 -3 0 -6", fill: "none", stroke: "#e8f0ff", "stroke-width": 0.7 }); anim(st, { attributeName: "opacity", values: "0.2;1;0.2", dur: "2.4s", begin: s * 0.5 + "s" }); }
+      person(g, x - 8, y, { col: "#d4202c", ra: 5, ray: 15, hair: "#3a2a1a" });
+      bottle(g, x + 15, y - 9);
+    }
+    function grapes(g, x, y) { for (var i = 0; i < 6; i++) E(g, "circle", { cx: x + (i % 3) * 1.8 + (i > 2 ? 0.9 : 0), cy: y + Math.floor(i / 3) * 1.8, r: 1, fill: "#6b3fa0", stroke: LEAD, "stroke-width": 0.2 }); }
+    function dining(g, x, y) {
+      couch(g, x - 2, y - 8, 18); recliner(g, x - 2, y - 8, "#f3f0ea", 0, "#c8562a");
+      E(g, "path", { d: "M" + (x - 6) + " " + (y - 19) + " h4 l-1 2 h-2 Z", fill: GOLD, stroke: LEAD, "stroke-width": 0.4 }); L2(g, x - 7, y - 13, x - 4.5, y - 17, PALE, 0.7);
+      E(g, "rect", { x: x + 6, y: y - 6, width: 5, height: 1.2, fill: "#8a3b1a" }); grapes(g, x + 6.5, y - 9.5);
+    }
+    function revels(g, x, y) {
+      x += 5;
+      couch(g, x + 2, y - 8, 22); recliner(g, x - 2, y - 8, "#8c1c5e", -2, "#f0d060"); recliner(g, x + 9, y - 8, "#1b3fb0", 3, "#c8562a");
+      amphora(g, x - 12, y, -75); E(g, "ellipse", { cx: x - 6, cy: y - 0.6, rx: 7, ry: 1, fill: "#7a1f3d" });
+      bottle(g, x + 13, y, 100); bottle(g, x - 3, y - 26, 35);
+      triskele(g, x - 6, HT + 10, 4.5, GOLD, 0.8, 9); triskele(g, x + 8, HT + 13, 3.5, "#ff5aa0", 0.8, -6);
+    }
+    function revelsStart(g, x, y) { amphora(g, x - 2, y - 2, 0); E(g, "path", { d: "M" + (x - 3) + " " + (y - 18) + " h5 l-1 2.4 h-3 Z", fill: GOLD, stroke: LEAD, "stroke-width": 0.4 }); triskele(g, x, HT + 12, 3.4, GOLD, 0.7, 7); }
+
+    // --- the sun as a rose window at solar noon, the moon at its phase in the night cabin
+    var nsun = (sb[-0.833] && (sb[-0.833].rise + sb[-0.833].set) / 2) || msH(13), sunX = X((nsun - day0) / 3600e3);
+    var rose = G(svg, {});
+    for (var k = 0; k < 16; k++) { var a1 = k / 16 * 2 * Math.PI, a2 = (k + 1) / 16 * 2 * Math.PI, ro = k % 2 ? 7 : 10;
+      E(rose, "path", { d: "M" + sunX + " 33 L" + (sunX + ro * Math.cos(a1)).toFixed(1) + " " + (33 + ro * Math.sin(a1)).toFixed(1) + " L" + (sunX + ro * Math.cos(a2)).toFixed(1) + " " + (33 + ro * Math.sin(a2)).toFixed(1) + " Z", fill: k % 2 ? "#e8b04a" : "#d4202c", stroke: LEAD, "stroke-width": 0.5 }); }
+    anim(rose, { type: "rotate", from: "0 " + sunX + " 33", to: "360 " + sunX + " 33", dur: "40s" });
+    E(svg, "circle", { cx: sunX, cy: 33, r: 4.2, fill: "#f6d36b", stroke: LEAD, "stroke-width": 0.8 }); triskele(svg, sunX, 33, 3, "#8c1c3e", 0.6);
     var SYN = 29.530588853, age = (((nowMs / 864e5 + 2440587.5 - 2451550.26) % SYN) + SYN) % SYN, ph = age / SYN;
     var lit = Math.round((1 - Math.cos(2 * Math.PI * ph)) / 2 * 100);
     var phName = age < 1.85 || age > SYN - 1.85 ? "New moon" : age < 5.54 ? "Waxing crescent" : age < 9.23 ? "First quarter" : age < 12.92 ? "Waxing gibbous" :
       age < 16.61 ? "Full moon" : age < 20.30 ? "Waning gibbous" : age < 23.99 ? "Last quarter" : "Waning crescent";
-    function moonAt(mx, my, r) {
-      for (var k = 0; k < 28; k++) { var an = k / 28 * 2 * Math.PI, r1 = r + 2.5, r2 = r + (k % 2 ? 6 : 10);
-        add("line", { x1: mx + r1 * Math.cos(an), y1: my + r1 * Math.sin(an), x2: mx + r2 * Math.cos(an), y2: my + r2 * Math.sin(an), stroke: k % 4 ? GOLD : "#b06fd0", "stroke-width": k % 2 ? 0.6 : 1, "stroke-opacity": 0.85 }); }
-      add("circle", { cx: mx, cy: my, r: r + 2, fill: "#120c1c", stroke: GOLD, "stroke-width": 0.8 });
-      add("circle", { cx: mx, cy: my, r: r, fill: "#3b4462" });
-      var k = Math.cos(2 * Math.PI * ph), rx = Math.abs(k) * r, waxing = ph < 0.5, gibbous = k < 0;
-      var d = "M" + mx + " " + (my - r) + " A" + r + " " + r + " 0 0 " + (waxing ? 1 : 0) + " " + mx + " " + (my + r) +
-        " A" + rx + " " + r + " 0 0 " + (waxing ? (gibbous ? 1 : 0) : (gibbous ? 0 : 1)) + " " + mx + " " + (my - r) + " Z";
-      add("path", { d: d, fill: "#f2ecd2" });
-      add("circle", { cx: mx - r * 0.3, cy: my - r * 0.2, r: r * 0.16, fill: "rgba(150,140,110,0.35)" });
-      add("circle", { cx: mx + r * 0.25, cy: my + r * 0.3, r: r * 0.12, fill: "rgba(150,140,110,0.3)" });
-    }
-    // put the moon over the middle of each night that shows in the dial
-    for (var di = 0; di < days.length - 1; di++) {
-      var a = days[di].set, b2 = days[di + 1].rise;
-      if (!a || !b2) continue;
-      var mid = (a + b2) / 2;
-      if (mid > t0 + 1800e3 && mid < t1 - 1800e3) moonAt(X(mid), TOP + 21, 9);
-    }
+    (function (mx, my, r) {
+      for (var k = 0; k < 24; k++) E(svg, "circle", { cx: mx + (r + 3.2) * Math.cos(k * Math.PI / 12), cy: my + (r + 3.2) * Math.sin(k * Math.PI / 12), r: k % 2 ? 0.5 : 0.8, fill: k % 2 ? "#ffffff" : GOLD });
+      E(svg, "circle", { cx: mx, cy: my, r: r + 1.2, fill: LEAD });
+      E(svg, "circle", { cx: mx, cy: my, r: r, fill: "#24305e" });
+      var kk = Math.cos(2 * Math.PI * ph), rx = Math.abs(kk) * r, waxing = ph < 0.5, gib = kk < 0;
+      E(svg, "path", { d: "M" + mx + " " + (my - r) + " A" + r + " " + r + " 0 0 " + (waxing ? 1 : 0) + " " + mx + " " + (my + r) + " A" + rx + " " + r + " 0 0 " + (waxing ? (gib ? 1 : 0) : (gib ? 0 : 1)) + " " + mx + " " + (my - r) + " Z", fill: "#f6efd0" });
+      E(svg, "path", { d: "M" + (mx - r * 0.35) + " " + (my - r * 0.1) + " a" + r * 0.3 + " " + r * 0.3 + " 0 1 0 " + r * 0.25 + " 0", fill: "none", stroke: "rgba(120,110,80,0.5)", "stroke-width": 0.5 });
+    })(X(6.2), 35, 8);
 
-    // The crew's day, in Irish clock hours. Each scene sits in the middle of its stretch of the dial.
-    var tz = (function () { var hs = hhmm(noon(0)).split(":"); return +hs[0] - 12 + +hs[1] / 60; })();
-    var at = function (off, hr) { return noon(off) + (hr - 12 - tz) * 3600e3; };
-    var SCENES = [[3, 10, "Asleep", sleep], [10, 12, "Rising to a mess aboard", wake], [12, 14, "Breakfast", breakfast], [14, 18, "Under way", underway],
-      [18, 21, "Cooking", cooking], [21, 23, "Dining like ancient Greeks", dining], [23, 27, "Drinking like very drunk ancient Greeks", revels]];
-    var nowScene = "";
-    for (var o = -1; o <= 1; o++) SCENES.forEach(function (sc) {
-      var s0 = at(o, sc[0]), s1 = at(o, sc[1]);
-      if (nowMs >= s0 && nowMs < s1) nowScene = sc[2];
-      var a0 = Math.max(s0, t0), a1 = Math.min(s1, t1);
-      if (a1 - a0 < 1.2 * 3600e3) return;
-      var cx = (X(a0) + X(a1)) / 2, ink = isDay((a0 + a1) / 2) ? "#2a2622" : "#efe6cc";
-      var g = document.createElementNS(NSV, "g"); dial.appendChild(g);
-      var t = document.createElementNS(NSV, "title"); t.textContent = sc[2]; g.appendChild(t);
-      sc[3](g, cx, BOT - 14, ink, (nowMs - s0) / (s1 - s0));
+    // --- dial furniture: hours along the top, sunrise and sunset beneath, now as a gold pointer
+    E(svg, "rect", { x: 2, y: 16, width: 316, height: 88, rx: 9, fill: "none", stroke: "#b8964a", "stroke-width": 2.2 });
+    for (var hh = 0; hh <= 24; hh++) {
+      var hx = X(hh), major = hh % 6 === 0;
+      E(svg, "line", { x1: hx, x2: hx, y1: major ? 11 : 13, y2: 15.5, stroke: major ? "var(--ink)" : "var(--muted)", "stroke-width": major ? 1.1 : 0.5 });
+      if (major) E(svg, "text", { x: Math.max(14, Math.min(306, hx)), y: 9, "text-anchor": "middle", "font-size": 8.5, fill: "var(--muted)", "font-family": "var(--mono)" }, (hh < 10 ? "0" : "") + hh + ":00");
+    }
+    var nx = X(nowH);
+    E(svg, "path", { d: "M" + (nx - 4.5) + " 9.5 L" + (nx + 4.5) + " 9.5 L" + nx + " 17 Z", fill: "#b8964a", stroke: LEAD, "stroke-width": 0.5 });
+    E(svg, "line", { x1: nx, x2: nx, y1: 17, y2: 103, stroke: GOLD, "stroke-width": 1, "stroke-dasharray": "2 1.5" });
+    if (sb[-0.833]) [["↑ ", sb[-0.833].rise], ["↓ ", sb[-0.833].set]].forEach(function (m) {
+      var x = Math.max(16, Math.min(304, X((m[1] - day0) / 3600e3)));
+      E(svg, "line", { x1: x, x2: x, y1: 104, y2: 108, stroke: "var(--muted)", "stroke-width": 0.8 });
+      E(svg, "text", { x: x, y: 117, "text-anchor": "middle", "font-size": 9, fill: "var(--muted)", "font-family": "var(--mono)" }, m[0] + hhmm(m[1]));
     });
-    function P(g, tag, a) { var n = el(tag, a); g.appendChild(n); return n; }
-    function line(g, x1, y1, x2, y2, c, w) { P(g, "line", { x1: x1, y1: y1, x2: x2, y2: y2, stroke: c === LEAD ? "none" : (c === "#efe6cc" ? LEAD : "#fff6dd"), "stroke-width": (w || 1.3) + 1.4, "stroke-linecap": "round", "stroke-opacity": 0.7 }); P(g, "line", { x1: x1, y1: y1, x2: x2, y2: y2, stroke: c, "stroke-width": w || 1.3, "stroke-linecap": "round" }); }
-    function head(g, x, y, c, wreath) { P(g, "circle", { cx: x, cy: y, r: 2.6, fill: "none", stroke: c === "#efe6cc" ? LEAD : "#fff6dd", "stroke-width": 2.6, "stroke-opacity": 0.7 }); P(g, "circle", { cx: x, cy: y, r: 2.6, fill: "none", stroke: c, "stroke-width": 1.2 }); if (wreath) P(g, "path", { d: "M" + (x - 3) + " " + (y - 1.5) + " Q" + x + " " + (y - 5.5) + " " + (x + 3) + " " + (y - 1.5), fill: "none", stroke: "#6aa84f", "stroke-width": 1.4 }); }
-    function figure(g, x, y, c, pose) { // y = feet
-      head(g, x, y - 17, c, pose && pose.wreath);
-      line(g, x, y - 14.5, x, y - 7, c);
-      line(g, x, y - 12, x + (pose && pose.la || -4), y - (pose && pose.lay || 9), c); line(g, x, y - 12, x + (pose && pose.ra || 4), y - (pose && pose.ray || 9), c);
-      line(g, x, y - 7, x - 3, y, c); line(g, x, y - 7, x + 3, y, c);
-    }
-    function bottle(g, x, y, tip) { P(g, "rect", { x: x - 1.2, y: y - 6, width: 2.4, height: 6, fill: "#3f8f4a", transform: tip ? "rotate(" + tip + " " + x + " " + y + ")" : "" }); P(g, "rect", { x: x - 0.5, y: y - 8, width: 1, height: 2.2, fill: "#3f8f4a", transform: tip ? "rotate(" + tip + " " + x + " " + y + ")" : "" }); }
-    function bunk(g, x, y, c) { P(g, "rect", { x: x - 12, y: y - 4, width: 24, height: 2, fill: c }); line(g, x - 12, y - 7, x - 12, y, c); }
-    function sleep(g, x, y, c) {
-      [-9, 9].forEach(function (dx, i) {
-        bunk(g, x + dx, y - i * 12, c);
-        head(g, x + dx - 8, y - i * 12 - 6.5, c); line(g, x + dx - 5.5, y - i * 12 - 6, x + dx + 9, y - i * 12 - 6, c, 2.2);
-      });
-      ["z", "Z", "z"].forEach(function (z, i) { P(g, "text", { x: x - 2 + i * 5, y: y - 26 - i * 5, "font-size": 6 + i * 2, fill: c, "font-family": "var(--mono)" }).textContent = z; });
-    }
-    function wake(g, x, y, c) {
-      bunk(g, x - 6, y, c);
-      figure(g, x - 10, y - 4, c, { la: -6, lay: 17, ra: 6, ray: 17 });            // big stretch
-      bottle(g, x + 6, y, 70); bottle(g, x + 10, y, -15); bottle(g, x + 14, y, 95);   // the mess
-      P(g, "rect", { x: x + 3, y: y - 3, width: 4, height: 3, fill: c, transform: "rotate(20 " + (x + 5) + " " + y + ")" });
-      P(g, "text", { x: x + 4, y: y - 16, "font-size": 9, fill: c, "font-family": "var(--mono)" }).textContent = "?!";
-    }
-    function breakfast(g, x, y, c) {
-      figure(g, x - 7, y, c, { ra: 8, ray: 10 });
-      line(g, x + 1, y - 10, x + 9, y - 10, c, 1); P(g, "ellipse", { cx: x + 12, cy: y - 10, rx: 4, ry: 1.3, fill: c }); // pan
-      P(g, "circle", { cx: x + 12, cy: y - 11.2, r: 1.4, fill: "#f6c445" });        // an egg
-      P(g, "rect", { x: x + 6, y: y - 6, width: 12, height: 1.4, fill: c }); line(g, x + 8, y - 6, x + 8, y, c); line(g, x + 16, y - 6, x + 16, y, c);
-      P(g, "ellipse", { cx: x + 12, cy: y - 7, rx: 3, ry: 0.8, fill: "#ffffff" });
-    }
-    function underway(g, x, y, c, p) {
-      var w = 34;
-      P(g, "path", { d: "M" + (x - w / 2) + " " + (y - 5) + " L" + (x + w / 2) + " " + (y - 5) + " L" + (x + w / 2 - 5) + " " + y + " L" + (x - w / 2 + 3) + " " + y + " Z", fill: "#f4f4f4", stroke: "#2a2622", "stroke-width": 0.6 });
-      P(g, "rect", { x: x - 8, y: y - 11, width: 12, height: 6, fill: "#e8e8f0", stroke: "#2a2622", "stroke-width": 0.6 });
-      figure(g, x + 9, y - 5, c, { la: -4, lay: 11, ra: -2, ray: 11 });             // at the helm
-      P(g, "circle", { cx: x + 6, cy: y - 11, r: 2.2, fill: "none", stroke: c, "stroke-width": 0.8 });
-      for (var k = 0; k < 8; k++) line(g, x - w / 2 - 3 - k * 3, y - 1 + (k % 2), x - w / 2 - 1 - k * 3, y - 1 + (k % 2), "#ffffff", 0.8); // wake
-      var n = Math.max(0, Math.min(4, Math.round((p > 0 ? p : 0.75) * 4)));        // bottles pile up towards 18:00
-      for (var b = 0; b < n; b++) bottle(g, x - 12 + b * 3, y - 5);
-    }
-    function cooking(g, x, y, c, p) {
-      figure(g, x - 6, y, c, { ra: 8, ray: 11, la: -3, lay: 4 });
-      P(g, "rect", { x: x + 2, y: y - 9, width: 9, height: 7, fill: c }); line(g, x + 1, y - 9, x + 12, y - 9, c, 1);   // the pot
-      line(g, x + 2, y - 1, x + 11, y - 1, "#ff7a2a", 1.6);                          // the hob
-      for (var s = 0; s < 3; s++) P(g, "path", { d: "M" + (x + 4 + s * 2.5) + " " + (y - 11) + " q2 -3 0 -6 q-2 -3 0 -6", fill: "none", stroke: "rgba(230,230,240,0.85)", "stroke-width": 0.8 });
-      bottle(g, x - 14, y);
-    }
-    function couch(g, x, y, c) { P(g, "rect", { x: x - 11, y: y - 6, width: 22, height: 2.4, fill: "#8a4b2a" }); line(g, x - 10, y - 4, x - 10, y, "#8a4b2a"); line(g, x + 10, y - 4, x + 10, y, "#8a4b2a"); line(g, x - 11, y - 10, x - 11, y - 6, "#8a4b2a", 2); }
-    function recline(g, x, y, c, tilt) { // a Greek propped on one elbow along a couch
-      head(g, x - 7, y - 11 + tilt, c, true);
-      line(g, x - 5, y - 9 + tilt, x + 7, y - 7, c); line(g, x + 7, y - 7, x + 11, y - 9, c);   // body, legs
-      line(g, x - 4, y - 8 + tilt, x - 8, y - 6, c);                                       // elbow down
-      P(g, "path", { d: "M" + (x - 5) + " " + (y - 9 + tilt) + " L" + (x + 8) + " " + (y - 7) + " L" + (x + 2) + " " + (y - 5) + " Z", fill: "rgba(255,255,255,0.85)" }); // toga
-    }
-    function grapes(g, x, y) { for (var i = 0; i < 6; i++) P(g, "circle", { cx: x + (i % 3) * 2 - (i > 2 ? -1 : 0), cy: y + Math.floor(i / 3) * 2, r: 1.1, fill: "#6b3fa0" }); }
-    function dining(g, x, y, c) {
-      couch(g, x, y, c); recline(g, x, y - 1, c, 0);
-      line(g, x - 3, y - 13, x - 1, y - 16, c, 1); P(g, "path", { d: "M" + (x - 2.5) + " " + (y - 17) + " h4 l-1 2.5 h-2 Z", fill: "#c9a227" }); // raised kylix
-      P(g, "rect", { x: x + 12, y: y - 7, width: 7, height: 1.4, fill: "#8a4b2a" }); grapes(g, x + 13, y - 11);
-    }
-    function revels(g, x, y, c) {
-      [-11, 11].forEach(function (dx, i) { couch(g, x + dx, y, c); recline(g, x + dx, y - 1, c, i ? 3 : -2); });
-      P(g, "path", { d: "M" + (x - 2) + " " + (y - 1) + " q4 -9 8 0 Z", fill: "#b5651d", transform: "rotate(-70 " + (x + 2) + " " + (y - 2) + ")" }); // tipped amphora
-      P(g, "ellipse", { cx: x + 6, cy: y - 0.5, rx: 6, ry: 1, fill: "#7a1f3d" });     // spilled wine
-      [[x - 17, y - 22], [x + 6, y - 21]].forEach(function (q) {                      // the room is spinning
-        P(g, "path", { d: "M" + q[0] + " " + q[1] + " a2 2 0 1 1 2 2 a3 3 0 1 1 -3 -3", fill: "none", stroke: "#f6c445", "stroke-width": 0.9 });
-      });
-      bottle(g, x - 2, y - 26, 30); bottle(g, x + 16, y, 100);
-    }
-
-    // Celtic plait along the top and bottom of the glass
-    function plait(yc) {
-      add("rect", { x: L, y: yc - 4, width: R - L, height: 8, fill: LEAD });
-      var lam = 12, amp = 2.3;
-      var strand = function (sg, xa, xb) { var dd = ""; for (var x = xa; x <= xb + 0.01; x += 1) dd += (dd ? " L" : "M") + x.toFixed(1) + " " + (yc + sg * amp * Math.sin(2 * Math.PI * (x - L) / lam)).toFixed(2); return dd; };
-      var draw = function (sg, xa, xb, col) { add("path", { d: strand(sg, xa, xb), fill: "none", stroke: LEAD, "stroke-width": 2.6 }); add("path", { d: strand(sg, xa, xb), fill: "none", stroke: col, "stroke-width": 1.3 }); };
-      draw(1, L, R, GOLD); draw(-1, L, R, "#c9a227");
-      for (var k = 0; L + k * lam / 2 < R; k++) { var xc = L + k * lam / 2; draw(k % 2 ? 1 : -1, xc - lam / 4, xc + lam / 4, k % 2 ? GOLD : "#c9a227"); }
-    }
-    plait(TOP + 4); plait(BOT - 3);
-    // bezel and markings
-    P(svg, "rect", { x: L, y: TOP, width: R - L, height: BOT - TOP, rx: 12, fill: "none", stroke: "#b8964a", "stroke-width": 2.2 });
-    P(svg, "rect", { x: L + 2, y: TOP + 2, width: R - L - 4, height: BOT - TOP - 4, rx: 10, fill: "none", stroke: "rgba(255,240,200,0.35)", "stroke-width": 0.8 });
-    for (var hm = Math.ceil(t0 / 3600e3) * 3600e3; hm <= t1; hm += 3600e3) {
-      var hs = hhmm(hm), hx = X(hm), major = ["00:00", "06:00", "12:00", "18:00"].indexOf(hs) >= 0;
-      P(svg, "line", { x1: hx, x2: hx, y1: major ? 14 : 18, y2: 21, stroke: major ? "var(--ink)" : "var(--muted)", "stroke-width": major ? 1.2 : 0.6 });
-      if (major) P(svg, "text", { x: Math.max(L + 14, Math.min(R - 14, hx)), y: 10, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }).textContent = hs;
-    }
-    var nx = X(nowMs);
-    P(svg, "path", { d: "M" + (nx - 5) + " " + (TOP - 7) + " L" + (nx + 5) + " " + (TOP - 7) + " L" + nx + " " + TOP + " Z", fill: "#b8964a" });
-    P(svg, "line", { x1: nx, x2: nx, y1: TOP, y2: BOT, stroke: "rgba(184,150,74,0.9)", "stroke-width": 1.2 });
-    marks.forEach(function (ms) {
-      if (ms <= t0 || ms >= t1) return;
-      var x = Math.max(L + 14, Math.min(R - 14, X(ms)));
-      P(svg, "text", { x: x, y: BOT + 13, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }).textContent = (marks.indexOf(ms) % 2 ? "↓ " : "↑ ") + hhmm(ms);
-    });
-    $("sun-note").textContent = "Aboard now: " + (nowScene || "Asleep") + ". Moon: " + phName.toLowerCase() + ", " + lit + "% lit. The dial shows the next 24 hours; the gold marker is now.";
+    $("sun-note").textContent = "Aboard now: " + (nowRoom ? nowRoom[2] : "Asleep") + ". Moon: " + phName.toLowerCase() + ", " + lit + "% lit. Today, bow to stern is midnight to midnight; the glass in each room is the sky at those hours, and the gold pointer is now.";
   }
 
 
@@ -1962,7 +1971,6 @@ a { color: var(--water); }
   });
 })();
 </script>
-
 
 </body>
 </html>
