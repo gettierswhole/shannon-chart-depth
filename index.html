@@ -1685,6 +1685,35 @@ a { color: var(--water); }
     px(x + 26, y + 7, 3, 2, "#f4f4f4");
   }
 
+  // A giant hand from the sky with a very large hand-rolled cigarette between two fingers. Drawn at double scale.
+  function hand(cx, by, closed, t) {
+    var S = 2, SK = "#f0b088", SH = "#c8805c", SL = "#4a5a8a", SLD = "#33406a";
+    var P = function (x, y, w, hh, c) { px(cx + x * S, by + y * S, w * S, hh * S, c); };
+    px(cx - 7 * S, 0, 14 * S, Math.max(0, by - 11 * S), SL); px(cx + 4 * S, 0, 3 * S, Math.max(0, by - 11 * S), SLD); // sleeve
+    P(-8, -12, 16, 3, "#e8e0d0");                                            // shirt cuff
+    P(-7, -9, 14, 9, SK); P(4, -9, 3, 9, SH);                                // palm
+    if (!closed) {
+      [-7, -3, 1, 5].forEach(function (fx, i) {                               // four spread fingers, reaching down
+        var len = (i === 0 || i === 3) ? 6 : 7;
+        P(fx + (i === 0 ? -1 : i === 3 ? 1 : 0), 0, 3, len, SK); P(fx + 2 + (i === 0 ? -1 : i === 3 ? 1 : 0), 0, 1, len - 1, SH);
+      });
+      P(-10, -6, 3, 6, SK);                                                  // thumb
+    } else {
+      P(-7, 0, 14, 4, SK); for (var k = -7; k < 7; k += 4) P(k + 3, 0, 1, 4, SH); // knuckles
+      P(-9, -4, 3, 5, SK);
+    }
+    // the rollie, wedged between two fingers and sticking out to the side, drooping a little at the lit end
+    var cy = closed ? 1 : 3, x0 = 4;
+    for (var j = 0; j < 22; j++) P(x0 + j, cy + (j > 16 ? 1 : 0), 1, 3, j % 7 === 3 ? "#e4dccb" : "#f6f1e6");
+    P(x0 - 1, cy - 1, 3, 1, "#f6f1e6"); P(x0 - 1, cy + 3, 2, 1, "#d8cfbd");        // twisted paper end at the fingers
+    var ex = x0 + 22;
+    P(ex, cy + 1, 2, 3, Math.floor(t * 6) % 2 ? "#ff5a20" : "#ffb030"); P(ex + 2, cy + 2, 1, 1, "#802010"); // ember
+    for (var s = 0; s < 7; s++) {                                             // smoke curling up
+      var sy = by + (cy - 3 - s * 4) * S - ((t * 14) % 8), sx = cx + (ex + 1) * S + Math.round(Math.sin(t * 3 + s) * 3) + (s % 2) * 2;
+      if (sy > 0) px(sx, sy, 3, 3, s < 2 ? "rgba(220,220,230,0.8)" : "rgba(200,200,215,0.45)");
+    }
+  }
+
   function frame(t) { // t in seconds, 0..DUR
     // sky bands, sun sinking
     for (var i = 0; i < SKY.length; i++) px(0, i * 7, 160, 7, SKY[i]);
@@ -1708,6 +1737,14 @@ a { color: var(--water); }
     var wakeLen = t < 5 ? 10 : 40;
     for (var w = 0; w < wakeLen; w += 3) px(bx - w - 2, 64 + bob + (w % 2), 2, 1, "#ffffff");
     boat(bx, 54, bob);
+    // the hand comes down while the boat idles, grabs at thin air as it bolts, then gives up
+    if (t > 1.2 && t < 8.4) {
+      var hy, hcx, shut = false;
+      if (t < 4.8) { hy = -30 + (t - 1.2) / 3.6 * 70; hcx = 46 + Math.sin(t * 2.3) * 4; }   // fingertips reach the cabin roof
+      else if (t < 5.6) { hy = 40 + (t - 4.8) * 12; hcx = 46; shut = t > 5.15; }          // lunge and grab... nothing
+      else { hy = 50 - (t - 5.6) * 30; hcx = 46; shut = true; }                            // gives up
+      hand(Math.round(hcx), Math.round(hy), shut, t);
+    }
     // captions
     if (t > 1.6 && t < 4.6 && Math.floor(t * 4) % 2 === 0) centre("VINNY DETECTED!", 8, "#ffffff", 2);
     if (t >= 4.6 && t < 8.4) { centre("FULL SPEED", 6, "#ffd070", 2); centre("AHEAD!", 20, "#ffd070", 2); }
