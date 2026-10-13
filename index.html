@@ -6,6 +6,7 @@
 <meta name="description" content="Live Shannon water levels against CSIG chart datum, with lake forecasts, lock times, marine notices and places to eat ashore.">
 </head>
 <body>
+
 <title>Shannon Chart Depth</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1178,6 +1179,13 @@ a { color: var(--water); }
     c.innerHTML = '<span class="rate-k">Claude</span> <span class="stars"></span>';
     c.querySelector(".stars").textContent = starText(v.stars) + " " + v.stars.toFixed(1);
     row.appendChild(c);
+    // The profile method, locked on 13 Oct 2026, shown beside the current one while your new ratings decide between them.
+    if (typeof v.stars2 === "number") {
+      var c2 = document.createElement("span"); c2.className = "rate-claude";
+      c2.innerHTML = '<span class="rate-k">Profile</span> <span class="stars"></span>';
+      c2.querySelector(".stars").textContent = starText(v.stars2) + " " + v.stars2.toFixed(1);
+      row.appendChild(c2);
+    }
     var lab = document.createElement("label"); lab.className = "rate-you";
     var sel = document.createElement("select"); sel.id = "rate-" + v.id;
     var opts = ["–", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"];
@@ -1200,25 +1208,35 @@ a { color: var(--water); }
   function saveMyRating(id, val) {
     if (!state.db) return;
     var next = Object.assign({}, state.myRatings || {});
-    if (val == null) delete next[id]; else next[id] = val;
-    state.myRatings = next;
-    state.db.doc("ratings/mine").set({ ratings: next, notes: state.myNotes || {}, updated: new Date().toISOString() }).catch(function () {});
+    var when = Object.assign({}, state.myRatedAt || {});
+    if (val == null) { delete next[id]; delete when[id]; } else { next[id] = val; when[id] = new Date().toISOString(); }
+    state.myRatings = next; state.myRatedAt = when;
+    state.db.doc("ratings/mine").set({ ratings: next, notes: state.myNotes || {}, ratedAt: when, updated: new Date().toISOString() }).catch(function () {});
     render();
   }
   // How well Claude's ratings match yours, across every venue you've rated.
+  // Ratings made after the profile method was locked are the fair test between the two methods.
+  var PROFILE_LOCKED = "2026-10-13T16:15:00Z";
   function scoreCard(r) {
     var box = document.createElement("div"); box.className = "scorecard";
-    var pairs = r.food.filter(function (v) { return typeof v.stars === "number" && state.myRatings && typeof state.myRatings[v.id] === "number"; });
-    if (!pairs.length) { box.textContent = "Reviewer experiment: rate a place you know to see how close Claude gets."; return box; }
-    var gaps = pairs.map(function (v) { return Math.abs(state.myRatings[v.id] - v.stars); });
-    var mean = gaps.reduce(function (a, b) { return a + b; }, 0) / gaps.length;
-    var close = gaps.filter(function (g) { return g <= 0.5; }).length;
-    var bias = pairs.reduce(function (a, v) { return a + (state.myRatings[v.id] - v.stars); }, 0) / pairs.length;
-    box.textContent = "Reviewer experiment: you've rated " + pairs.length + (pairs.length === 1 ? " place" : " places") +
-      ". Claude was within half a star on " + close + ", with an average gap of " + mean.toFixed(1) + " stars" +
-      (Math.abs(bias) >= 0.25 ? " and tends to rate " + (bias > 0 ? "lower" : "higher") + " than you." : ".");
+    var all = [];
+    REACHES.forEach(function (x) { (x.food || []).forEach(function (v) { if (typeof v.stars === "number" && state.myRatings && typeof state.myRatings[v.id] === "number") all.push(v); }); });
+    if (!all.length) { box.textContent = "Reviewer experiment: rate a place you know to see how close Claude gets."; return box; }
+    var gap = function (list, key) { return list.reduce(function (a, v) { return a + Math.abs(state.myRatings[v.id] - (typeof v[key] === "number" ? v[key] : v.stars)); }, 0) / list.length; };
+    var close = all.filter(function (v) { return Math.abs(state.myRatings[v.id] - v.stars) <= 0.5; }).length;
+    var test = all.filter(function (v) { var t = state.myRatedAt && state.myRatedAt[v.id]; return t && t > PROFILE_LOCKED; });
+    var txt = "Reviewer experiment, all stretches: you've rated " + all.length + (all.length === 1 ? " place" : " places") +
+      ". Claude was within half a star on " + close + ", average gap " + gap(all, "stars").toFixed(1) + " stars. ";
+    if (!test.length) txt += "Head to head from here: your next ratings score the current method against the Profile method (−½ star for famous names, +½ for specialist kitchens).";
+    else {
+      var gc = gap(test, "stars"), gp = gap(test, "stars2");
+      txt += "Head to head since the Profile method was locked, " + test.length + (test.length === 1 ? " rating" : " ratings") + ": current " + gc.toFixed(2) + " vs Profile " + gp.toFixed(2) + " stars average gap" +
+        (test.length < 6 ? ". Too early to call." : gp < gc ? ". Profile is ahead." : gp > gc ? ". Current is ahead." : ". Level.");
+    }
+    box.textContent = txt;
     return box;
   }
+
 
   // Change over roughly the last six hours of stored readings.
   function trend(h) {
@@ -1505,6 +1523,7 @@ a { color: var(--water); }
         var data = snap.exists ? snap.data() : null;
         state.myRatings = (data && data.ratings && typeof data.ratings === "object") ? Object.assign({}, data.ratings) : {};
         state.myNotes = (data && data.notes && typeof data.notes === "object") ? Object.assign({}, data.notes) : {};
+        state.myRatedAt = (data && data.ratedAt && typeof data.ratedAt === "object") ? Object.assign({}, data.ratedAt) : {};
         state.myRatingsVersion = true;
         render();
       }, function () {});
@@ -1531,6 +1550,7 @@ a { color: var(--water); }
   }
 })();
 </script>
+
 
 </body>
 </html>
