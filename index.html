@@ -170,6 +170,16 @@ a { color: var(--water); }
 .workings { font-family: var(--mono); font-size: 0.82rem; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; white-space: pre; }
 .fine { font-size: 0.85rem; color: var(--muted); margin: 0; }
 .caveats { font-size: 0.88rem; color: var(--muted); display: grid; gap: 6px; margin: 0; padding-left: 18px; }
+.vinny { display: grid; justify-items: center; gap: 10px; margin-top: 8px; }
+.vinny-glass { display: grid; gap: 4px; justify-items: center; width: min(100%, 320px); padding: 14px 16px; border-radius: 6px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15)), var(--bad-soft);
+  border: 3px solid var(--bad); outline: 2px dashed var(--bad); outline-offset: 5px; color: var(--bad); cursor: pointer; }
+.vinny-glass .vinny-big { font-family: var(--display); font-size: 1.4rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.vinny-glass .vinny-small { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; }
+.vinny-glass.broken { background: repeating-linear-gradient(115deg, transparent 0 14px, rgba(0,0,0,0.25) 14px 15px), repeating-linear-gradient(35deg, transparent 0 22px, rgba(0,0,0,0.2) 22px 23px), var(--bad-soft); }
+#vinny-cv { width: min(100%, 480px); height: auto; aspect-ratio: 16 / 9; image-rendering: pixelated; image-rendering: crisp-edges; border: 3px solid var(--ink); border-radius: 4px; background: #000; }
+@media (prefers-reduced-motion: no-preference) { .vinny-glass.shake { animation: vshake 0.3s linear; } }
+@keyframes vshake { 25% { transform: translateX(-4px) rotate(-1deg); } 75% { transform: translateX(4px) rotate(1deg); } }
 @media (prefers-reduced-motion: no-preference) { .waterfill { transition: y 0.6s ease, height 0.6s ease; } }
 </style>
 
@@ -383,6 +393,14 @@ a { color: var(--water); }
       </section>
     </div>
   </div>
+  <section class="vinny" id="vinny" aria-label="Emergency button">
+    <button type="button" class="vinny-glass" id="vinny-btn">
+      <span class="vinny-small">In case of emergency</span>
+      <span class="vinny-big">Break in case of Vinny</span>
+      <span class="vinny-small">Tap glass · sound on</span>
+    </button>
+    <canvas id="vinny-cv" width="160" height="90" hidden aria-label="16-bit animation: a cruiser makes a getaway at full speed"></canvas>
+  </section>
 </div>
 
 <script>
@@ -1585,6 +1603,135 @@ a { color: var(--water); }
       }, function () {});
     }).catch(function () {});
   }
+})();
+</script>
+<script>
+// Break in case of Vinny: 10 seconds of 16-bit getaway, drawn at 160x90 and scaled up, with an original chiptune
+// (square lead, FM-style bass, noise drums) synthesised live with Web Audio. Nothing is downloaded.
+(function () {
+  "use strict";
+  var btn = document.getElementById("vinny-btn"), cv = document.getElementById("vinny-cv");
+  if (!btn || !cv) return;
+  var ctx = cv.getContext("2d"), playing = false, DUR = 10;
+
+  function music() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    var ac = new AC(), t0 = ac.currentTime + 0.05, beat = 60 / 150;
+    var master = ac.createGain(); master.gain.value = 0.22; master.connect(ac.destination);
+    var hz = function (n) { return 440 * Math.pow(2, (n - 69) / 12); };
+    function lead(n, at, len) { // SNES-ish square with a touch of vibrato
+      var o = ac.createOscillator(), g = ac.createGain(), v = ac.createOscillator(), vg = ac.createGain();
+      o.type = "square"; o.frequency.value = hz(n); v.frequency.value = 6; vg.gain.value = 4;
+      v.connect(vg); vg.connect(o.frequency);
+      g.gain.setValueAtTime(0.0001, at); g.gain.linearRampToValueAtTime(0.35, at + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+      o.connect(g); g.connect(master); o.start(at); v.start(at); o.stop(at + len + 0.05); v.stop(at + len + 0.05);
+    }
+    function bass(n, at, len) { // Mega Drive-ish 2-operator FM bass
+      var car = ac.createOscillator(), mod = ac.createOscillator(), mg = ac.createGain(), g = ac.createGain();
+      car.frequency.value = hz(n); mod.frequency.value = hz(n) * 2; mg.gain.setValueAtTime(hz(n) * 3, at); mg.gain.exponentialRampToValueAtTime(hz(n) * 0.3, at + len);
+      mod.connect(mg); mg.connect(car.frequency);
+      g.gain.setValueAtTime(0.5, at); g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+      car.connect(g); g.connect(master); car.start(at); mod.start(at); car.stop(at + len + 0.05); mod.stop(at + len + 0.05);
+    }
+    var noise = ac.createBuffer(1, ac.sampleRate * 0.3, ac.sampleRate), d = noise.getChannelData(0);
+    for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    function drum(at, hat) {
+      var s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+      s.buffer = noise; f.type = hat ? "highpass" : "lowpass"; f.frequency.value = hat ? 7000 : 900;
+      g.gain.setValueAtTime(hat ? 0.12 : 0.6, at); g.gain.exponentialRampToValueAtTime(0.0001, at + (hat ? 0.05 : 0.18));
+      s.connect(f); f.connect(g); g.connect(master); s.start(at); s.stop(at + 0.3);
+    }
+    // Original tune in A minor: two 8-beat phrases, then a run up and a final hit (25 beats = 10 s at 150 bpm).
+    var mel = [69,72,76,74,72,74,76,79, 77,76,74,72,74,72,71,69, 69,72,76,79,81,79,76,72, 74,76,77,79,81,83,84,null, 81];
+    var lens = [1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 0.5,0.5,0.5,0.5,0.5,0.5,1,1, 3];
+    var sum = lens.reduce(function (a, b) { return a + b; }, 0), u = 9 / sum, t = t0;
+    mel.forEach(function (n, k) { if (n != null) lead(n, t, lens[k] * u * 0.9); t += lens[k] * u; });
+    // 32 eighth-note steps over the first 9 seconds, then a final hit.
+    var roots = [45, 41, 43, 40, 45, 41, 43, 47], step = 9 / 32;
+    for (var b = 0; b < 32; b++) {
+      var at = t0 + b * step;
+      if (b % 2 === 0) bass(roots[Math.floor(b / 4) % roots.length] + (b % 4 === 2 ? 12 : 0), at, step * 1.6);
+      drum(at, b % 2 === 1); if (b % 8 === 6) drum(at + step / 2, false);
+    }
+    bass(33, t0 + 9, 1); drum(t0 + 9, false);
+    setTimeout(function () { try { ac.close(); } catch (e) {} }, (DUR + 1) * 1000);
+    return ac;
+  }
+
+  // 16-bit palette
+  var SKY = ["#1a1040", "#3a1860", "#6a2080", "#b03070", "#e8605a", "#f8a050", "#ffd070"];
+  var SEA = ["#103060", "#184880", "#2060a0", "#3080c0"];
+  function px(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); }
+  var FONT = { // 3x5 pixel font for the few letters we need
+    A:"010101111101101",C:"011100100100011",D:"110101101101110",E:"111100110100111",F:"111100110100100",G:"011100101101011",H:"101101111101101",
+    I:"111010010010111",L:"100100100100111",N:"101111111111101",O:"010101101101010",P:"110101110100100",R:"110101110101101",S:"011100010001110",
+    T:"111010010010010",U:"101101101101111",V:"101101101101010",W:"101101111111101",Y:"101101010010010",K:"101101110101101",M:"101111111101101",
+    "!":"010010010000010"," ":"000000000000000",".":"000000000000010"
+  };
+  function text(s, x, y, c, sc) {
+    sc = sc || 1;
+    for (var i = 0; i < s.length; i++) {
+      var g = FONT[s[i]] || FONT[" "];
+      for (var k = 0; k < 15; k++) if (g[k] === "1") px(x + (i * 4 + (k % 3)) * sc, y + Math.floor(k / 3) * sc, sc, sc, c);
+    }
+  }
+  function centre(s, y, c, sc) { text(s, Math.round((160 - s.length * 4 * sc) / 2), y, c, sc); }
+  function boat(x, y, bob) {
+    y += bob;
+    px(x, y + 6, 26, 4, "#f4f4f4"); px(x + 2, y + 10, 22, 2, "#c02030"); px(x + 4, y + 12, 18, 1, "#802020");
+    px(x + 6, y + 2, 12, 4, "#e8e8f0"); px(x + 8, y + 3, 3, 2, "#3080c0"); px(x + 12, y + 3, 3, 2, "#3080c0");
+    px(x + 10, y - 1, 2, 3, "#f8d040"); // the skipper, legging it
+    px(x + 26, y + 7, 3, 2, "#f4f4f4");
+  }
+
+  function frame(t) { // t in seconds, 0..DUR
+    // sky bands, sun sinking
+    for (var i = 0; i < SKY.length; i++) px(0, i * 7, 160, 7, SKY[i]);
+    var sunY = 30 + t * 1.2;
+    for (var r = 0; r < 10; r++) px(80 - (10 - r), sunY + r, (10 - r) * 2, 1, r % 3 === 2 ? SKY[4] : "#ffe890");
+    // far hills, parallax
+    for (var hx = 0; hx < 180; hx += 2) {
+      var h = 6 + 4 * Math.sin((hx + t * 8) / 11) + 3 * Math.sin((hx + t * 8) / 5);
+      px(hx - ((t * 8) % 2), 49 - h, 2, h, "#2a1848");
+    }
+    // sea with scrolling glints
+    for (var s = 0; s < SEA.length; s++) px(0, 49 + s * 10, 160, 10, SEA[s]);
+    for (var g = 0; g < 26; g++) {
+      var gx = (g * 37 + t * (30 + (g % 4) * 18)) % 170 - 5, gy = 51 + (g * 13) % 38;
+      px(160 - gx, gy, 3 + (g % 3), 1, g % 2 ? "#80c0f0" : "#ffffff");
+    }
+    // the getaway: boat runs in, idles nervously, then full speed off the right edge
+    var bx = t < 2 ? -30 + t * 30 : t < 5 ? 30 + Math.sin(t * 12) * 2 : 30 + Math.pow(t - 5, 2) * 9;
+    var bob = Math.round(Math.sin(t * 9) * 1.2);
+    // wake
+    var wakeLen = t < 5 ? 10 : 40;
+    for (var w = 0; w < wakeLen; w += 3) px(bx - w - 2, 64 + bob + (w % 2), 2, 1, "#ffffff");
+    boat(bx, 54, bob);
+    // captions
+    if (t > 1.6 && t < 4.6 && Math.floor(t * 4) % 2 === 0) centre("VINNY DETECTED!", 8, "#ffffff", 2);
+    if (t >= 4.6 && t < 8.4) { centre("FULL SPEED", 6, "#ffd070", 2); centre("AHEAD!", 20, "#ffd070", 2); }
+    if (t >= 8.4) centre("PHEW. SAFE.", 12, "#ffffff", 2);
+    // scanlines for that CRT look
+    ctx.fillStyle = "rgba(0,0,0,0.18)";
+    for (var y = 0; y < 90; y += 2) ctx.fillRect(0, y, 160, 1);
+  }
+
+  btn.addEventListener("click", function () {
+    if (playing) return;
+    playing = true;
+    btn.classList.add("broken", "shake");
+    setTimeout(function () { btn.classList.remove("shake"); }, 350);
+    cv.hidden = false;
+    try { music(); } catch (e) {}
+    var start = performance.now();
+    (function loop(now) {
+      var t = Math.min(DUR, (now - start) / 1000);
+      frame(t);
+      if (t < DUR) requestAnimationFrame(loop);
+      else setTimeout(function () { playing = false; cv.hidden = true; btn.classList.remove("broken"); }, 1200);
+    })(start);
+  });
 })();
 </script>
 
