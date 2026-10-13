@@ -1,0 +1,1441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Live Shannon water levels against CSIG chart datum, with lake forecasts, lock times, marine notices and places to eat ashore.">
+</head>
+<body>
+<title>Shannon Chart Depth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a wheelhouse instrument — pick the stretch, read the correction, then the staff gauge, calculator and settings. One column on a phone, two on wider screens. */
+:root {
+  --bg: #edf2f1;
+  --surface: #f9fbfa;
+  --ink: #13221e;
+  --muted: #566a64;
+  --line: #cfdad6;
+  --water: #2b6c80;
+  --water-soft: #d3e6ec;
+  --ok: #2c7a4c;
+  --warn: #9c6612;
+  --bad: #b13a2f;
+  --ok-soft: #dcefe3;
+  --warn-soft: #f6e9cf;
+  --bad-soft: #f6dcd8;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1513; --surface: #13201d; --ink: #e2ebe8; --muted: #93a7a1; --line: #263a35;
+    --water: #72b5c8; --water-soft: #1b3a43; --ok: #63c08a; --warn: #e2ac50; --bad: #ec7d70;
+    --ok-soft: #173326; --warn-soft: #3a2d13; --bad-soft: #3d1d19; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1513; --surface: #13201d; --ink: #e2ebe8; --muted: #93a7a1; --line: #263a35;
+  --water: #72b5c8; --water-soft: #1b3a43; --ok: #63c08a; --warn: #e2ac50; --bad: #ec7d70;
+  --ok-soft: #173326; --warn-soft: #3a2d13; --bad-soft: #3d1d19; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; padding-inline: 16px; padding-block: 20px 40px; }
+.wrap { max-width: 900px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+h1 { font-family: var(--display); font-weight: 600; font-size: 1.9rem; letter-spacing: 0.01em; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); font-size: 0.9rem; margin: 0; }
+
+/* Stretch selector: ordered south to north, as the river runs upstream */
+.reaches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.reaches button { border: 0; border-radius: 0; background: transparent; color: var(--ink); padding: 10px 8px; text-align: left; display: grid; gap: 1px; min-width: 0; font-weight: 600; }
+.reaches button + button { border-left: 1px solid var(--line); }
+.reaches button span { font-weight: 400; font-size: 0.78rem; color: var(--muted); }
+.reaches button[aria-pressed="true"] { background: var(--water); color: var(--surface); }
+.reaches button[aria-pressed="true"] span { color: var(--surface); opacity: 0.85; }
+
+.grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: start; } }
+.col { display: grid; gap: 16px; min-width: 0; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; }
+.label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; margin: 0 0 6px; }
+h2 { font-family: var(--display); font-weight: 600; font-size: 1.3rem; margin: 0 0 10px; }
+
+.hero { display: grid; gap: 10px; }
+.big { font-family: var(--display); font-weight: 600; font-size: clamp(3.6rem, 16vw, 5.4rem); line-height: 0.95; font-variant-numeric: tabular-nums; color: var(--water); letter-spacing: -0.01em; }
+.big .unit { font-size: 0.42em; color: var(--muted); margin-left: 6px; font-weight: 500; }
+.big.pending { font-size: clamp(2.4rem, 10vw, 3.2rem); color: var(--muted); }
+.say { font-size: 1.1rem; margin: 0; max-width: 34em; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 0.85rem; color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pill.ok { color: var(--ok); background: var(--ok-soft); }
+.pill.warn { color: var(--warn); background: var(--warn-soft); }
+.pill.bad { color: var(--bad); background: var(--bad-soft); }
+
+.wx { display: grid; gap: 10px; }
+.wx-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
+.wx-head h2 { margin: 0; }
+.wx dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: 0.95rem; }
+.wx dt { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; padding-top: 2px; }
+.wx dd { margin: 0; }
+.wx h3 { font-size: 0.95rem; margin: 6px 0 2px; }
+.today { display: grid; gap: 14px; }
+#trip button.linkish { background: none; border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; font: inherit; font-size: 0.85rem; color: var(--water); cursor: pointer; }
+.today-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 8px 12px; }
+.today-row > div { min-width: 0; }
+.today-main { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 1.05rem; }
+.sun { display: grid; gap: 6px; }
+.sun svg { width: 100%; height: auto; display: block; }
+.moor { text-align: right; }
+.moor-time { color: var(--bad); font-weight: 500; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 0.95rem; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); }
+.chip.past { color: var(--muted); text-decoration: line-through; opacity: 0.7; }
+.chip.next { border-color: var(--water); background: var(--water); color: var(--surface); font-weight: 500; }
+.contacts { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 0.92rem; }
+.contacts li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; }
+.contacts .num { font-family: var(--mono); user-select: all; }
+.food { display: grid; gap: 12px; }
+.food-menu { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.food-menu + .food-menu { margin-top: 10px; }
+.food-menu > summary { cursor: pointer; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-weight: 600; }
+.food-menu > summary .food-title { font-family: var(--display); font-size: 1.15rem; }
+.food-menu > summary .food-count { font-size: 0.82rem; color: var(--muted); font-weight: 400; margin-left: auto; }
+.food-menu[open] > summary { margin-bottom: 10px; }
+.food h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 4px 0 0; }
+.venue { display: grid; gap: 3px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.venue-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 10px; }
+.venue-name { font-weight: 600; }
+.venue .where { font-size: 0.82rem; color: var(--muted); }
+.venue .today-hrs { font-size: 0.9rem; }
+.venue .today-hrs.closed { color: var(--bad); }
+.venue .links { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.88rem; }
+.rate { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-size: 0.9rem; }
+.rate-k { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+.rate .stars { color: var(--warn); font-family: var(--mono); }
+.rate-you { display: inline-flex; align-items: center; gap: 6px; }
+.rate-you select { font-size: 0.85rem; padding: 3px 6px; width: auto; }
+.rate-gap { font-size: 0.78rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; }
+.rate-gap.ok { color: var(--ok); background: var(--ok-soft); }
+.rate-gap.warn { color: var(--warn); background: var(--warn-soft); }
+.rate-gap.bad { color: var(--bad); background: var(--bad-soft); }
+.scorecard { font-size: 0.88rem; padding: 8px 12px; border-radius: 8px; background: var(--water-soft); }
+.notices { display: grid; gap: 10px; }
+.notice-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.notice-list li { display: grid; gap: 2px; padding-left: 10px; border-left: 3px solid var(--line); }
+.notice-list li.urgent { border-left-color: var(--bad); }
+.notice-list li.active { border-left-color: var(--warn); }
+.notice-list a { font-weight: 600; text-decoration: none; }
+.notice-list a:hover { text-decoration: underline; }
+.notice-list span { font-size: 0.9rem; color: var(--muted); }
+.ev-head { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 6px 0 8px; }
+.venue .news { font-size: 0.88rem; padding: 4px 8px; border-radius: 6px; background: var(--warn-soft); }
+.alert { margin: 0; padding: 8px 12px; border-radius: 8px; background: var(--bad-soft); color: var(--bad); font-weight: 600; font-size: 0.92rem; }
+.calc { display: grid; gap: 14px; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+label.f { display: grid; gap: 4px; font-size: 0.9rem; font-weight: 600; }
+label.f small { font-weight: 400; color: var(--muted); }
+input[type=number], input[type=time], select { font-family: var(--mono); font-size: 1.15rem; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); width: 100%; min-width: 0; }
+select { font-family: var(--body); font-size: 1rem; }
+input:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px solid var(--water); outline-offset: 2px; }
+.result { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.res { border-top: 1px solid var(--line); padding-top: 10px; }
+.res .v { font-family: var(--display); font-weight: 600; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.res .ft { color: var(--muted); font-size: 0.85rem; }
+.res.state-ok .v { color: var(--ok); } .res.state-warn .v { color: var(--warn); } .res.state-bad .v { color: var(--bad); }
+
+.gauge-wrap { display: flex; gap: 14px; align-items: flex-start; }
+.gauge-wrap svg { flex: 0 0 auto; width: 150px; height: auto; }
+.gauge-notes { font-size: 0.88rem; color: var(--muted); display: grid; gap: 8px; min-width: 0; }
+.gauge-notes b { color: var(--ink); font-weight: 600; }
+.spark { margin-top: 14px; }
+.spark svg { width: 100%; height: auto; display: block; }
+
+details { border-top: 1px solid var(--line); padding-top: 12px; }
+details + details { margin-top: 12px; }
+summary { cursor: pointer; font-weight: 600; }
+.stack { display: grid; gap: 10px; margin-top: 12px; font-size: 0.92rem; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.row label.f { flex: 1 1 160px; }
+button { font: inherit; font-size: 0.9rem; font-weight: 600; padding: 9px 14px; border-radius: 8px; border: 1px solid var(--water); background: var(--water); color: var(--surface); cursor: pointer; }
+button.ghost { background: transparent; color: var(--water); }
+a { color: var(--water); }
+.workings { font-family: var(--mono); font-size: 0.82rem; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; white-space: pre; }
+.fine { font-size: 0.85rem; color: var(--muted); margin: 0; }
+.caveats { font-size: 0.88rem; color: var(--muted); display: grid; gap: 6px; margin: 0; padding-left: 18px; }
+@media (prefers-reduced-motion: no-preference) { .waterfill { transition: y 0.6s ease, height 0.6s ease; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Shannon Chart Depth</h1>
+    <p class="sub">CSIG charted depths corrected for today's water level</p>
+  </header>
+
+  <nav class="reaches" id="reaches" aria-label="Stretch of river"></nav>
+
+  <div class="grid">
+    <div class="col">
+      <section class="panel hero" aria-live="polite">
+        <p class="label">Correction to charted depths</p>
+        <div class="big" id="offset">–</div>
+        <p class="say" id="say">Loading the latest gauge reading…</p>
+        <div class="meta">
+          <span class="pill ok" id="fresh">Checking</span>
+          <span id="src"></span>
+        </div>
+      </section>
+
+      <section class="panel wx" id="wx">
+        <div class="wx-head">
+          <h2 id="wx-title">Lake forecast</h2>
+          <span class="pill ok" id="wx-wind" hidden></span>
+        </div>
+        <div id="wx-body"><p class="fine">No forecast stored yet.</p></div>
+        <p class="fine" id="wx-meta"></p>
+        <p class="fine" id="wx-hourly" hidden></p>
+      </section>
+
+      <section class="panel calc" id="trip">
+        <div class="wx-head">
+          <h2>Time to travel</h2>
+          <button type="button" class="linkish" id="trip-swap">Swap ⇅</button>
+        </div>
+        <div class="fields">
+          <label class="f">From <select id="trip-from"></select></label>
+          <label class="f">To <select id="trip-to"></select></label>
+          <label class="f">Leaving at <input type="time" id="trip-dep" step="300"></label>
+        </div>
+        <div class="result">
+          <div class="res" id="trip-hrs-box"><div class="label">Cruising</div><div class="v" id="trip-hrs">–</div><div class="ft" id="trip-hrs-ft"></div></div>
+          <div class="res" id="trip-eta-box"><div class="label">Arrive about</div><div class="v" id="trip-eta">–</div><div class="ft" id="trip-eta-ft"></div></div>
+        </div>
+        <p class="fine">Cruising hours from the shannon-river.com distance chart, counted only between sunrise and 30 minutes before sunset. Allow extra for locks, Portumna Bridge and the weather.</p>
+      </section>
+
+      <section class="panel today" id="today">
+        <div class="wx-head">
+          <h2>Today on the river</h2>
+          <span class="fine" id="today-date"></span>
+        </div>
+        <p class="alert" id="closure-alert" hidden></p>
+        <div class="sun">
+          <div class="today-row">
+            <div>
+              <p class="label" id="sun-label">Daylight</p>
+              <p class="today-main" id="sun-main"></p>
+            </div>
+          </div>
+          <svg id="sun-bar" viewBox="0 0 320 44" role="img" aria-label="Night, twilight and daylight over the next 24 hours, with now marked"></svg>
+          <p class="fine" id="sun-note"></p>
+        </div>
+        <div class="today-row">
+          <div>
+            <p class="label">Locks</p>
+            <p class="today-main" id="lock-hours"></p>
+          </div>
+        </div>
+        <div class="today-row" id="bridge-box">
+          <div>
+            <p class="label">Portumna Bridge openings</p>
+            <div class="chips" id="bridge-times"></div>
+          </div>
+          <span class="pill ok" id="bridge-next"></span>
+        </div>
+        <div>
+          <p class="label">Phone</p>
+          <ul class="contacts" id="contacts"></ul>
+        </div>
+        <div id="food-box" hidden>
+          <div class="food" id="food"></div>
+          <p class="fine" id="food-asof" hidden>Hours, phones and menus from each venue's own website, checked 13 Oct 2026. Star ratings and reviews are on each venue's Google listing.</p>
+        </div>
+        <p class="fine" id="today-note" hidden></p>
+        <div id="events-box" hidden>
+          <h3 class="ev-head">Events on the water</h3>
+          <ul class="notice-list" id="events"></ul>
+          <p class="fine" id="events-note"></p>
+        </div>
+      </section>
+
+      <section class="panel notices">
+        <div class="wx-head">
+          <h2>Marine notices</h2>
+          <span class="fine" id="notices-asof">Live notices as of 13 Oct 2026</span>
+        </div>
+        <ul class="notice-list" id="notices"></ul>
+        <p class="fine"><a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">All live marine notices on waterwaysireland.org</a>. New notices are picked up from Waterways Ireland's email list every two hours.</p>
+      </section>
+
+      <section class="panel calc">
+        <h2>Depth at a spot</h2>
+        <div class="fields">
+          <label class="f" for="charted">Charted depth <small>metres, from the CSIG chart</small>
+            <input id="charted" type="number" inputmode="decimal" step="0.1" min="0" value="2.0">
+          </label>
+          <label class="f" for="draft">Your draft <small>metres, remembered on this device</small>
+            <input id="draft" type="number" inputmode="decimal" step="0.05" min="0" value="1.0">
+          </label>
+        </div>
+        <div class="result">
+          <div class="res" id="r-depth">
+            <p class="label">Water there now</p>
+            <div class="v mono" id="depth">–</div>
+            <div class="ft" id="depth-ft"></div>
+          </div>
+          <div class="res" id="r-clear">
+            <p class="label">Under your keel</p>
+            <div class="v mono" id="clear">–</div>
+            <div class="ft" id="clear-ft"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="panel">
+        <h2>Water against chart datum</h2>
+        <div class="gauge-wrap">
+          <svg id="gauge" viewBox="0 0 150 320" role="img" aria-label="Staff gauge showing the water level against chart datum"></svg>
+          <div class="gauge-notes">
+            <div>Water level<br><b class="mono" id="g-level">–</b></div>
+            <div>Chart datum<br><b class="mono" id="g-datum">–</b></div>
+            <div>Over the cill<br><b class="mono" id="g-cill">–</b></div>
+            <div>Metres above Ordnance Datum Malin Head.</div>
+          </div>
+        </div>
+        <div class="spark" id="spark" hidden>
+          <p class="label">Recent readings</p>
+          <svg id="spark-svg" viewBox="0 0 320 90" role="img" aria-label="Recent water level readings"></svg>
+        </div>
+      </section>
+
+      <section class="panel">
+        <details id="manual-box">
+          <summary>Enter a reading yourself</summary>
+          <div class="stack">
+            <p class="fine" id="manual-help"></p>
+            <div class="row">
+              <label class="f" for="manual">Gauge level <small>m OD Malin, or staff gauge</small>
+                <input id="manual" type="number" inputmode="decimal" step="0.001">
+              </label>
+              <button id="use-manual" type="button">Use this reading</button>
+            </div>
+            <p class="fine" id="feet-help"></p>
+            <div class="row">
+              <label class="f" for="feet">Feet over the cill <small>e.g. 8.25</small>
+                <input id="feet" type="number" inputmode="decimal" step="0.05">
+              </label>
+              <button id="use-feet" type="button">Use this reading</button>
+            </div>
+            <p class="fine">Or check against your sounder, as the CSIG suggest: on a flat stretch of lake, compare a charted spot depth with what your sounder reads. Add your transducer depth so the sounder gives depth below the surface.</p>
+            <div class="row">
+              <label class="f" for="spot">Charted spot depth <small>metres</small>
+                <input id="spot" type="number" inputmode="decimal" step="0.1" min="0">
+              </label>
+              <label class="f" for="sounder">Sounder reads <small>metres below surface</small>
+                <input id="sounder" type="number" inputmode="decimal" step="0.1" min="0">
+              </label>
+              <button id="use-sounder" type="button">Use this check</button>
+            </div>
+            <div class="row" id="manual-active" hidden>
+              <p class="fine" id="manual-note"></p>
+              <button id="clear-manual" class="ghost" type="button">Go back to the gauge feed</button>
+            </div>
+          </div>
+        </details>
+
+        <details id="datum-box">
+          <summary>Chart datum</summary>
+          <div class="stack">
+            <p class="fine" id="datum-help"></p>
+            <div class="workings" id="workings"></div>
+            <div class="row">
+              <label class="f" for="cill">Cill <small>heights in m OD Malin</small>
+                <select id="cill"></select>
+              </label>
+              <label class="f" for="datum-ft">Feet over it <small>from the CSIG chart</small>
+                <input id="datum-ft" type="number" inputmode="decimal" step="0.25" min="0">
+              </label>
+            </div>
+            <p class="fine" id="datum-note"></p>
+          </div>
+        </details>
+      </section>
+
+      <section class="panel">
+        <p class="label">Official reports</p>
+        <ul class="caveats" id="esb"></ul>
+        <p class="fine" style="margin-top:8px">Waterways Ireland's report lists each lock's ordinary summer level and the 9:00 reading, published by 9:30 on weekdays (weekend readings appear on Monday). Its levels and the ESB's are in Poolbeg datum: take off 2.71 m to compare them with this page. Ardnacrusha uses about 100 m³/s per turbine, so around 400 means all four are running and Lough Derg is being drawn hard.</p>
+      </section>
+
+      <section class="panel">
+        <p class="label">Keep in mind</p>
+        <ul class="caveats" id="caveats"></ul>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+// Public copy: stand in for the artifact database with data.json, re-read every 10 minutes.
+(function () {
+  var subs = [], cache = null;
+  function pick(path) {
+    if (!cache) return undefined;
+    var p = path.split("/");
+    var col = cache[p[0]];
+    return col ? col[p[1]] : undefined;
+  }
+  function deliver() {
+    subs.forEach(function (s) {
+      var d = pick(s.path);
+      try { s.cb({ exists: d !== undefined, data: function () { return d; } }); } catch (e) {}
+    });
+  }
+  function load() {
+    fetch("data.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j) { cache = j; deliver(); } })
+      .catch(function () {});
+  }
+  var db = {
+    doc: function (path) {
+      return {
+        onSnapshot: function (cb) { subs.push({ path: path, cb: cb }); if (cache) deliver(); return function () {}; },
+        set: function () { return Promise.reject(new Error("read-only")); }
+      };
+    }
+  };
+  window.claude = { use: function (name) { return name === "db" ? Promise.resolve(db) : Promise.reject(new Error("unavailable")); } };
+  load(); setInterval(load, 10 * 60 * 1000);
+})();
+</script>
+<style>.rate-you, .rate-gap, .scorecard { display: none !important; }</style>
+<script>
+(function () {
+  "use strict";
+  var FT = 3.28084, FOOT = 0.3048, POOLBEG_TO_MALIN = -2.71;
+
+  // Lock cill heights from the Shannon and Limerick Navigation lock tables (Poolbeg OD), converted to Malin.
+  var REACHES = [
+    {
+      id: "derg", name: "Lough Derg", span: "Killaloe – Meelick",
+      gauge: { doc: "portumna", station: "25341", name: "Portumna Bridge", zero: 29.169 },
+      cills: [
+        { name: "Killaloe lower cill", poolbeg: 30.97 },
+        { name: "Killaloe upper cill", poolbeg: 30.52 }
+      ],
+      feet: 8,
+      weather: ["derg"],
+      sunAt: [52.95, -8.29],
+      bridge: true,
+      contacts: [["Portumna Bridge", "+353 (0)90 974 1011"], ["Ardnacrusha Lock (closed until 31 March 2027)", "+353 (0)87 997 0131"]],
+      hourly: ["Hourly wind, rain and temperature for Lough Derg", "https://www.met.ie/weather-forecast/lough-derg-tipperary#forecasts"],
+      esb: [
+        ["Shannon forecast (next five days)", "01-Shannon-Hydro-Forecast.pdf"],
+        ["Total Ardnacrusha flow", "07-Total-Ardnacrusha-Flow.pdf"],
+        ["Total Parteen Weir flow", "08-Total-Parteen-Weir-Flow.pdf"],
+        ["Pier Head, Killaloe level", "06-Pier-Head-Killaloe.pdf"],
+        ["Portumna Bridge level", "05-Portumna-Bridge.pdf"]
+      ],
+      datumHelp: "CSIG depths here are reduced to 8 ft on the gauge at the entrance to the old canal in Killaloe, as the CSIG's lead mapper confirmed on the IWAI forum in 2018 and 2019. He reckons the lake has averaged about 9 ft 6 in on that gauge, 18 in above datum, since charting began. Waterways Ireland's ordinary summer level at Portumna, 33.38 m Poolbeg (30.67 m Malin), is within 3 cm of this datum. Oddly, the lock table lists the lower cill higher than the upper one; switch cills only if the CSIG confirm they mean the other.",
+      manualHelp: "Copy the OD level from the <a href=\"https://waterlevel.ie/0000025341/\" target=\"_blank\" rel=\"noopener\">Portumna Bridge page on waterlevel.ie</a>. A staff gauge reading under 5 m has the gauge zero of 29.169 m added for you.",
+      feetHelp: "At Killaloe, read the gauge at the canal entrance. It is marked in feet over the cill, so 8 ft is chart datum.",
+      caveats: [
+        "The gauge is at Portumna. When Ardnacrusha runs hard the lake slopes toward Killaloe, so the south end can sit a few centimetres lower.",
+        "Upstream of Portumna to Meelick the river runs downhill to the gauge, so you'll have slightly more water there than shown."
+      ]
+    },
+    {
+      id: "mid", name: "Meelick – Athlone", span: "Banagher, Shannonbridge",
+      gauge: { doc: "banagher", station: "25017", name: "Banagher", zero: 30.330 },
+      cills: [
+        { name: "Victoria Lock upper cill", poolbeg: 33.21 },
+        { name: "Athlone lower cill", poolbeg: 33.22 }
+      ],
+      feet: null,
+      osl: { name: "Banagher ordinary summer level", poolbeg: 35.36 },
+      weather: ["derg", "ree"],
+      sunAt: [53.25, -8.02],
+      bridge: true,
+      contacts: [["Victoria Lock, Meelick", "+353 (0)90 975 1359"], ["Athlone Lock", "+353 (0)90 649 2026"], ["Pollboy Lock, River Suck", "+353 (0)90 964 4938"], ["Portumna Bridge", "+353 (0)90 974 1011"]],
+      esb: [
+        ["Shannon forecast (next five days)", "01-Shannon-Hydro-Forecast.pdf"],
+        ["Athlone Weir downstream level", "04-Athlone-Weir-Downstream.pdf"],
+        ["Portumna Bridge level", "05-Portumna-Bridge.pdf"]
+      ],
+      datumHelp: "The CSIG's lead mapper says river sections between locks have no datum of their own: depths are averaged, and chart values are fine while you stay in the navigation. Until you set a datum here, the page estimates a correction against Waterways Ireland's ordinary summer level at Banagher, 35.36 m Poolbeg (32.65 m Malin), whose target band is 35.31 to 35.41. To use your own figure instead, pick a cill and enter feet over it.",
+      manualHelp: "Copy the OD level from the <a href=\"https://waterlevel.ie/0000025017/\" target=\"_blank\" rel=\"noopener\">Banagher page on waterlevel.ie</a>. A staff gauge reading under 5 m has the gauge zero of 30.330 m added for you.",
+      feetHelp: "If a lock keeper gives you the depth over the cill, enter it in feet.",
+      caveats: [
+        "Banagher sits mid-stretch. With the sluices at Meelick open and the river running, the level near Athlone will be higher and near Meelick lower.",
+        "This stretch floods early. Expect the level to change quickly after heavy rain."
+      ]
+    },
+    {
+      id: "ree", name: "Lough Ree", span: "Athlone – Tarmonbarry",
+      gauge: { doc: "hodsons", station: "26088", name: "Hodson's Bay", zero: 32.549 },
+      cills: [
+        { name: "Athlone upper cill", poolbeg: 35.35 }
+      ],
+      feet: 7,
+      weather: ["ree"],
+      sunAt: [53.55, -7.98],
+      bridge: false,
+      contacts: [["Athlone Lock", "+353 (0)90 649 2026"], ["Tarmonbarry and Cloondara Locks", "+353 (0)87 922 2020"]],
+      // Day keys: 0 = Sunday … 6 = Saturday; null = closed. Hours from venue websites only.
+      food: [
+        { area: "South end: Glasson, Coosan, Hodson Bay" },
+        { name: "Wineport Lodge", where: "Glasson", phone: "+353 (0)90 643 9010",
+          note: "Hours not published online; ring or book a table.",
+          menus: [["Casual dining", "https://www.wineport.ie/wp-content/uploads/2026/10/Casual-Dining-Menu-4.pdf"], ["Evening", "https://www.wineport.ie/wp-content/uploads/2026/10/Evening-Menu-Weekend-252627-Sep-2026-6.pdf"], ["Sunday lunch", "https://www.wineport.ie/wp-content/uploads/2026/05/2026-Sunday-Menu-210x210-R3.pdf"], ["Book", "https://www.wineport.ie/book-a-table/"]],
+          google: ["Wineport Lodge", "ChIJ4QX1Nv5JXEgRKBajXJGHyo8"] },
+        { name: "Glasson Lakehouse", where: "Glasson (Bonnie's restaurant, Tom's Fish & Tackle pub)", phone: "+353 (0)90 648 5508",
+          note: "Bonnie's serves lunch and dinner daily; Tom's pub serves food from midday to late.",
+          menus: [["Bonnie's all-day", "https://glasson.b-cdn.net/wp-content/uploads/2026/08/Bonnies-Lunch-Menu.pdf"], ["Tom's pub", "https://glasson.b-cdn.net/wp-content/uploads/2026/08/Toms-Dinner-Menu.pdf"]],
+          google: ["Glasson Lakehouse", "ChIJrVOmAudJXEgRIqez0LFZyHI"] },
+        { name: "The Lough Ree Inn", where: "Coosan Point", phone: "+353 (0)90 643 3481",
+          note: "No website or published hours; ring ahead.",
+          menus: [["Listing", "https://www.visitwestmeath.ie/eat-and-sleep/restaurants-cafes/the-lough-ree-inn/"]],
+          google: ["The Lough Ree Inn", "ChIJiYAmfd1JXEgR06R73S9Ar3I"] },
+        { name: "Hodson Bay Hotel", where: "Hodson Bay (Waterfront Bar, L'Escale restaurant)", phone: "+353 (0)90 644 2004",
+          days: { 0: "Bar food 11:00 – 16:00 and 16:30 – 21:00", 1: "Bar food 11:00 – 16:00 and 16:30 – 21:00", 2: "Bar food 11:00 – 16:00 and 16:30 – 21:00", 3: "Bar food 11:00 – 16:00 and 16:30 – 21:00", 4: "Bar food 11:00 – 16:00 and 16:30 – 21:00", 5: "Bar food 11:00 – 16:00 and 16:30 – 21:00", 6: "Bar food 11:00 – 16:00 and 16:30 – 21:00" },
+          note: "L'Escale dinner hours not published; book ahead.",
+          menus: [["Bar sample", "https://www.hodsonbayhotel.com/wp-content/uploads/2026/08/Brasserie-March-2026-UPDATED.pdf"], ["L'Escale sample", "https://www.hodsonbayhotel.com/wp-content/uploads/2026/03/ALC-Restaurant-Menu-LEscale-Jan-2026.pdf"], ["Book", "https://www.hodsonbayhotel.com/book-dining/"]],
+          google: ["Hodson Bay Hotel", "ChIJrw_kjx9IXEgRQlIyUtU8PPQ"] },
+        { area: "North end: Lanesborough, Tarmonbarry" },
+        { name: "Lanesborough takeaways", where: "Main Street and the bridge",
+          note: "Village Inn (pizza, kebab), Tasty Kebab & Pizza and Ping's Oriental. None publish hours or menus online; check the listings.",
+          links: [["Village Inn", "Village Inn Take Away Lanesborough", "ChIJlyiRdEIuXEgRx7OqkX9LtoI"], ["Tasty Kebab", "Tasty kebab & pizza Lanesborough", "ChIJ3WS6HowvXEgRFGw8bTkXYx4"], ["Ping's", "Ping's Oriental Take Away Lanesborough", "ChIJq3_jbkIuXEgRkk0Eb03H_1Q"]] },
+        { name: "The Purple Onion", where: "Tarmonbarry", phone: "+353 (0)43 335 9919",
+          days: { 0: null, 1: null, 2: "From 16:00, last orders 20:00", 3: "12:30, last orders 20:00", 4: "12:30, last orders 20:00", 5: "12:30, last orders 20:00", 6: "12:30, last orders 20:00" },
+          note: "Popular; book a table.",
+          menus: [["Menu", "https://www.purpleonion.ie/menus"]],
+          google: ["The Purple Onion Kitchen Termonbarry", "ChIJlXZ8xXgrXEgRR-O8wFO7n0U"] },
+        { name: "Keenan's", where: "Tarmonbarry, by the bridge", phone: "+353 (0)43 332 6052",
+          note: "Bar and restaurant food; times not published online, so ring ahead.",
+          menus: [["Website", "https://www.keenans.ie"]],
+          google: ["Keenan's Hotel Termonbarry", "ChIJdxM-y7wrXEgRbSwetWLW3_4"] },
+        { name: "Cloondara", where: "Royal Canal junction",
+          note: "No restaurant or takeaway found in the village; Tarmonbarry is about 2 km away." }
+      ],
+      esb: [
+        ["Shannon forecast (next five days)", "01-Shannon-Hydro-Forecast.pdf"],
+        ["Thatch, Lough Ree level", "03-Thatch-Lough-Ree.pdf"],
+        ["Bellantra Sluices, Lough Allen level", "02-Bellantra-Sluices-Lough-Allen.pdf"]
+      ],
+      datumHelp: "CSIG depths are reduced to ordinary summer level. Waterways Ireland give Lough Ree's as 37.49 m Poolbeg (34.78 m Malin), which is 7 ft over the Athlone upper cill, the figure the CSIG's lead mapper gave in 2018. His 2019 post said 5 ft, which instead matches the ESB's minimum navigation level of 36.88 m Poolbeg; set 5 ft here if you prefer that.",
+      manualHelp: "Copy the OD level from the <a href=\"https://waterlevel.ie/0000026088/\" target=\"_blank\" rel=\"noopener\">Hodson's Bay page on waterlevel.ie</a>. A staff gauge reading under 5 m has the gauge zero of 32.549 m added for you.",
+      feetHelp: "A daily reading over the cill is available for Athlone Lock; 7 ft is chart datum.",
+      caveats: [
+        "ESB draw Lough Ree down in autumn to make room for winter rain, so expect it below datum from late summer.",
+        "A strong wind along the lake piles water up at the downwind end."
+      ]
+    }
+  ];
+  REACHES.forEach(function (r) {
+    r.cills.forEach(function (c) { c.malin = Math.round((c.poolbeg + POOLBEG_TO_MALIN) * 1000) / 1000; });
+    if (r.osl) r.osl.malin = Math.round((r.osl.poolbeg + POOLBEG_TO_MALIN) * 1000) / 1000;
+  });
+
+  // Readings known when this page was published; replaced by the stored feed.
+  var BAKED = {
+    portumna: { level: 30.627, time: "2026-10-12T22:00:00Z" },
+    banagher: { level: 32.376, time: "2026-10-12T22:15:00Z" },
+    hodsons: { level: 34.689, time: "2026-10-12T22:15:00Z" }
+  };
+
+  function load(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function save(key, v) { try { if (v == null) localStorage.removeItem(key); else localStorage.setItem(key, v); } catch (e) {} }
+  function loadJSON(key) { var s = load(key); if (!s) return null; try { return JSON.parse(s); } catch (e) { return null; } }
+
+  var state = { reach: load("shannon.reach") || "derg", feeds: {}, histories: {} };
+  if (!REACHES.some(function (r) { return r.id === state.reach; })) state.reach = "derg";
+  Object.keys(BAKED).forEach(function (k) { state.feeds[k] = BAKED[k]; state.histories[k] = []; });
+
+  function reach() { for (var i = 0; i < REACHES.length; i++) if (REACHES[i].id === state.reach) return REACHES[i]; return REACHES[0]; }
+  function settings(r) {
+    var s = loadJSON("shannon.datum." + r.id) || {};
+    var ci = typeof s.cill === "number" && r.cills[s.cill] ? s.cill : 0;
+    var ft = typeof s.feet === "number" ? s.feet : r.feet;
+    return { cill: ci, feet: ft };
+  }
+  function datumOf(r) {
+    var s = settings(r);
+    if (s.feet == null) return r.osl ? r.osl.malin : null;
+    return r.cills[s.cill].malin + s.feet * FOOT;
+  }
+  // A stretch with no CSIG datum, measured against an ordinary summer level instead.
+  function isOsl(r) { return !!r.osl && settings(r).feet == null; }
+  function manualOf(r) { return loadJSON("shannon.manual." + r.id); }
+  function reading(r) { return manualOf(r) || state.feeds[r.gauge.doc]; }
+  function byId(id) { for (var i = 0; i < REACHES.length; i++) if (REACHES[i].id === id) return REACHES[i]; return null; }
+
+  // For a stretch with no datum of its own: the average of its neighbours' corrections.
+  function estimateOf(r) {
+    if (!r.estimateFrom || datumOf(r) != null) return null;
+    var parts = [], oldest = null;
+    for (var i = 0; i < r.estimateFrom.length; i++) {
+      var x = byId(r.estimateFrom[i]), d = datumOf(x);
+      if (d == null) return null;
+      var rd = reading(x);
+      parts.push({ name: x.name, off: rd.level - d });
+      if (!oldest || new Date(rd.time) < new Date(oldest)) oldest = rd.time;
+    }
+    var sum = parts.reduce(function (a, p) { return a + p.off; }, 0);
+    return { off: sum / parts.length, parts: parts, time: oldest };
+  }
+  // The correction used by the calculator: measured where there is a datum, estimated otherwise.
+  function correctionOf(r) {
+    var d = datumOf(r);
+    if (d != null) return reading(r).level - d;
+    var est = estimateOf(r);
+    return est ? est.off : null;
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var dr = parseFloat(load("derg.draft"));
+  if (isFinite(dr)) $("draft").value = dr;
+
+  function signed(x, dp) { var s = Math.abs(x).toFixed(dp); return (x < -0.0005 ? "−" : "+") + s; }
+  function ageText(ms) {
+    var mins = Math.max(0, Math.round(ms / 60000));
+    if (mins < 60) return mins + " min old";
+    var h = Math.round(mins / 60);
+    if (h < 48) return h + " h old";
+    return Math.round(h / 24) + " days old";
+  }
+  function fmtTime(iso) {
+    return new Date(iso).toLocaleString("en-IE", { weekday: "short", hour: "2-digit", minute: "2-digit", day: "numeric", month: "short", timeZone: "Europe/Dublin" });
+  }
+  function ftIn(m) {
+    var totalIn = Math.round(Math.abs(m) * FT * 12);
+    return (m < 0 ? "−" : "") + Math.floor(totalIn / 12) + " ft " + (totalIn % 12) + " in";
+  }
+
+  function buildSelector() {
+    var nav = $("reaches"); nav.textContent = "";
+    REACHES.forEach(function (r) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-pressed", r.id === state.reach ? "true" : "false");
+      b.textContent = r.name;
+      var s = document.createElement("span"); s.textContent = r.span; b.appendChild(s);
+      b.addEventListener("click", function () { state.reach = r.id; save("shannon.reach", r.id); buildSelector(); buildReachPanels(); render(); });
+      nav.appendChild(b);
+    });
+  }
+
+  function buildReachPanels() {
+    var r = reach(), s = settings(r);
+    $("manual-help").innerHTML = r.manualHelp;
+    $("feet-help").textContent = r.feetHelp + " The cill used is the one chosen under Chart datum.";
+    $("datum-help").textContent = r.datumHelp;
+    var sel = $("cill"); sel.textContent = "";
+    r.cills.forEach(function (c, i) {
+      var o = document.createElement("option"); o.value = i;
+      o.textContent = c.name + " (" + c.malin.toFixed(2) + ")";
+      sel.appendChild(o);
+    });
+    sel.value = s.cill;
+    $("datum-ft").value = s.feet == null ? "" : s.feet;
+    var ul = $("caveats"); ul.textContent = "";
+    r.caveats.concat(["OPW data is raw and unchecked. A sudden jump is more likely a sensor fault than the river.",
+      "Charts age. Silt, weed and boulders move; use this as an aid, not a guarantee."]).forEach(function (t) {
+      var li = document.createElement("li"); li.textContent = t; ul.appendChild(li);
+    });
+    var esb = $("esb"); esb.textContent = "";
+    // Waterways Ireland publish one report per day, named by date.
+    var dub = function (offsetDays) {
+      return new Date(Date.now() - offsetDays * 864e5).toLocaleDateString("en-CA", { timeZone: "Europe/Dublin" });
+    };
+    [["Waterways Ireland levels report, today", dub(0)], ["Waterways Ireland levels report, yesterday", dub(1)]].forEach(function (l) {
+      var li = document.createElement("li"), a = document.createElement("a");
+      a.href = "https://www.waterwaysireland.org/WaterwaysIreland/media/Water-Level-Reports/WaterLevels_" + l[1] + ".pdf?ext=.pdf";
+      a.target = "_blank"; a.rel = "noopener"; a.textContent = l[0];
+      li.appendChild(a); esb.appendChild(li);
+    });
+    r.esb.forEach(function (l) {
+      var li = document.createElement("li"), a = document.createElement("a");
+      a.href = "http://www.esbhydro.ie/Shannon/" + l[1]; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = "ESB: " + l[0]; li.appendChild(a); esb.appendChild(li);
+    });
+    $("manual").value = ""; $("feet").value = "";
+  }
+
+  // Met Éireann inland lakes forecast, stored by the scheduled task.
+  var LAKE_NAMES = { derg: "Lough Derg", ree: "Lough Ree" };
+  var FIELDS = [["wind", "Wind"], ["weather", "Weather"], ["visibility", "Visibility"], ["overnight", "Overnight"], ["outlook", "Outlook"]];
+  function maxForce(text) {
+    var m, max = null, re = /force\s+(\d+)(?:\s+(?:to|or)\s+(\d+))?/gi;
+    while ((m = re.exec(text || ""))) { var f = parseInt(m[2] || m[1], 10); if (max == null || f > max) max = f; }
+    return max;
+  }
+  function renderWeather() {
+    var r = reach(), w = state.weather, body = $("wx-body"), pill = $("wx-wind");
+    var hl = $("wx-hourly");
+    if (r.hourly) { hl.hidden = false; hl.innerHTML = '<a href="' + r.hourly[1] + '" target="_blank" rel="noopener">' + r.hourly[0] + "</a> on met.ie"; }
+    else hl.hidden = true;
+    $("wx-title").textContent = r.weather.length > 1 ? "Lake forecasts" : LAKE_NAMES[r.weather[0]] + " forecast";
+    if (!w || !w.lakes) { pill.hidden = true; return; }
+    body.textContent = "";
+    var top = null;
+    r.weather.forEach(function (id) {
+      var f = w.lakes[id];
+      if (!f) return;
+      if (r.weather.length > 1) { var h = document.createElement("h3"); h.textContent = LAKE_NAMES[id]; body.appendChild(h); }
+      var dl = document.createElement("dl");
+      FIELDS.forEach(function (fd) {
+        if (!f[fd[0]]) return;
+        var dt = document.createElement("dt"), dd = document.createElement("dd");
+        dt.textContent = fd[1]; dd.textContent = f[fd[0]];
+        dl.appendChild(dt); dl.appendChild(dd);
+      });
+      body.appendChild(dl);
+      var mf = maxForce((f.wind || "") + " " + (f.overnight || ""));
+      if (mf != null && (top == null || mf > top)) top = mf;
+    });
+    if (top != null) {
+      pill.hidden = false;
+      pill.className = "pill " + (top >= 6 ? "bad" : top >= 5 ? "warn" : "ok");
+      pill.textContent = "Up to force " + top;
+    } else pill.hidden = true;
+    var age = Date.now() - new Date(w.issued).getTime();
+    $("wx-meta").innerHTML = "Issued " + fmtTime(w.issued) + (age > 18 * 3600e3 ? " · <b>may be out of date</b>" : "") +
+      '. Source: <a href="https://www.met.ie/forecasts/marine-inland-lakes/inland-lakes" target="_blank" rel="noopener">Met Éireann inland lakes forecast</a>.';
+  }
+
+  // Waterways Ireland's published Shannon lock and Portumna Bridge timetables (2026).
+  // Seasons are [startMonth, startDay] inclusive; weekday = Mon–Sat, sunday = Sun.
+  var SEASONS = [
+    { from: [3, 14], name: "14–31 March", lock: { weekday: ["09:30", "18:30"], sunday: ["09:30", "18:00"] },
+      bridge: { weekday: ["10:00", "11:00", "12:30", "14:30", "16:30", "17:30"], sunday: ["10:00", "12:30", "14:30", "16:00", "17:00"] } },
+    { from: [4, 1], name: "April to September", lock: { weekday: ["09:30", "19:30"], sunday: ["09:30", "18:00"] },
+      bridge: { weekday: ["10:00", "11:00", "12:30", "14:30", "16:00", "17:30", "18:30"], sunday: ["10:00", "11:00", "12:30", "14:30", "16:00", "17:00"] } },
+    { from: [10, 1], name: "October", lock: { weekday: ["09:30", "18:30"], sunday: ["09:30", "18:00"] },
+      bridge: { weekday: ["10:00", "11:00", "12:30", "14:30", "16:30", "17:30"], sunday: ["10:00", "12:30", "14:30", "16:00", "17:00"] } },
+    { from: [11, 1], name: "winter (1 November to 13 March)", lock: { weekday: ["09:00", "12:00"], sunday: ["09:00", "11:00"] },
+      bridge: { weekday: ["09:30", "10:30", "11:30"], sunday: ["09:30", "10:30"] } }
+  ];
+  var LUNCH = ["13:00", "14:00"];
+  var MN = "https://www.waterwaysireland.org/news/";
+  // Whole-day closures of Waterways Ireland locks and lifting bridges from marine notices (Dublin dates).
+  var CLOSURES = [
+    { date: "2026-10-14", why: "industrial action", notice: "Marine Notice 111", url: MN + "marine-notice-no-111-of-2026" }
+  ];
+  // Live Shannon-relevant notices as of 13 October 2026. until = last day it matters (Dublin date).
+  var NOTICES = [
+    { no: "111", title: "Industrial action: locks and lifting bridges closed Wed 14 Oct", text: "No passage through Waterways Ireland locks or lifting bridges on the Shannon on 14 October. Allow extra time on the days either side.", url: MN + "marine-notice-no-111-of-2026", until: "2026-10-15", level: "urgent" },
+    { no: "106", title: "Ardnacrusha locks closed to 31 March 2027", text: "ESB maintenance: no transit between the Shannon and Limerick at Ardnacrusha until the end of March.", url: MN + "marine-notice-no-106-of-2026", until: "2027-03-31", level: "active" },
+    { no: "90", title: "Low water and weed growth, all navigations", text: "Stay in the marked channel, give markers a wide berth and plan for your draft. If grounded: engine off, lifejackets on, stay aboard, call 112 for the Coast Guard if you can't refloat.", url: MN + "marine-notice-no-90-of-2026", until: "2026-12-31", level: "active" },
+    { no: "53", title: "Hartley Bridge works, Carrick to Leitrim", text: "Centre arch only; upstream boats give way to those coming down; 5 km/h within 200 m. Until September 2027.", url: MN + "marine-notice-no-53-of-2026", until: "2027-09-30", level: "" },
+    { no: "107", title: "Winter mooring 1 Nov 2026 to 31 Mar 2027", text: "Apply and pay €63.50 online by 1 November. Power and water at public moorings off over the winter; the 5-day rule applies otherwise.", url: MN + "marine-notice-no-107-of-2026", until: "2027-03-31", level: "" },
+    { no: "35", title: "Lifejackets compulsory at locks", text: "Everyone handling lines or gates, or aboard in the lock chamber or on the lock walls, must wear a PFD.", url: MN + "marine-notice-no-35-of-2026", until: "2099-12-31", level: "" }
+  ];
+  function dublinISO(offsetDays) { return new Date(Date.now() + (offsetDays || 0) * 864e5).toLocaleDateString("en-CA", { timeZone: "Europe/Dublin" }); }
+  function closureOn(iso) { for (var i = 0; i < CLOSURES.length; i++) if (CLOSURES[i].date === iso) return CLOSURES[i]; return null; }
+  var noticesAsOf = "13 Oct 2026";
+  function renderEvents() {
+    var r = reach(), today = dublinISO(0), horizon = dublinISO(60), ul = $("events"); ul.textContent = "";
+    var ev = (state.events && Array.isArray(state.events.events) ? state.events.events : []).filter(function (e) {
+      return e && e.date && e.title && (e.end || e.date) >= today && e.date <= horizon && (e.reach === r.id || e.reach === "all");
+    }).sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+    $("events-box").hidden = !ev.length;
+    var fmt = function (iso) { var p = iso.split("-"); return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 12)).toLocaleDateString("en-IE", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }); };
+    ev.forEach(function (e) {
+      var li = document.createElement("li"), t = document.createElement(e.url ? "a" : "strong"), s = document.createElement("span");
+      if (e.url) { t.href = e.url; t.target = "_blank"; t.rel = "noopener"; }
+      t.textContent = fmt(e.date) + (e.end && e.end !== e.date ? " to " + fmt(e.end) : "") + ": " + e.title;
+      s.textContent = [e.where, e.source].filter(Boolean).join(" · ");
+      li.appendChild(t); li.appendChild(s); ul.appendChild(li);
+    });
+    if (state.events && state.events.updated) $("events-note").textContent = "Regattas, rallies and festivals from club calendars and venue newsletters, next 60 days. Checked " +
+      new Date(state.events.updated).toLocaleDateString("en-IE", { day: "numeric", month: "short", timeZone: "Europe/Dublin" }) + ".";
+  }
+  function renderNotices() {
+    renderEvents();
+    var today = dublinISO(0), ul = $("notices"); ul.textContent = "";
+    $("notices-asof").textContent = "Live notices as of " + noticesAsOf;
+    NOTICES.filter(function (n) { return n.until >= today; }).forEach(function (n) {
+      var li = document.createElement("li"), a = document.createElement("a"), s = document.createElement("span");
+      li.className = n.level;
+      a.href = n.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "MN " + n.no + ": " + n.title;
+      s.textContent = n.text;
+      li.appendChild(a); li.appendChild(s); ul.appendChild(li);
+    });
+  }
+  function dublinNow(offsetDays) {
+    var d = new Date(Date.now() + (offsetDays || 0) * 864e5), p = {};
+    new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Dublin", year: "numeric", month: "numeric", day: "numeric", weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
+      .formatToParts(d).forEach(function (x) { p[x.type] = x.value; });
+    return { m: +p.month, d: +p.day, wd: p.weekday, mins: (+p.hour) * 60 + (+p.minute), date: d };
+  }
+  function seasonFor(t) {
+    var key = t.m * 100 + t.d, s = SEASONS[SEASONS.length - 1];
+    SEASONS.forEach(function (x) { if (key >= x.from[0] * 100 + x.from[1]) s = x; });
+    if (key < 314) s = SEASONS[SEASONS.length - 1];
+    return s;
+  }
+  function toMins(hhmm) { var a = hhmm.split(":"); return +a[0] * 60 + +a[1]; }
+  function dayKind(t) { return t.wd === "Sun" ? "sunday" : "weekday"; }
+
+  function renderToday() {
+    var r = reach(), t = dublinNow(0), s = seasonFor(t), kind = dayKind(t);
+    var hrs = s.lock[kind], open = toMins(hrs[0]), close = toMins(hrs[1]);
+    var hasLunch = close > toMins(LUNCH[1]);
+    $("today-date").textContent = t.date.toLocaleDateString("en-IE", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Dublin" });
+    $("lock-hours").textContent = hrs[0] + " – " + hrs[1] + (hasLunch ? " · lunch " + LUNCH[0] + " – " + LUNCH[1] : "");
+
+    // Lock status now shows only through the closure alert; the badge was replaced by the daylight line.
+    var st = { className: "", textContent: "" }, now = t.mins;
+    renderSun(r);
+    var closedToday = closureOn(dublinISO(0)), closedTomorrow = closureOn(dublinISO(1));
+    var alertEl = $("closure-alert");
+    if (closedToday) {
+      alertEl.hidden = false;
+      alertEl.innerHTML = "Locks and lifting bridges are not operating today (" + closedToday.why + '). <a href="' + closedToday.url + '" target="_blank" rel="noopener">' + closedToday.notice + "</a>";
+    } else if (closedTomorrow) {
+      alertEl.hidden = false;
+      alertEl.innerHTML = "Tomorrow: locks and lifting bridges not operating (" + closedTomorrow.why + '). <a href="' + closedTomorrow.url + '" target="_blank" rel="noopener">' + closedTomorrow.notice + "</a>";
+    } else alertEl.hidden = true;
+
+    if (closedToday) { st.className = "pill bad"; st.textContent = "Closed today"; }
+    else if (now < open) { st.className = "pill warn"; st.textContent = "Opens at " + hrs[0]; }
+    else if (hasLunch && now >= toMins(LUNCH[0]) && now < toMins(LUNCH[1])) { st.className = "pill warn"; st.textContent = "Lunch until " + LUNCH[1]; }
+    else if (now < close) {
+      var left = close - now;
+      st.className = left <= 60 ? "pill warn" : "pill ok";
+      st.textContent = "Open, closes " + hrs[1] + (left <= 60 ? " (" + left + " min)" : "");
+    } else {
+      var tm = dublinNow(1), ts = seasonFor(tm);
+      st.className = "pill bad";
+      st.textContent = closedTomorrow ? "Closed, and not operating tomorrow" : "Closed, opens " + ts.lock[dayKind(tm)][0] + " tomorrow";
+    }
+
+    $("bridge-box").hidden = !r.bridge;
+    if (r.bridge) {
+      var times = s.bridge[kind], box = $("bridge-times"), nextT = null;
+      box.textContent = "";
+      times.forEach(function (tt) {
+        var c = document.createElement("span"), m = toMins(tt);
+        c.className = "chip";
+        if (closedToday || m < now) c.className += " past";
+        else if (nextT == null) { nextT = tt; c.className += " next"; }
+        c.textContent = tt; box.appendChild(c);
+      });
+      var bn = $("bridge-next");
+      if (closedToday) { bn.className = "pill bad"; bn.textContent = "Not opening today"; }
+      else if (nextT) {
+        var wait = toMins(nextT) - now;
+        bn.className = "pill " + (wait <= 15 ? "warn" : "ok");
+        bn.textContent = wait <= 0 ? "Opening now" : "Next in " + (wait >= 60 ? Math.floor(wait / 60) + " h " + (wait % 60) + " min" : wait + " min");
+      } else {
+        var tb = dublinNow(1);
+        bn.className = "pill bad";
+        bn.textContent = closedTomorrow ? "Done for today, none tomorrow" : "Done for today, first " + seasonFor(tb).bridge[dayKind(tb)][0] + " tomorrow";
+      }
+    }
+
+    renderFood(r, t);
+    var ul = $("contacts"); ul.textContent = "";
+    r.contacts.forEach(function (c) {
+      var li = document.createElement("li"), n = document.createElement("span"), a = document.createElement("a");
+      n.textContent = c[0];
+      a.href = "tel:" + c[1].replace(/\(0\)|[^+\d]/g, ""); a.className = "num"; a.textContent = c[1];
+      li.appendChild(n); li.appendChild(a); ul.appendChild(li);
+    });
+    $("today-note").textContent = "Waterways Ireland's 2026 timetable for " + s.name + ". Locks open outside these hours only in exceptional circumstances." +
+      (s.from[0] === 11 ? " Between November and mid-March, check with the Inspectorate (+353 (0)90 649 4232) that the navigation is open before you travel." : "") +
+      " Bank holidays aren't listed separately, so ring ahead.";
+  }
+
+  // Sun times by the standard sunrise equation (accurate to a minute or two).
+  // Returns UTC ms of the sun crossing altitude h (degrees) on the UTC day containing dayMs; null if it never does.
+  function sunTimes(dayMs, lat, lon, h) {
+    var rad = Math.PI / 180, J = dayMs / 864e5 + 2440587.5;
+    var n = Math.round(J - 2451545.0 + 0.0008), Js = n - lon / 360;
+    var M = (357.5291 + 0.98560028 * Js) % 360;
+    var C = 1.9148 * Math.sin(M * rad) + 0.02 * Math.sin(2 * M * rad) + 0.0003 * Math.sin(3 * M * rad);
+    var L = (M + C + 180 + 102.9372) % 360;
+    var Jt = 2451545.0 + Js + 0.0053 * Math.sin(M * rad) - 0.0069 * Math.sin(2 * L * rad);
+    var dec = Math.asin(Math.sin(L * rad) * Math.sin(23.4397 * rad));
+    var cw = (Math.sin(h * rad) - Math.sin(lat * rad) * Math.sin(dec)) / (Math.cos(lat * rad) * Math.cos(dec));
+    if (cw < -1 || cw > 1) return null;
+    var w = Math.acos(cw) / rad / 360;
+    var toMs = function (jd) { return (jd - 2440587.5) * 864e5; };
+    return { rise: toMs(Jt - w), set: toMs(Jt + w) };
+  }
+  function hhmm(ms) { return new Date(ms).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Europe/Dublin" }); }
+  function renderSun(r) {
+    var lat = r.sunAt[0], lon = r.sunAt[1], nowMs = Date.now();
+    // Midday of the Irish calendar day, so the right day is used just after local midnight.
+    var noon = function (off) { var p = dublinISO(off).split("-"); return Date.UTC(+p[0], +p[1] - 1, +p[2], 12); };
+    var day = function (off) {
+      var base = noon(off);
+      return { sun: sunTimes(base, lat, lon, -0.833), civil: sunTimes(base, lat, lon, -6) };
+    };
+    var today = day(0), tomorrow = day(1);
+    if (!today.sun || !today.civil) { $("sun-main").textContent = "–"; return; }
+    // Start of evening nautical twilight: the end of civil twilight (sun 6° below the horizon).
+    var moor = today.civil.set, label, main;
+    if (nowMs < today.sun.rise) { label = "Next sunrise"; main = "Sunrise " + hhmm(today.sun.rise) + " · sunset " + hhmm(today.sun.set); }
+    else if (nowMs < today.sun.set) { label = "Next sunset"; main = "Sunset " + hhmm(today.sun.set) + " · rose " + hhmm(today.sun.rise); }
+    else if (nowMs < moor) { label = "Sun has set"; main = "Sunset was " + hhmm(today.sun.set) + " · sunrise " + hhmm(tomorrow.sun.rise) + " tomorrow"; }
+    else { label = "Next sunrise"; main = "Sunrise " + hhmm(tomorrow.sun.rise) + " tomorrow"; moor = tomorrow.civil.set; }
+    $("sun-label").textContent = label;
+    $("sun-main").textContent = main;
+    $("sun-note").textContent = "The next 24 hours, from night through twilight to daylight. The marker is now.";
+
+    // Rolling 24-hour bar: night, astronomical, nautical and civil twilight, daylight. It scrolls with the clock.
+    var svg = $("sun-bar"); svg.textContent = "";
+    var t0 = nowMs - 3 * 3600e3, t1 = nowMs + 21 * 3600e3, L = 4, R = 316;
+    var X = function (ms) { return L + (Math.max(t0, Math.min(t1, ms)) - t0) / (t1 - t0) * (R - L); };
+    svg.appendChild(el("rect", { x: L, y: 8, width: R - L, height: 14, rx: 3, fill: "#1b2540" }));
+    var bands = [[-18, "#2c3a5e"], [-12, "#4d6290"], [-6, "var(--water-soft)"], [-0.833, "var(--warn-soft)"]];
+    var marks = [];
+    for (var off = -1; off <= 2; off++) {
+      var base = noon(off);
+      bands.forEach(function (b) {
+        var s = sunTimes(base, lat, lon, b[0]);
+        if (!s || s.set < t0 || s.rise > t1) return;
+        var x0 = X(s.rise), x1 = X(s.set);
+        svg.appendChild(el("rect", { x: x0, y: 8, width: Math.max(0, x1 - x0), height: 14, fill: b[1] }));
+        if (b[0] === -0.833) { marks.push(s.rise); marks.push(s.set); }
+      });
+    }
+    var nx = X(nowMs);
+    svg.appendChild(el("path", { d: "M" + (nx - 5) + " 2 L" + (nx + 5) + " 2 L" + nx + " 8 Z", fill: "var(--ink)" }));
+    svg.appendChild(el("line", { x1: nx, x2: nx, y1: 8, y2: 22, stroke: "var(--ink)", "stroke-width": 1.5 }));
+    marks.forEach(function (ms) {
+      if (ms <= t0 || ms >= t1) return;
+      var x = Math.max(L + 14, Math.min(R - 14, X(ms)));
+      svg.appendChild(el("text", { x: x, y: 38, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }, hhmm(ms)));
+    });
+  }
+
+  // Cruising hours between places, from shannon-river.com's chart (north to south; lower triangle).
+  var TRIP_PLACES = ["Belleek", "Enniskillen", "Belturbet", "Ballyconnell", "Ballinamore", "Leitrim", "Carrick-on-Shannon", "Dromod", "Roosky",
+    "Tarmonbarry", "Lanesborough", "Athlone", "Shannonbridge", "Banagher", "Portumna", "Scarriff", "Killaloe"];
+  var TRIP_ROWS = [[], [5], [9, 4], [12, 7, 3], [15, 10, 6, 3], [22, 16, 13, 10, 7], [23, 18, 14, 11, 8, 1], [25, 20, 16, 13, 10, 3, 2],
+    [26, 21, 17, 14, 11, 4, 3, 1], [28, 23, 19, 15, 13, 6, 5, 3, 2], [29, 24, 20, 16, 14, 7, 6, 4, 3, 1],
+    [32, 27, 23, 20, 17, 10, 9, 7, 6, 4, 2], [34, 29, 25, 22, 19, 12, 11, 9, 8, 7, 4, 2], [36, 31, 27, 24, 21, 14, 13, 11, 10, 8, 7, 4, 2],
+    [39, 34, 30, 27, 24, 17, 16, 14, 13, 11, 10, 7, 5, 3], [43, 38, 34, 31, 28, 21, 20, 18, 17, 15, 14, 11, 9, 7, 4],
+    [43, 38, 34, 31, 28, 21, 20, 19, 17, 15, 14, 11, 9, 7, 4, 2]];
+  var TRIP_DEFAULT = { derg: ["Portumna", "Killaloe"], mid: ["Banagher", "Athlone"], ree: ["Athlone", "Lanesborough"] };
+  function tripHours(a, b) {
+    var i = TRIP_PLACES.indexOf(a), j = TRIP_PLACES.indexOf(b);
+    if (i < 0 || j < 0) return null; if (i === j) return 0;
+    return i > j ? TRIP_ROWS[i][j] : TRIP_ROWS[j][i];
+  }
+  var tripReady = false;
+  function renderTrip() {
+    var r = reach(), from = $("trip-from"), to = $("trip-to"), dep = $("trip-dep");
+    if (!tripReady) {
+      [from, to].forEach(function (s) {
+        TRIP_PLACES.forEach(function (p) { var o = document.createElement("option"); o.value = p; o.textContent = p; s.appendChild(o); });
+        s.addEventListener("change", function () { save("shannon.trip." + state.reach, JSON.stringify([from.value, to.value])); tripCalc(); });
+      });
+      dep.addEventListener("input", function () { dep.dataset.touched = "1"; tripCalc(); });
+      $("trip-swap").addEventListener("click", function () {
+        var f = from.value; from.value = to.value; to.value = f;
+        save("shannon.trip." + state.reach, JSON.stringify([from.value, to.value])); tripCalc();
+      });
+      tripReady = true;
+    }
+    if (tripReady !== r.id) {
+      var pair = loadJSON("shannon.trip." + r.id) || TRIP_DEFAULT[r.id] || ["Athlone", "Lanesborough"];
+      from.value = pair[0]; to.value = pair[1]; tripReady = r.id;
+    }
+    if (!dep.dataset.touched) {
+      // Default departure: now, rounded up to the next quarter hour.
+      var m = Math.ceil(minsNowDublin() / 15) * 15 % 1440;
+      dep.value = pad2(Math.floor(m / 60)) + ":" + pad2(m % 60);
+    }
+    tripCalc();
+  }
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  function minsNowDublin() { var p = hhmm(Date.now()).split(":"); return +p[0] * 60 + +p[1]; }
+  // Cruising window for an Irish calendar day: sunrise to 30 minutes before sunset, in minutes after local midnight.
+  function cruiseWindow(off, r) {
+    var p = dublinISO(off).split("-"), s = sunTimes(Date.UTC(+p[0], +p[1] - 1, +p[2], 12), r.sunAt[0], r.sunAt[1], -0.833);
+    if (!s) return null;
+    var m = function (ms) { var t = hhmm(ms).split(":"); return +t[0] * 60 + +t[1]; };
+    return { start: m(s.rise), end: m(s.set) - 30 };
+  }
+  function fmtMins(m) { return pad2(Math.floor(m / 60)) + ":" + pad2(Math.round(m % 60)); }
+  function fmtDur(m) { var hh = Math.floor(m / 60), mm = Math.round(m % 60); return hh + " h" + (mm ? " " + pad2(mm) : ""); }
+  function dayName(off) {
+    if (off === 0) return "Today"; if (off === 1) return "Tomorrow";
+    var p = dublinISO(off).split("-");
+    return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 12)).toLocaleDateString("en-IE", { weekday: "long", timeZone: "UTC" });
+  }
+  function tripCalc() {
+    var r = reach(), h = tripHours($("trip-from").value, $("trip-to").value), dep = $("trip-dep").value;
+    $("trip-eta-box").className = "res";
+    if (h == null) return;
+    if (h === 0) { $("trip-hrs").textContent = "0 h"; $("trip-hrs-ft").textContent = "Pick two different places."; $("trip-eta").textContent = "–"; $("trip-eta-ft").textContent = ""; return; }
+    $("trip-hrs").textContent = h + " h";
+    if (!/^\d\d:\d\d$/.test(dep)) { $("trip-hrs-ft").textContent = ""; $("trip-eta").textContent = "–"; $("trip-eta-ft").textContent = ""; return; }
+    // Spend the cruising hours only inside each day's window, starting today at the chosen time.
+    var left = h * 60, t = +dep.slice(0, 2) * 60 + +dep.slice(3), legs = [], off = 0, arrive = null, startNote = "";
+    for (off = 0; off < 30 && left > 0; off++) {
+      var w = cruiseWindow(off, r);
+      if (!w) continue;
+      var from = off === 0 ? Math.max(t, w.start) : w.start;
+      if (off === 0 && t < w.start) startNote = "Starts at sunrise, " + fmtMins(w.start) + ".";
+      if (from >= w.end) { if (off === 0) startNote = "Too late to set off today, so it starts at sunrise."; continue; }
+      var use = Math.min(left, w.end - from);
+      legs.push(dayName(off) + " " + fmtMins(from) + "–" + fmtMins(from + use));
+      left -= use;
+      if (left <= 0) arrive = { off: off, at: from + use, w: w };
+    }
+    if (!arrive) { $("trip-eta").textContent = "–"; $("trip-eta-ft").textContent = ""; return; }
+    var days = legs.length;
+    $("trip-hrs-ft").textContent = days === 1 ? "One day in daylight" : days + " days in daylight: " + legs.join(" · ");
+    $("trip-eta").textContent = fmtMins(arrive.at);
+    var lead = arrive.off === 0 ? "Today" : arrive.off === 1 ? "Tomorrow" : dayName(arrive.off);
+    $("trip-eta-ft").textContent = lead + ". Cruising window ends " + fmtMins(arrive.w.end) + "." + (startNote ? " " + startNote : "");
+  }
+
+  function gmaps(q, id) { return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q) + "&query_place_id=" + id; }
+  function link(label, href) {
+    var a = document.createElement("a"); a.href = href; a.target = "_blank"; a.rel = "noopener"; a.textContent = label; return a;
+  }
+  function renderFood(r, t) {
+    var box = $("food-box"), wrap = $("food");
+    box.hidden = !r.food;
+    if (!r.food) return;
+    var dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(t.wd);
+    wrap.textContent = "";
+    var rated = r.food.some(function (v) { return typeof v.stars === "number"; });
+    var asof = r.foodChecked ? new Date(r.foodChecked).toLocaleDateString("en-IE", { day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Dublin" }) : "13 Oct 2026";
+    $("food-asof").textContent = (rated ?
+      "Walk times are estimates from the public moorings. Claude's rating weighs the crowd's score by how many reviews it rests on, adds awards and guide listings, and spreads it onto a five-star scale. Rate places yourself to test it. " :
+      "") + "Hours, phones and menus from each venue's own website, checked " + asof + " and refreshed weekly. Crowd ratings and reviews are on each venue's Google listing.";
+    // Split into two collapsible menus: places to eat, and drinks-only pubs. Harbour headings repeat in each where needed.
+    var isPub = function (v) { return v.kind === "pub" || /^(Pub[: ]|Ireland's oldest pub)/.test(v.note || ""); };
+    var sections = [{ key: "eat", title: "Eating ashore", items: [] }, { key: "pubs", title: "Pubs", items: [] }];
+    var area = null, lastArea = {};
+    r.food.forEach(function (v) {
+      if (v.area) { area = v; return; }
+      var s = sections[isPub(v) ? 1 : 0];
+      if (area && lastArea[s.key] !== area) { s.items.push(area); lastArea[s.key] = area; }
+      s.items.push(v);
+    });
+    sections.forEach(function (s) {
+      var count = s.items.filter(function (v) { return !v.area && v.id; }).length;
+      if (!count && s.key === "pubs") return;
+      var det = document.createElement("details"); det.className = "food-menu";
+      det.id = "food-" + s.key;
+      var openKey = "shannon.open." + s.key;
+      if (load(openKey) === "1") det.open = true;
+      det.addEventListener("toggle", function () { save(openKey, det.open ? "1" : "0"); });
+      var sum = document.createElement("summary");
+      sum.innerHTML = '<span class="food-title"></span> <span class="food-count"></span>';
+      sum.querySelector(".food-title").textContent = s.title;
+      sum.querySelector(".food-count").textContent = count + (count === 1 ? " place" : " places");
+      det.appendChild(sum);
+      var inner = document.createElement("div"); inner.className = "food";
+      if (s.key === "eat" && rated) inner.appendChild(scoreCard(r));
+      s.items.forEach(function (v) { inner.appendChild(venueCard(v)); });
+      det.appendChild(inner);
+      wrap.appendChild(det);
+    });
+    function venueCard(v) {
+      if (v.area) { var h = document.createElement("h3"); h.textContent = v.area; return h; }
+      var d = document.createElement("div"); d.className = "venue";
+      var top = document.createElement("div"); top.className = "venue-top";
+      var n = document.createElement("span"); n.className = "venue-name"; n.textContent = v.name; top.appendChild(n);
+      if (v.phone) { var p = link(v.phone, "tel:" + v.phone.replace(/\(0\)|[^+\d]/g, "")); p.className = "num"; top.appendChild(p); }
+      d.appendChild(top);
+      if (v.where) { var w = document.createElement("span"); w.className = "where"; w.textContent = v.where; d.appendChild(w); }
+      if (v.walk) { var wk = document.createElement("span"); wk.className = "where"; wk.textContent = v.walk; d.appendChild(wk); }
+      if (typeof v.stars === "number") d.appendChild(ratingRow(v));
+      if (v.days) {
+        var td = document.createElement("span"), today = v.days[dow];
+        td.className = "today-hrs" + (today === null ? " closed" : "");
+        td.textContent = "Today: " + (today === null ? "closed" : today);
+        d.appendChild(td);
+      }
+      if (v.note) { var nt = document.createElement("span"); nt.className = "where"; nt.textContent = v.note; d.appendChild(nt); }
+      var todayISO = dublinISO(0);
+      ((state.events && state.events.venueNews) || []).forEach(function (x) {
+        if (!x || x.venueId !== v.id || !x.text || (x.until && x.until < todayISO)) return;
+        var nw = document.createElement("span"); nw.className = "news"; nw.textContent = "From their newsletter: " + x.text; d.appendChild(nw);
+      });
+      var ls = document.createElement("div"); ls.className = "links";
+      (v.menus || []).forEach(function (m) { ls.appendChild(link(m[0], m[1])); });
+      if (v.google) ls.appendChild(link("Google rating & reviews", gmaps(v.google[0], v.google[1])));
+      (v.links || []).forEach(function (m) { ls.appendChild(link(m[0] + " on Google", gmaps(m[1], m[2]))); });
+      if (ls.childNodes.length) d.appendChild(ls);
+      return d;
+    }
+  }
+
+  function starText(s) { var f = Math.floor(s); return "★".repeat(f) + (s - f >= 0.5 ? "½" : ""); }
+  function ratingRow(v) {
+    var row = document.createElement("div"); row.className = "rate";
+    var c = document.createElement("span"); c.className = "rate-claude";
+    c.innerHTML = '<span class="rate-k">Claude</span> <span class="stars"></span>';
+    c.querySelector(".stars").textContent = starText(v.stars) + " " + v.stars.toFixed(1);
+    row.appendChild(c);
+    var lab = document.createElement("label"); lab.className = "rate-you";
+    var sel = document.createElement("select"); sel.id = "rate-" + v.id;
+    var opts = ["–", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"];
+    opts.forEach(function (o) { var op = document.createElement("option"); op.value = o === "–" ? "" : o; op.textContent = o === "–" ? "Not rated" : starText(+o) + " " + (+o).toFixed(1); sel.appendChild(op); });
+    var mine = state.myRatings && state.myRatings[v.id];
+    sel.value = typeof mine === "number" ? String(mine) : "";
+    sel.disabled = !state.db;
+    sel.addEventListener("change", function () { saveMyRating(v.id, sel.value === "" ? null : +sel.value); });
+    var k = document.createElement("span"); k.className = "rate-k"; k.textContent = "You";
+    lab.appendChild(k); lab.appendChild(sel);
+    row.appendChild(lab);
+    if (typeof mine === "number") {
+      var gap = Math.abs(mine - v.stars), g = document.createElement("span");
+      g.className = "rate-gap " + (gap <= 0.5 ? "ok" : gap <= 1 ? "warn" : "bad");
+      g.textContent = gap === 0 ? "Spot on" : (gap <= 0.5 ? "Close" : "Off by " + gap.toFixed(1));
+      row.appendChild(g);
+    }
+    return row;
+  }
+  function saveMyRating(id, val) {
+    if (!state.db) return;
+    var next = Object.assign({}, state.myRatings || {});
+    if (val == null) delete next[id]; else next[id] = val;
+    state.myRatings = next;
+    state.db.doc("ratings/mine").set({ ratings: next, notes: state.myNotes || {}, updated: new Date().toISOString() }).catch(function () {});
+    render();
+  }
+  // How well Claude's ratings match yours, across every venue you've rated.
+  function scoreCard(r) {
+    var box = document.createElement("div"); box.className = "scorecard";
+    var pairs = r.food.filter(function (v) { return typeof v.stars === "number" && state.myRatings && typeof state.myRatings[v.id] === "number"; });
+    if (!pairs.length) { box.textContent = "Reviewer experiment: rate a place you know to see how close Claude gets."; return box; }
+    var gaps = pairs.map(function (v) { return Math.abs(state.myRatings[v.id] - v.stars); });
+    var mean = gaps.reduce(function (a, b) { return a + b; }, 0) / gaps.length;
+    var close = gaps.filter(function (g) { return g <= 0.5; }).length;
+    var bias = pairs.reduce(function (a, v) { return a + (state.myRatings[v.id] - v.stars); }, 0) / pairs.length;
+    box.textContent = "Reviewer experiment: you've rated " + pairs.length + (pairs.length === 1 ? " place" : " places") +
+      ". Claude was within half a star on " + close + ", with an average gap of " + mean.toFixed(1) + " stars" +
+      (Math.abs(bias) >= 0.25 ? " and tends to rate " + (bias > 0 ? "lower" : "higher") + " than you." : ".");
+    return box;
+  }
+
+  // Change over roughly the last six hours of stored readings.
+  function trend(h) {
+    if (!h || h.length < 2) return null;
+    var last = h[h.length - 1], tl = new Date(last.t).getTime(), base = null;
+    for (var i = h.length - 2; i >= 0; i--) {
+      var dt = tl - new Date(h[i].t).getTime();
+      if (dt > 8 * 3600e3) break;
+      base = h[i];
+      if (dt >= 5 * 3600e3) break;
+    }
+    if (!base) return null;
+    var hrs = Math.round((tl - new Date(base.t).getTime()) / 3600e3);
+    var cm = Math.round((last.v - base.v) * 100);
+    if (Math.abs(cm) < 1) return "Steady over " + hrs + " h";
+    return (cm < 0 ? "↓ Falling " : "↑ Rising ") + Math.abs(cm) + " cm in " + hrs + " h";
+  }
+
+  function render() {
+    var r = reach(), s = settings(r), cill = r.cills[s.cill];
+    var rd = reading(r), man = manualOf(r);
+    var datum = datumOf(r);
+
+    // Workings
+    var w;
+    if (isOsl(r)) {
+      w = "Banagher summer level".padEnd(24) + r.osl.poolbeg.toFixed(2) + " m Poolbeg\n" +
+        "Poolbeg → Malin".padEnd(24) + "−2.71 m\n" +
+        "Datum (estimated)".padEnd(24) + datum.toFixed(3) + " m OD Malin";
+    } else {
+    w = cill.name.padEnd(22) + cill.poolbeg.toFixed(2) + " m Poolbeg\n" +
+      "Poolbeg → Malin".padEnd(22) + "−2.71 m\n";
+    }
+    if (isOsl(r)) { /* workings done */ }
+    else if (s.feet != null) {
+      w += ("+ " + s.feet + " ft").padEnd(22) + "+" + (s.feet * FOOT).toFixed(3) + " m\n" +
+        "Chart datum".padEnd(22) + datum.toFixed(3) + " m OD Malin";
+    } else {
+      w += "+ ? ft".padEnd(22) + "from your chart\n" + "Chart datum".padEnd(22) + "not set";
+    }
+    $("workings").textContent = w;
+    $("datum-note").textContent = s.feet != null && s.feet !== r.feet && r.feet != null ?
+      "You've changed this from the CSIG figure of " + r.feet + " ft." : "";
+
+    // Freshness
+    var age = Date.now() - new Date(rd.time).getTime();
+    var pill = $("fresh");
+    if (man) { pill.className = "pill warn"; pill.textContent = "Your reading, " + ageText(age); }
+    else if (age < 3 * 3600e3) { pill.className = "pill ok"; pill.textContent = "Current, " + ageText(age); }
+    else if (age < 12 * 3600e3) { pill.className = "pill warn"; pill.textContent = ageText(age); }
+    else { pill.className = "pill bad"; pill.textContent = "Out of date, " + ageText(age); }
+    $("src").innerHTML = (man ? "Entered by you" : r.gauge.name + " gauge (OPW " + r.gauge.station + ")") +
+      ' · <span class="mono">' + rd.level.toFixed(3) + " m</span> · " + fmtTime(rd.time);
+    var tr = man ? null : trend(state.histories[r.gauge.doc]);
+    if (tr) $("src").innerHTML += " · <b>" + tr + "</b>";
+
+    $("g-level").textContent = rd.level.toFixed(3) + " m";
+    $("g-cill").textContent = ftIn(rd.level - cill.malin) + " (" + cill.name.replace(/ cill$/, "") + ")";
+
+    if (isOsl(r)) {
+      var eoff = rd.level - datum, ecm = Math.round(Math.abs(eoff) * 100);
+      $("offset").className = "big";
+      $("offset").innerHTML = signed(eoff, 2) + '<span class="unit">m est.</span>';
+      $("say").textContent = "Estimated. CSIG charts average the depths on this stretch, so this compares " + r.gauge.name +
+        " with its ordinary summer level instead: roughly " +
+        (ecm === 0 ? "no change to" : (eoff > 0 ? "add " : "take ") + ecm + " cm " + (eoff > 0 ? "to" : "off")) +
+        " charted depths. Treat it as a rough guide.";
+      $("g-datum").textContent = datum.toFixed(3) + " m (est.)";
+      if (!man) {
+        pill.className = age < 12 * 3600e3 ? "pill warn" : "pill bad";
+        pill.textContent = "Estimated, " + ageText(age);
+      }
+    } else if (datum == null) {
+      $("offset").className = "big pending";
+      $("offset").textContent = "Averaged";
+      $("say").textContent = "Chart depths on this stretch are averaged, so take them as they are while you're in the navigation. The water at " + r.gauge.name + " is " + ftIn(rd.level - cill.malin) + " over the " + cill.name + ".";
+      $("g-datum").textContent = "not set";
+    } else {
+      var off = rd.level - datum;
+      var cm = Math.round(Math.abs(off) * 100);
+      $("offset").className = "big";
+      $("offset").innerHTML = signed(off, 2) + '<span class="unit">m</span>';
+      var say;
+      if (cm === 0) say = "The water is at chart datum. Charted depths are what you have.";
+      else if (off > 0) say = "The water is " + cm + " cm above chart datum. Add " + cm + " cm to every charted depth.";
+      else say = "The water is " + cm + " cm below chart datum. Take " + cm + " cm off every charted depth.";
+      $("say").textContent = say;
+      $("g-datum").textContent = datum.toFixed(3) + " m";
+    }
+    renderWeather();
+    renderTrip();
+    renderToday();
+    renderNotices();
+    drawGauge(rd.level, datum);
+    drawSpark(state.histories[r.gauge.doc] || [], datum);
+    calc();
+
+    $("manual-active").hidden = !man;
+    if (man) $("manual-note").textContent = "Using your " +
+      (man.sounder != null ? "sounder check (" + signed(man.sounder / 100, 2) + " m against the chart)" :
+       man.feet != null ? "reading of " + man.feet + " ft over the cill" : "reading of " + man.level.toFixed(3) + " m") +
+      " from " + fmtTime(man.time) + ".";
+  }
+
+  function calc() {
+    var r = reach(), corr = correctionOf(r), estd = isOsl(r);
+    var ch = parseFloat($("charted").value), dr = parseFloat($("draft").value);
+    var clr = $("r-clear");
+    if (corr == null || !isFinite(ch)) {
+      $("depth").textContent = "–"; $("depth-ft").textContent = corr == null ? "Needs the chart datum" : "";
+      $("clear").textContent = "–"; $("clear-ft").textContent = ""; clr.className = "res"; return;
+    }
+    var depth = ch + corr;
+    $("depth").textContent = depth.toFixed(2) + " m";
+    $("depth-ft").textContent = (depth * FT).toFixed(1) + " ft" + (estd ? " · estimated" : "");
+    if (!isFinite(dr)) { $("clear").textContent = "–"; $("clear-ft").textContent = "Enter your draft"; clr.className = "res"; return; }
+    var c = depth - dr, st, word;
+    $("clear").textContent = signed(c, 2) + " m";
+    if (c < 0.3) { st = "bad"; word = c < 0 ? "Aground" : "Too tight"; }
+    else if (c < 0.6) { st = "warn"; word = "Go slow"; }
+    else { st = "ok"; word = "Comfortable"; }
+    clr.className = "res state-" + st;
+    $("clear-ft").textContent = (c * FT).toFixed(1) + " ft · " + word;
+  }
+
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, text) {
+    var e = document.createElementNS(NS, tag), style = "";
+    for (var k in attrs) {
+      // CSS custom properties only resolve reliably through style, not SVG presentation attributes.
+      if (/^(fill|stroke|font-family)$/.test(k)) style += k + ":" + attrs[k] + ";";
+      else e.setAttribute(k, attrs[k]);
+    }
+    if (style) e.setAttribute("style", style);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function drawGauge(level, datum) {
+    var svg = $("gauge"); svg.textContent = "";
+    var ref = datum == null ? level : datum;
+    var lo = -0.5, hi = 1.0, top = 16, bot = 304;
+    var y = function (rel) { return bot - (rel - lo) / (hi - lo) * (bot - top); };
+    var rel = level - ref, clamped = Math.max(lo, Math.min(hi, rel));
+    var x0 = 54, w = 34;
+    svg.appendChild(el("rect", { x: x0, y: top, width: w, height: bot - top, fill: "var(--bg)", stroke: "var(--line)" }));
+    svg.appendChild(el("rect", { "class": "waterfill", x: x0 + 1, y: y(clamped), width: w - 2, height: bot - y(clamped), fill: "var(--water-soft)" }));
+    svg.appendChild(el("line", { x1: x0, x2: x0 + w, y1: y(clamped), y2: y(clamped), stroke: "var(--water)", "stroke-width": 2.5 }));
+    for (var i = 0; i <= 15; i++) {
+      var t = lo + i * 0.1, yy = y(t), major = i % 5 === 0;
+      svg.appendChild(el("line", { x1: x0, x2: x0 + (major ? 14 : 7), y1: yy, y2: yy, stroke: "var(--muted)", "stroke-width": major ? 1.5 : 1 }));
+      if (major) svg.appendChild(el("text", { x: x0 - 6, y: yy + 4, "text-anchor": "end", "font-size": 11, "font-family": "var(--mono)", fill: "var(--muted)" }, (t > 0.001 ? "+" : t < -0.001 ? "−" : "") + Math.abs(t).toFixed(1)));
+    }
+    if (datum != null) {
+      svg.appendChild(el("line", { x1: x0 - 4, x2: x0 + w + 8, y1: y(0), y2: y(0), stroke: "var(--ink)", "stroke-width": 1.5, "stroke-dasharray": "4 3" }));
+      svg.appendChild(el("text", { x: x0 + w + 6, y: y(0) - 5, "font-size": 11, fill: "var(--ink)", "font-family": "var(--body)" }, "Datum"));
+    }
+    var note = rel > hi ? "off scale ↑" : rel < lo ? "off scale ↓" : "Water";
+    svg.appendChild(el("text", { x: x0 + w + 6, y: y(clamped) + 14, "font-size": 11, fill: "var(--water)", "font-weight": 600, "font-family": "var(--body)" }, note));
+    svg.appendChild(el("text", { x: 4, y: top - 4, "font-size": 9, fill: "var(--muted)", "font-family": "var(--body)" }, datum == null ? "m from now" : "m from datum"));
+  }
+
+  function drawSpark(h, datum) {
+    var box = $("spark");
+    if (!h || h.length < 2) { box.hidden = true; return; }
+    box.hidden = false;
+    var svg = $("spark-svg"); svg.textContent = "";
+    var ref = datum == null ? h[h.length - 1].v : datum;
+    var W = 320, H = 90, L = 40, R = 6, T = 8, B = 20;
+    var ts = h.map(function (p) { return new Date(p.t).getTime(); });
+    var vs = h.map(function (p) { return p.v - ref; });
+    var t0 = Math.min.apply(null, ts), t1 = Math.max.apply(null, ts);
+    var v0 = Math.min(0, Math.min.apply(null, vs)), v1 = Math.max(0, Math.max.apply(null, vs));
+    var pad = Math.max(0.03, (v1 - v0) * 0.15); v0 -= pad; v1 += pad;
+    var X = function (t) { return L + (t - t0) / Math.max(1, t1 - t0) * (W - L - R); };
+    var Y = function (v) { return T + (v1 - v) / (v1 - v0) * (H - T - B); };
+    if (datum != null) svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(0), y2: Y(0), stroke: "var(--ink)", "stroke-dasharray": "4 3", "stroke-width": 1 }));
+    svg.appendChild(el("text", { x: L - 4, y: Y(0) + 4, "text-anchor": "end", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }, datum == null ? "now" : "0"));
+    [v0 + pad, v1 - pad].forEach(function (v) {
+      if (Math.abs(Y(v) - Y(0)) < 10) return;
+      svg.appendChild(el("text", { x: L - 4, y: Y(v) + 4, "text-anchor": "end", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }, signed(v, 2)));
+    });
+    var pts = h.map(function (p, i) { return X(ts[i]).toFixed(1) + "," + Y(vs[i]).toFixed(1); });
+    svg.appendChild(el("polygon", { points: X(ts[0]) + "," + Y(v0) + " " + pts.join(" ") + " " + X(ts[ts.length - 1]) + "," + Y(v0), fill: "var(--water-soft)" }));
+    svg.appendChild(el("polyline", { points: pts.join(" "), fill: "none", stroke: "var(--water)", "stroke-width": 2 }));
+    svg.appendChild(el("circle", { cx: X(ts[ts.length - 1]), cy: Y(vs[vs.length - 1]), r: 3.5, fill: "var(--water)" }));
+    var f = function (t) { return new Date(t).toLocaleDateString("en-IE", { day: "numeric", month: "short", timeZone: "Europe/Dublin" }); };
+    svg.appendChild(el("text", { x: L, y: H - 4, "font-size": 10, fill: "var(--muted)", "font-family": "var(--body)" }, f(t0)));
+    svg.appendChild(el("text", { x: W - R, y: H - 4, "text-anchor": "end", "font-size": 10, fill: "var(--muted)", "font-family": "var(--body)" }, f(t1)));
+  }
+
+  // Inputs
+  $("charted").addEventListener("input", calc);
+  $("draft").addEventListener("input", function () { save("derg.draft", $("draft").value); calc(); });
+  function saveDatum() {
+    var r = reach(), ft = parseFloat($("datum-ft").value);
+    var s = { cill: parseInt($("cill").value, 10) || 0, feet: isFinite(ft) && ft >= 0 && ft < 20 ? ft : null };
+    if (s.feet == null && r.feet != null) s.feet = r.feet;
+    save("shannon.datum." + r.id, JSON.stringify(s));
+    $("datum-ft").value = s.feet == null ? "" : s.feet;
+    render();
+  }
+  $("cill").addEventListener("change", saveDatum);
+  $("datum-ft").addEventListener("change", saveDatum);
+
+  function setManual(m) { save("shannon.manual." + reach().id, m ? JSON.stringify(m) : null); render(); }
+  function warn(t) { $("manual-note").textContent = t; $("manual-active").hidden = false; }
+  $("use-manual").addEventListener("click", function () {
+    var r = reach(), v = parseFloat($("manual").value);
+    if (!isFinite(v)) return;
+    if (v < 5) v += r.gauge.zero;
+    var expect = state.feeds[r.gauge.doc].level;
+    if (Math.abs(v - expect) > 2.5) { warn("That doesn't look like a reading for " + r.gauge.name + ". Expect something near " + expect.toFixed(1) + " m."); return; }
+    setManual({ level: v, time: new Date().toISOString() });
+  });
+  $("use-feet").addEventListener("click", function () {
+    var r = reach(), f = parseFloat($("feet").value);
+    if (!isFinite(f)) return;
+    if (f < 2 || f > 16) { warn("That doesn't look like feet over the cill. Expect something between about 5 and 12 ft."); return; }
+    var cill = r.cills[settings(r).cill];
+    setManual({ level: cill.malin + f * FOOT, time: new Date().toISOString(), feet: f });
+  });
+  $("use-sounder").addEventListener("click", function () {
+    var r = reach(), datum = datumOf(r);
+    var spot = parseFloat($("spot").value), snd = parseFloat($("sounder").value);
+    if (!isFinite(spot) || !isFinite(snd)) return;
+    if (datum == null) { warn("This stretch has no chart datum, so a sounder check can't set a level here."); return; }
+    if (Math.abs(snd - spot) > 2) { warn("Those differ by more than 2 m. Check you're on the charted spot and that the sounder shows depth below the surface."); return; }
+    setManual({ level: datum + (snd - spot), time: new Date().toISOString(), sounder: Math.round((snd - spot) * 100) });
+  });
+  $("clear-manual").addEventListener("click", function () { $("manual").value = ""; $("feet").value = ""; $("spot").value = ""; $("sounder").value = ""; setManual(null); });
+
+  // Carry over settings from the single-lake version of this page.
+  (function migrate() {
+    var oldM = loadJSON("derg.manual");
+    if (oldM && !load("shannon.manual.derg")) save("shannon.manual.derg", JSON.stringify(oldM));
+    save("derg.manual", null); save("derg.datum", null);
+  })();
+
+  buildSelector();
+  buildReachPanels();
+  render();
+  setInterval(render, 60000);
+
+  // Gauge readings are kept in this page's store and refreshed every two hours by a scheduled task.
+  if (window.claude && window.claude.use) {
+    window.claude.use("db").then(function (db) {
+      if (!db) return;
+      Object.keys(BAKED).forEach(function (key) {
+        db.doc("gauge/" + key).onSnapshot(function (snap) {
+          if (!snap.exists) return;
+          var data = snap.data();
+          if (typeof data.level !== "number" || !data.time) return;
+          state.feeds[key] = { level: data.level, time: data.time };
+          state.histories[key] = Array.isArray(data.history) ? data.history.filter(function (p) { return p && typeof p.v === "number" && p.t; }) : [];
+          render();
+        }, function () { /* keep the last reading shown */ });
+      });
+      db.doc("food/ree").onSnapshot(function (snap) {
+        if (!snap.exists) return;
+        var data = snap.data();
+        if (!data || !Array.isArray(data.venues) || !data.venues.length) return;
+        var ree = byId("ree");
+        ree.food = data.venues.filter(function (v) { return v && (v.area || v.name); });
+        if (data.checked) ree.foodChecked = data.checked;
+        render();
+      }, function () {});
+      ["derg", "mid"].forEach(function (rid) {
+        db.doc("food/" + rid).onSnapshot(function (snap) {
+          if (!snap.exists) return;
+          var data = snap.data();
+          if (!data || !Array.isArray(data.venues) || !data.venues.length) return;
+          var rr = byId(rid);
+          rr.food = data.venues.filter(function (v) { return v && (v.area || v.name); });
+          if (data.checked) rr.foodChecked = data.checked;
+          render();
+        }, function () {});
+      });
+      // Your own star ratings, saved for the reviewer experiment.
+      state.db = db;
+      db.doc("ratings/mine").onSnapshot(function (snap) {
+        var data = snap.exists ? snap.data() : null;
+        state.myRatings = (data && data.ratings && typeof data.ratings === "object") ? Object.assign({}, data.ratings) : {};
+        state.myNotes = (data && data.notes && typeof data.notes === "object") ? Object.assign({}, data.notes) : {};
+        state.myRatingsVersion = true;
+        render();
+      }, function () {});
+      db.doc("notices/live").onSnapshot(function (snap) {
+        if (!snap.exists) return;
+        var data = snap.data();
+        if (!data || !Array.isArray(data.notices)) return;
+        NOTICES = data.notices.filter(function (n) { return n && n.no && n.title && n.url && n.until; });
+        CLOSURES = Array.isArray(data.closures) ? data.closures.filter(function (c) { return c && c.date && c.url; }) : [];
+        if (data.updated) noticesAsOf = new Date(data.updated).toLocaleDateString("en-IE", { day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Dublin" });
+        render();
+      }, function () {});
+      db.doc("events/live").onSnapshot(function (snap) {
+        if (!snap.exists) return;
+        var data = snap.data();
+        if (data && typeof data === "object") { state.events = data; render(); }
+      }, function () {});
+      db.doc("weather/lakes").onSnapshot(function (snap) {
+        if (!snap.exists) return;
+        var data = snap.data();
+        if (data && data.issued && data.lakes) { state.weather = data; render(); }
+      }, function () {});
+    }).catch(function () {});
+  }
+})();
+</script>
+
+</body>
+</html>
