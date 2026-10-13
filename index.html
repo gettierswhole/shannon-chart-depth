@@ -175,6 +175,7 @@ a { color: var(--water); }
   <header>
     <h1>Shannon Chart Depth</h1>
     <p class="sub">CSIG charted depths corrected for today's water level</p>
+    <p class="alert" id="offline" hidden>No signal: showing the last data saved on this phone. Check the reading times before relying on it.</p>
   </header>
 
   <nav class="reaches" id="reaches" aria-label="Stretch of river"></nav>
@@ -215,7 +216,7 @@ a { color: var(--water); }
           <div class="res" id="trip-hrs-box"><div class="label">Cruising</div><div class="v" id="trip-hrs">–</div><div class="ft" id="trip-hrs-ft"></div></div>
           <div class="res" id="trip-eta-box"><div class="label">Arrive about</div><div class="v" id="trip-eta">–</div><div class="ft" id="trip-eta-ft"></div></div>
         </div>
-        <p class="fine">Cruising hours from the shannon-river.com distance chart, counted only between sunrise and 30 minutes before sunset. Allow extra for locks, Portumna Bridge and the weather.</p>
+        <p class="fine">Cruising hours from the shannon-river.com distance chart, counted only between sunrise and 30 minutes before sunset, plus 20 minutes per lock, Waterways Ireland lock hours and lunch breaks, Portumna Bridge openings and announced closures. Allow extra for the weather.</p>
       </section>
 
       <section class="panel today" id="today">
@@ -414,6 +415,7 @@ a { color: var(--water); }
   };
   window.claude = { use: function (name) { return name === "db" ? Promise.resolve(db) : Promise.reject(new Error("unavailable")); } };
   load(); setInterval(load, 10 * 60 * 1000);
+  if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js"); } catch (e) {} }
 })();
 </script>
 <style>.rate-you, .rate-gap, .scorecard { display: none !important; }</style>
@@ -554,6 +556,27 @@ a { color: var(--water); }
   function load(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
   function save(key, v) { try { if (v == null) localStorage.removeItem(key); else localStorage.setItem(key, v); } catch (e) {} }
   function loadJSON(key) { var s = load(key); if (!s) return null; try { return JSON.parse(s); } catch (e) { return null; } }
+  function cachedDb(real) {
+    return {
+      doc: function (path) {
+        var key = "shannon.cache." + path;
+        return {
+          onSnapshot: function (cb, err) {
+            var c = loadJSON(key);
+            if (c) { try { cb({ exists: true, data: function () { return c; } }); } catch (e) {} }
+            if (!real) return function () {};
+            return real.doc(path).onSnapshot(function (snap) {
+              if (snap.exists) { try { save(key, JSON.stringify(snap.data())); } catch (e) {} }
+              cb(snap);
+            }, err || function () {});
+          },
+          set: function (v) { return real ? real.doc(path).set(v) : Promise.reject(new Error("offline")); }
+        };
+      }
+    };
+  }
+  function showOnline() { var o = document.getElementById("offline"); if (o) o.hidden = navigator.onLine !== false; }
+  window.addEventListener("online", showOnline); window.addEventListener("offline", showOnline);
 
   var state = { reach: load("shannon.reach") || "derg", feeds: {}, histories: {} };
   if (!REACHES.some(function (r) { return r.id === state.reach; })) state.reach = "derg";
@@ -975,32 +998,102 @@ a { color: var(--water); }
     var p = dublinISO(off).split("-");
     return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 12)).toLocaleDateString("en-IE", { weekday: "long", timeZone: "UTC" });
   }
+  // Locks and lifting bridges on each leg between neighbouring chart places, listed north to south.
+  // Shannon–Erne lock numbers from canalplan.co.uk; Shannon locks from Waterways Ireland.
+  var LOCK_MINS = 20, BRIDGE_MINS = 10;
+  var LEG_WORKS = {
+    "Belleek|Enniskillen": [["Portora Lock", "lock"]],
+    "Belturbet|Ballyconnell": [["Corraquill Lock (1)", "lock"]],
+    "Ballyconnell|Ballinamore": [["Ballyconnell Lock (2)", "lock"], ["Skelan Lock (3)", "lock"], ["Aghoo Lock (4)", "lock"], ["Ardrum Lock (5)", "lock"]],
+    "Ballinamore|Leitrim": [["Ballinamore Lock (6)", "lock"], ["Ballyduff Lock (7)", "lock"], ["Castlefore Lock (8)", "lock"], ["Kilclare Upper Lock (9)", "lock"],
+      ["Kilclare Middle Lock (10)", "lock"], ["Kilclare Lower Lock (11)", "lock"], ["Lisconor Lock (12)", "lock"], ["Newbrook Lock (13)", "lock"],
+      ["Drumduff Lock (14)", "lock"], ["Tirmactiernan Lock (15)", "lock"], ["Killarcan Lock (16)", "lock"]],
+    "Carrick-on-Shannon|Dromod": [["Albert Lock, Jamestown", "lock"]],
+    "Roosky|Tarmonbarry": [["Roosky Lock", "lock"]],
+    "Tarmonbarry|Lanesborough": [["Tarmonbarry Lock", "lock"]],
+    "Athlone|Shannonbridge": [["Athlone Lock", "lock"]],
+    "Banagher|Portumna": [["Victoria Lock, Meelick", "lock"], ["Portumna Bridge", "bridge"]]
+  };
+  function tripPath(a, b) {
+    var i = TRIP_PLACES.indexOf(a), j = TRIP_PLACES.indexOf(b), step = i < j ? 1 : -1, path = [];
+    for (var k = i; k !== j + step; k += step) path.push(TRIP_PLACES[k]);
+    // Scarriff is a side trip off Lough Derg: don't route through it to or from Killaloe.
+    var s = path.indexOf("Scarriff");
+    if (s > 0 && s < path.length - 1) path.splice(s, 1);
+    return path;
+  }
+  function tripPlan(a, b, dep, r) {
+    var total = tripHours(a, b) * 60, path = tripPath(a, b), legs = [], wsum = 0;
+    for (var k = 0; k < path.length - 1; k++) {
+      var p = path[k], q = path[k + 1], north = TRIP_PLACES.indexOf(p) < TRIP_PLACES.indexOf(q);
+      var works = (LEG_WORKS[north ? p + "|" + q : q + "|" + p] || []).slice();
+      if (!north) works.reverse();
+      var wgt = tripHours(p, q); wsum += wgt;
+      legs.push({ w: wgt, works: works });
+    }
+    var off = 0, t = dep, days = {}, waits = [], locks = 0, bridges = 0, stuck = false;
+    var mark = function (from, to) { var d = days[off] || (days[off] = { a: from, b: to }); d.a = Math.min(d.a, from); d.b = Math.max(d.b, to); };
+    var win = function () { return cruiseWindow(off, r); };
+    var next = function () { off++; t = 0; if (off > 40) stuck = true; };
+    var cruise = function (m) {
+      while (m > 0.5 && !stuck) {
+        var w = win(); if (!w) { next(); continue; }
+        if (t < w.start) t = w.start;
+        if (t >= w.end) { next(); continue; }
+        var use = Math.min(m, w.end - t); mark(t, t + use); t += use; m -= use;
+        if (m > 0.5) next();
+      }
+    };
+    var pass = function (name, kind) {
+      while (!stuck) {
+        var w = win(); if (!w) { next(); continue; }
+        var iso = dublinISO(off), shut = closureOn(iso);
+        if (shut) { waits.push(name + " closed " + dayName(off).toLowerCase() + " (" + shut.why + ")"); next(); continue; }
+        var td = dublinNow(off), s = seasonFor(td), kd = dayKind(td), start = Math.max(t, w.start), dur = kind === "bridge" ? BRIDGE_MINS : LOCK_MINS;
+        if (kind === "bridge") {
+          var times = s.bridge[kd].map(toMins).filter(function (x) { return x >= start && x + dur <= w.end; });
+          if (!times.length) { waits.push("No more " + name + " openings " + dayName(off).toLowerCase()); next(); continue; }
+          if (times[0] - start >= 10) waits.push("Waits for the " + fmtMins(times[0]) + " opening of " + name);
+          mark(start, times[0] + dur); t = times[0] + dur; bridges++; return;
+        }
+        var hrs = s.lock[kd], open = toMins(hrs[0]), close = toMins(hrs[1]);
+        var lunch = close > toMins(LUNCH[1]) ? [toMins(LUNCH[0]), toMins(LUNCH[1])] : null;
+        var st = Math.max(start, open);
+        if (lunch && st + dur > lunch[0] && st < lunch[1]) st = lunch[1];
+        var lunchWait = lunch && st === lunch[1] && start < lunch[1];
+        if (st + dur > Math.min(close, w.end)) { waits.push(name + " shut for the day before you'd reach it " + dayName(off).toLowerCase()); next(); continue; }
+        if (st - start >= 10) waits.push(lunchWait ? "Waits for " + name + " to reopen after lunch at " + fmtMins(st) : "Waits for " + name + " to open at " + fmtMins(st));
+        mark(start, st + dur); t = st + dur; locks++; return;
+      }
+    };
+    legs.forEach(function (lg) {
+      var m = wsum ? total * lg.w / wsum : 0, n = lg.works.length;
+      // Spread the leg's cruising evenly either side of its locks and bridge.
+      for (var x = 0; x < n; x++) { cruise(m / (n + 1)); pass(lg.works[x][0], lg.works[x][1]); }
+      cruise(n ? m / (n + 1) : m);
+    });
+    return { off: off, t: t, days: days, waits: waits, locks: locks, bridges: bridges, stuck: stuck, total: total };
+  }
   function tripCalc() {
-    var r = reach(), h = tripHours($("trip-from").value, $("trip-to").value), dep = $("trip-dep").value;
+    var r = reach(), a = $("trip-from").value, b = $("trip-to").value, h = tripHours(a, b), dep = $("trip-dep").value;
     $("trip-eta-box").className = "res";
     if (h == null) return;
     if (h === 0) { $("trip-hrs").textContent = "0 h"; $("trip-hrs-ft").textContent = "Pick two different places."; $("trip-eta").textContent = "–"; $("trip-eta-ft").textContent = ""; return; }
-    $("trip-hrs").textContent = h + " h";
-    if (!/^\d\d:\d\d$/.test(dep)) { $("trip-hrs-ft").textContent = ""; $("trip-eta").textContent = "–"; $("trip-eta-ft").textContent = ""; return; }
-    // Spend the cruising hours only inside each day's window, starting today at the chosen time.
-    var left = h * 60, t = +dep.slice(0, 2) * 60 + +dep.slice(3), legs = [], off = 0, arrive = null, startNote = "";
-    for (off = 0; off < 30 && left > 0; off++) {
-      var w = cruiseWindow(off, r);
-      if (!w) continue;
-      var from = off === 0 ? Math.max(t, w.start) : w.start;
-      if (off === 0 && t < w.start) startNote = "Starts at sunrise, " + fmtMins(w.start) + ".";
-      if (from >= w.end) { if (off === 0) startNote = "Too late to set off today, so it starts at sunrise."; continue; }
-      var use = Math.min(left, w.end - from);
-      legs.push(dayName(off) + " " + fmtMins(from) + "–" + fmtMins(from + use));
-      left -= use;
-      if (left <= 0) arrive = { off: off, at: from + use, w: w };
-    }
-    if (!arrive) { $("trip-eta").textContent = "–"; $("trip-eta-ft").textContent = ""; return; }
-    var days = legs.length;
-    $("trip-hrs-ft").textContent = days === 1 ? "One day in daylight" : days + " days in daylight: " + legs.join(" · ");
-    $("trip-eta").textContent = fmtMins(arrive.at);
-    var lead = arrive.off === 0 ? "Today" : arrive.off === 1 ? "Tomorrow" : dayName(arrive.off);
-    $("trip-eta-ft").textContent = lead + ". Cruising window ends " + fmtMins(arrive.w.end) + "." + (startNote ? " " + startNote : "");
+    if (!/^\d\d:\d\d$/.test(dep)) { $("trip-hrs").textContent = h + " h"; $("trip-hrs-ft").textContent = ""; $("trip-eta").textContent = "–"; $("trip-eta-ft").textContent = ""; return; }
+    var p = tripPlan(a, b, +dep.slice(0, 2) * 60 + +dep.slice(3), r);
+    var extra = p.locks * LOCK_MINS + p.bridges * BRIDGE_MINS;
+    $("trip-hrs").textContent = extra ? fmtDur(h * 60 + extra) : h + " h";
+    var parts = [h + " h cruising"];
+    if (p.locks) parts.push(p.locks + (p.locks === 1 ? " lock" : " locks") + " at " + LOCK_MINS + " min");
+    if (p.bridges) parts.push("Portumna Bridge");
+    var dayKeys = Object.keys(p.days).map(Number).sort(function (x, y) { return x - y; });
+    var dayLine = dayKeys.map(function (k) { return dayName(k) + " " + fmtMins(p.days[k].a) + "–" + fmtMins(p.days[k].b); }).join(" · ");
+    $("trip-hrs-ft").textContent = parts.join(" + ") + ". " + (dayKeys.length > 1 ? dayKeys.length + " days: " + dayLine : dayLine);
+    if (p.stuck) { $("trip-eta").textContent = "–"; $("trip-eta-ft").textContent = "Can't fit this trip into the next few weeks of daylight and lock hours."; return; }
+    $("trip-eta").textContent = fmtMins(p.t);
+    var lead = p.off === 0 ? "Today" : p.off === 1 ? "Tomorrow" : dayName(p.off);
+    if (p.waits.length) $("trip-eta-box").className = "res state-warn";
+    $("trip-eta-ft").textContent = lead + "." + (p.waits.length ? " " + p.waits.slice(0, 3).join(". ") + "." : "");
   }
 
   function gmaps(q, id) { return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q) + "&query_place_id=" + id; }
@@ -1215,6 +1308,7 @@ a { color: var(--water); }
       $("say").textContent = say;
       $("g-datum").textContent = datum.toFixed(3) + " m";
     }
+    showOnline();
     renderWeather();
     renderTrip();
     renderToday();
@@ -1372,7 +1466,8 @@ a { color: var(--water); }
 
   // Gauge readings are kept in this page's store and refreshed every two hours by a scheduled task.
   if (window.claude && window.claude.use) {
-    window.claude.use("db").then(function (db) {
+    // Every document is also kept on this device, so the page shows the last data straight away and with no signal.
+    window.claude.use("db").then(function (d) { return cachedDb(d); }, function () { return cachedDb(null); }).then(function (db) {
       if (!db) return;
       Object.keys(BAKED).forEach(function (key) {
         db.doc("gauge/" + key).onSnapshot(function (snap) {
