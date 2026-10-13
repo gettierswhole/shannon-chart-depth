@@ -51,9 +51,10 @@ h1 { font-family: var(--display); font-weight: 600; font-size: 1.9rem; letter-sp
 .sub { color: var(--muted); font-size: 0.9rem; margin: 0; }
 
 /* Stretch selector: ordered south to north, as the river runs upstream */
-.reaches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.reaches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
 .reaches button { border: 0; border-radius: 0; background: transparent; color: var(--ink); padding: 10px 8px; text-align: left; display: grid; gap: 1px; min-width: 0; font-weight: 600; }
 .reaches button + button { border-left: 1px solid var(--line); }
+@media (max-width: 520px) { .reaches { grid-template-columns: repeat(2, minmax(0, 1fr)); } .reaches button:nth-child(3) { border-left: 0; } .reaches button:nth-child(n+3) { border-top: 1px solid var(--line); } }
 .reaches button span { font-weight: 400; font-size: 0.78rem; color: var(--muted); }
 .reaches button[aria-pressed="true"] { background: var(--water); color: var(--surface); }
 .reaches button[aria-pressed="true"] span { color: var(--surface); opacity: 0.85; }
@@ -540,6 +541,34 @@ a { color: var(--water); }
         "ESB draw Lough Ree down in autumn to make room for winter rain, so expect it below datum from late summer.",
         "A strong wind along the lake piles water up at the downwind end."
       ]
+    },
+    {
+      id: "key", name: "Upper Shannon", span: "Tarmonbarry – Lough Key",
+      gauge: { doc: "carrick", station: "26324", name: "Carrick-on-Shannon", zero: 38.888 },
+      cills: [],
+      feet: null,
+      osl: { name: "Carrick ordinary summer level", poolbeg: 42.98 },
+      pools: [
+        ["Lough Key (above Clarendon Lock)", 44.20],
+        ["Clarendon Lock to Albert Lock: Cootehall, Leitrim, Carrick, Jamestown", 42.98],
+        ["Albert Lock to Roosky: Drumsna, Loughs Boderg and Bofin, Dromod", 41.15],
+        ["Roosky to Tarmonbarry", 40.14]
+      ],
+      weather: ["key"],
+      sunAt: [53.94, -8.09],
+      bridge: false,
+      contacts: [["Tarmonbarry and Cloondara Locks", "+353 (0)87 922 2020"], ["Rooskey Lock", "+353 (0)71 963 8018"], ["Albert Lock, Jamestown Canal", "+353 (0)71 963 7715"], ["Clarendon Lock, Knockvicar", "+353 (0)71 966 7011"], ["Inspector of Navigation", "+353 (0)90 649 4232"]],
+      esb: [
+        ["Shannon forecast (next five days)", "01-Shannon-Hydro-Forecast.pdf"],
+        ["Bellantra Sluices, Lough Allen level", "02-Bellantra-Sluices-Lough-Allen.pdf"]
+      ],
+      datumHelp: "The CSIG's lead mapper says river sections between locks have no datum of their own, and no datum for this stretch has been published. Until you know better, the page estimates a correction for the Carrick pool (Clarendon Lock down to Albert Lock) against Waterways Ireland's ordinary summer level there, 42.98 m Poolbeg (40.27 m Malin), from the Carrick-on-Shannon gauge. The other pools are held by their own weirs and locks, so check Waterways Ireland's daily report for them.",
+      manualHelp: "Copy the OD level from the <a href=\"https://waterlevel.ie/0000026324/\" target=\"_blank\" rel=\"noopener\">Carrick-on-Shannon page on waterlevel.ie</a>. A staff gauge reading under 5 m has the gauge zero of 38.888 m added for you.",
+      feetHelp: "No cill heights are set for this stretch, so a feet-over-the-cill reading can't be used here.",
+      caveats: [
+        "The gauge is at Carrick, so the figure only applies between Clarendon Lock and Albert Lock. Lough Key and the pools below Albert Lock and Roosky are held at their own levels: Waterways Ireland's daily report gives each one.",
+        "Waterways Ireland give the upper Shannon's draft as 1.35 m, and less on the Lough Allen Canal."
+      ]
     }
   ];
   REACHES.forEach(function (r) {
@@ -551,7 +580,8 @@ a { color: var(--water); }
   var BAKED = {
     portumna: { level: 30.627, time: "2026-10-12T22:00:00Z" },
     banagher: { level: 32.376, time: "2026-10-12T22:15:00Z" },
-    hodsons: { level: 34.689, time: "2026-10-12T22:15:00Z" }
+    hodsons: { level: 34.689, time: "2026-10-12T22:15:00Z" },
+    carrick: { level: 40.316, time: "2026-10-13T17:15:00Z" }
   };
 
   function load(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
@@ -587,7 +617,7 @@ a { color: var(--water); }
   function settings(r) {
     var s = loadJSON("shannon.datum." + r.id) || {};
     var ci = typeof s.cill === "number" && r.cills[s.cill] ? s.cill : 0;
-    var ft = typeof s.feet === "number" ? s.feet : r.feet;
+    var ft = r.cills.length && typeof s.feet === "number" ? s.feet : r.feet;
     return { cill: ci, feet: ft };
   }
   function datumOf(r) {
@@ -670,7 +700,8 @@ a { color: var(--water); }
     sel.value = s.cill;
     $("datum-ft").value = s.feet == null ? "" : s.feet;
     var ul = $("caveats"); ul.textContent = "";
-    r.caveats.concat(["OPW data is raw and unchecked. A sudden jump is more likely a sensor fault than the river.",
+    var poolLines = r.pools ? ["Waterways Ireland's ordinary summer levels on this stretch, in m Malin: " + r.pools.map(function (x) { return x[0] + " " + (x[1] + POOLBEG_TO_MALIN).toFixed(2); }).join("; ") + "."] : [];
+    r.caveats.concat(poolLines).concat(["OPW data is raw and unchecked. A sudden jump is more likely a sensor fault than the river.",
       "Charts age. Silt, weed and boulders move; use this as an aid, not a guarantee."]).forEach(function (t) {
       var li = document.createElement("li"); li.textContent = t; ul.appendChild(li);
     });
@@ -694,7 +725,7 @@ a { color: var(--water); }
   }
 
   // Met Éireann inland lakes forecast, stored by the scheduled task.
-  var LAKE_NAMES = { derg: "Lough Derg", ree: "Lough Ree" };
+  var LAKE_NAMES = { derg: "Lough Derg", ree: "Lough Ree", key: "Lough Key" };
   var FIELDS = [["wind", "Wind"], ["weather", "Weather"], ["visibility", "Visibility"], ["overnight", "Overnight"], ["outlook", "Outlook"]];
   function maxForce(text) {
     var m, max = null, re = /force\s+(\d+)(?:\s+(?:to|or)\s+(\d+))?/gi;
@@ -725,6 +756,11 @@ a { color: var(--water); }
       var mf = maxForce((f.wind || "") + " " + (f.overnight || ""));
       if (mf != null && (top == null || mf > top)) top = mf;
     });
+    if (!body.childNodes.length) {
+      var none = document.createElement("p"); none.className = "fine";
+      none.textContent = "No " + r.weather.map(function (id) { return LAKE_NAMES[id]; }).join(" or ") + " forecast stored yet; it arrives with the next refresh.";
+      body.appendChild(none); pill.hidden = true; $("wx-meta").textContent = ""; return;
+    }
     if (top != null) {
       pill.hidden = false;
       pill.className = "pill " + (top >= 6 ? "bad" : top >= 5 ? "warn" : "ok");
@@ -951,7 +987,7 @@ a { color: var(--water); }
     [32, 27, 23, 20, 17, 10, 9, 7, 6, 4, 2], [34, 29, 25, 22, 19, 12, 11, 9, 8, 7, 4, 2], [36, 31, 27, 24, 21, 14, 13, 11, 10, 8, 7, 4, 2],
     [39, 34, 30, 27, 24, 17, 16, 14, 13, 11, 10, 7, 5, 3], [43, 38, 34, 31, 28, 21, 20, 18, 17, 15, 14, 11, 9, 7, 4],
     [43, 38, 34, 31, 28, 21, 20, 19, 17, 15, 14, 11, 9, 7, 4, 2]];
-  var TRIP_DEFAULT = { derg: ["Portumna", "Killaloe"], mid: ["Banagher", "Athlone"], ree: ["Athlone", "Lanesborough"] };
+  var TRIP_DEFAULT = { derg: ["Portumna", "Killaloe"], mid: ["Banagher", "Athlone"], ree: ["Athlone", "Lanesborough"], key: ["Tarmonbarry", "Carrick-on-Shannon"] };
   function tripHours(a, b) {
     var i = TRIP_PLACES.indexOf(a), j = TRIP_PLACES.indexOf(b);
     if (i < 0 || j < 0) return null; if (i === j) return 0;
@@ -1263,7 +1299,7 @@ a { color: var(--water); }
     // Workings
     var w;
     if (isOsl(r)) {
-      w = "Banagher summer level".padEnd(24) + r.osl.poolbeg.toFixed(2) + " m Poolbeg\n" +
+      w = r.osl.name.replace(" ordinary", "").padEnd(24) + r.osl.poolbeg.toFixed(2) + " m Poolbeg\n" +
         "Poolbeg → Malin".padEnd(24) + "−2.71 m\n" +
         "Datum (estimated)".padEnd(24) + datum.toFixed(3) + " m OD Malin";
     } else {
@@ -1294,7 +1330,7 @@ a { color: var(--water); }
     if (tr) $("src").innerHTML += " · <b>" + tr + "</b>";
 
     $("g-level").textContent = rd.level.toFixed(3) + " m";
-    $("g-cill").textContent = ftIn(rd.level - cill.malin) + " (" + cill.name.replace(/ cill$/, "") + ")";
+    $("g-cill").textContent = cill ? ftIn(rd.level - cill.malin) + " (" + cill.name.replace(/ cill$/, "") + ")" : "No cill set for this stretch";
 
     if (isOsl(r)) {
       var eoff = rd.level - datum, ecm = Math.round(Math.abs(eoff) * 100);
@@ -1458,6 +1494,7 @@ a { color: var(--water); }
     if (!isFinite(f)) return;
     if (f < 2 || f > 16) { warn("That doesn't look like feet over the cill. Expect something between about 5 and 12 ft."); return; }
     var cill = r.cills[settings(r).cill];
+    if (!cill) { warn("No cill heights are set for this stretch, so feet over the cill can't be used here."); return; }
     setManual({ level: cill.malin + f * FOOT, time: new Date().toISOString(), feet: f });
   });
   $("use-sounder").addEventListener("click", function () {
@@ -1506,7 +1543,7 @@ a { color: var(--water); }
         if (data.checked) ree.foodChecked = data.checked;
         render();
       }, function () {});
-      ["derg", "mid"].forEach(function (rid) {
+      ["derg", "mid", "key"].forEach(function (rid) {
         db.doc("food/" + rid).onSnapshot(function (snap) {
           if (!snap.exists) return;
           var data = snap.data();
