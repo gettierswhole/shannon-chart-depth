@@ -235,7 +235,7 @@ a { color: var(--water); }
               <p class="today-main" id="sun-main"></p>
             </div>
           </div>
-          <svg id="sun-bar" viewBox="0 0 320 44" role="img" aria-label="Night, twilight and daylight over the next 24 hours, with now marked"></svg>
+          <svg id="sun-bar" viewBox="0 0 320 58" role="img" aria-label="Night, twilight and daylight over the next 24 hours, with now marked"></svg>
           <p class="fine" id="sun-note"></p>
         </div>
         <div class="today-row">
@@ -982,7 +982,15 @@ a { color: var(--water); }
     var svg = $("sun-bar"); svg.textContent = "";
     var t0 = nowMs - 3 * 3600e3, t1 = nowMs + 21 * 3600e3, L = 4, R = 316;
     var X = function (ms) { return L + (Math.max(t0, Math.min(t1, ms)) - t0) / (t1 - t0) * (R - L); };
-    svg.appendChild(el("rect", { x: L, y: 8, width: R - L, height: 14, rx: 3, fill: "#1b2540" }));
+    svg.appendChild(el("rect", { x: L, y: 22, width: R - L, height: 14, rx: 3, fill: "#1b2540" }));
+    // Clock hours 00, 06, 12 and 18 (Irish time) along the top, opposite the sunrise and sunset times
+    for (var hm = Math.ceil(t0 / 3600e3) * 3600e3; hm <= t1; hm += 3600e3) {
+      var hs = hhmm(hm);
+      if (["00:00", "06:00", "12:00", "18:00"].indexOf(hs) < 0) continue;
+      var hx = X(hm);
+      svg.appendChild(el("line", { x1: hx, x2: hx, y1: 15, y2: 22, stroke: "var(--muted)", "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: Math.max(L + 14, Math.min(R - 14, hx)), y: 11, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }, hs));
+    }
     var bands = [[-18, "#2c3a5e"], [-12, "#4d6290"], [-6, "var(--water-soft)"], [-0.833, "var(--warn-soft)"]];
     var marks = [];
     for (var off = -1; off <= 2; off++) {
@@ -991,17 +999,17 @@ a { color: var(--water); }
         var s = sunTimes(base, lat, lon, b[0]);
         if (!s || s.set < t0 || s.rise > t1) return;
         var x0 = X(s.rise), x1 = X(s.set);
-        svg.appendChild(el("rect", { x: x0, y: 8, width: Math.max(0, x1 - x0), height: 14, fill: b[1] }));
+        svg.appendChild(el("rect", { x: x0, y: 22, width: Math.max(0, x1 - x0), height: 14, fill: b[1] }));
         if (b[0] === -0.833) { marks.push(s.rise); marks.push(s.set); }
       });
     }
     var nx = X(nowMs);
-    svg.appendChild(el("path", { d: "M" + (nx - 5) + " 2 L" + (nx + 5) + " 2 L" + nx + " 8 Z", fill: "var(--ink)" }));
-    svg.appendChild(el("line", { x1: nx, x2: nx, y1: 8, y2: 22, stroke: "var(--ink)", "stroke-width": 1.5 }));
+    svg.appendChild(el("path", { d: "M" + (nx - 5) + " 15 L" + (nx + 5) + " 15 L" + nx + " 22 Z", fill: "var(--ink)" }));
+    svg.appendChild(el("line", { x1: nx, x2: nx, y1: 22, y2: 36, stroke: "var(--ink)", "stroke-width": 1.5 }));
     marks.forEach(function (ms) {
       if (ms <= t0 || ms >= t1) return;
       var x = Math.max(L + 14, Math.min(R - 14, X(ms)));
-      svg.appendChild(el("text", { x: x, y: 38, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }, hhmm(ms)));
+      svg.appendChild(el("text", { x: x, y: 50, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }, hhmm(ms)));
     });
   }
 
