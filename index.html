@@ -235,7 +235,7 @@ a { color: var(--water); }
               <p class="today-main" id="sun-main"></p>
             </div>
           </div>
-          <svg id="sun-bar" viewBox="0 0 320 58" role="img" aria-label="Night, twilight and daylight over the next 24 hours, with now marked"></svg>
+          <svg id="sun-bar" viewBox="0 0 320 100" role="img" aria-label="A 24-hour dial: night, twilight and daylight, the moon's phase, and the crew's day aboard, with now marked"></svg>
           <p class="fine" id="sun-note"></p>
         </div>
         <div class="today-row">
@@ -978,40 +978,163 @@ a { color: var(--water); }
     $("sun-main").textContent = main;
     $("sun-note").textContent = "The next 24 hours, from night through twilight to daylight. The marker is now.";
 
-    // Rolling 24-hour bar: night, astronomical, nautical and civil twilight, daylight. It scrolls with the clock.
+    // The complication: a rolling 24-hour dial in a bezel. Sky colours follow the real sun (night, three twilights,
+    // daylight); the moon shows its real phase; and the crew's day plays out along it in stick figures.
     var svg = $("sun-bar"); svg.textContent = "";
-    var t0 = nowMs - 3 * 3600e3, t1 = nowMs + 21 * 3600e3, L = 4, R = 316;
+    var t0 = nowMs - 3 * 3600e3, t1 = nowMs + 21 * 3600e3, L = 6, R = 314, TOP = 22, BOT = 84, MID = (TOP + BOT) / 2;
     var X = function (ms) { return L + (Math.max(t0, Math.min(t1, ms)) - t0) / (t1 - t0) * (R - L); };
-    svg.appendChild(el("rect", { x: L, y: 22, width: R - L, height: 14, rx: 3, fill: "#1b2540" }));
-    // Clock hours 00, 06, 12 and 18 (Irish time) along the top, opposite the sunrise and sunset times
-    for (var hm = Math.ceil(t0 / 3600e3) * 3600e3; hm <= t1; hm += 3600e3) {
-      var hs = hhmm(hm);
-      if (["00:00", "06:00", "12:00", "18:00"].indexOf(hs) < 0) continue;
-      var hx = X(hm);
-      svg.appendChild(el("line", { x1: hx, x2: hx, y1: 15, y2: 22, stroke: "var(--muted)", "stroke-width": 1 }));
-      svg.appendChild(el("text", { x: Math.max(L + 14, Math.min(R - 14, hx)), y: 11, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }, hs));
-    }
-    var bands = [[-18, "#2c3a5e"], [-12, "#4d6290"], [-6, "var(--water-soft)"], [-0.833, "var(--warn-soft)"]];
-    var marks = [];
+    var NSV = "http://www.w3.org/2000/svg", defs = document.createElementNS(NSV, "defs");
+    var clip = document.createElementNS(NSV, "clipPath"); clip.setAttribute("id", "dial-clip");
+    clip.appendChild(el("rect", { x: L, y: TOP, width: R - L, height: BOT - TOP, rx: 12 })); defs.appendChild(clip); svg.appendChild(defs);
+    var dial = document.createElementNS(NSV, "g"); dial.setAttribute("clip-path", "url(#dial-clip)"); svg.appendChild(dial);
+    var add = function (tag, a, txt) { var n = el(tag, a, txt); dial.appendChild(n); return n; };
+    add("rect", { x: L, y: TOP, width: R - L, height: BOT - TOP, fill: "#1b2540" });
+    // a few stars in the night sky
+    for (var st = 0; st < 40; st++) add("circle", { cx: L + ((st * 73) % 308), cy: TOP + 3 + ((st * 37) % 30), r: st % 5 ? 0.5 : 0.8, fill: "#c8d0f0" });
+    var bands = [[-18, "#2c3a5e"], [-12, "#4d6290"], [-6, "#a9c8d6"], [-0.833, "#f3e3bd"]], marks = [], days = [];
     for (var off = -1; off <= 2; off++) {
       var base = noon(off);
+      days.push({ rise: (sunTimes(base, lat, lon, -0.833) || {}).rise, set: (sunTimes(base, lat, lon, -0.833) || {}).set, noon: base });
       bands.forEach(function (b) {
         var s = sunTimes(base, lat, lon, b[0]);
         if (!s || s.set < t0 || s.rise > t1) return;
-        var x0 = X(s.rise), x1 = X(s.set);
-        svg.appendChild(el("rect", { x: x0, y: 22, width: Math.max(0, x1 - x0), height: 14, fill: b[1] }));
+        add("rect", { x: X(s.rise), y: TOP, width: Math.max(0, X(s.set) - X(s.rise)), height: BOT - TOP, fill: b[1] });
         if (b[0] === -0.833) { marks.push(s.rise); marks.push(s.set); }
       });
     }
+    add("rect", { x: L, y: BOT - 9, width: R - L, height: 9, fill: "rgba(30,70,110,0.55)" });   // the river along the bottom
+    var isDay = function (ms) { return days.some(function (d) { return d.rise && ms > d.rise && ms < d.set; }); };
+
+    // Moon phase: days since a known new moon (6 Jan 2000, 18:14 UTC), synodic month 29.530589 days.
+    var SYN = 29.530588853, age = (((nowMs / 864e5 + 2440587.5 - 2451550.26) % SYN) + SYN) % SYN, ph = age / SYN;
+    var lit = Math.round((1 - Math.cos(2 * Math.PI * ph)) / 2 * 100);
+    var phName = age < 1.85 || age > SYN - 1.85 ? "New moon" : age < 5.54 ? "Waxing crescent" : age < 9.23 ? "First quarter" : age < 12.92 ? "Waxing gibbous" :
+      age < 16.61 ? "Full moon" : age < 20.30 ? "Waning gibbous" : age < 23.99 ? "Last quarter" : "Waning crescent";
+    function moonAt(mx, my, r) {
+      add("circle", { cx: mx, cy: my, r: r + 2.5, fill: "rgba(240,235,210,0.12)" });
+      add("circle", { cx: mx, cy: my, r: r, fill: "#3b4462" });
+      var k = Math.cos(2 * Math.PI * ph), rx = Math.abs(k) * r, waxing = ph < 0.5, gibbous = k < 0;
+      var d = "M" + mx + " " + (my - r) + " A" + r + " " + r + " 0 0 " + (waxing ? 1 : 0) + " " + mx + " " + (my + r) +
+        " A" + rx + " " + r + " 0 0 " + (waxing ? (gibbous ? 1 : 0) : (gibbous ? 0 : 1)) + " " + mx + " " + (my - r) + " Z";
+      add("path", { d: d, fill: "#f2ecd2" });
+      add("circle", { cx: mx - r * 0.3, cy: my - r * 0.2, r: r * 0.16, fill: "rgba(150,140,110,0.35)" });
+      add("circle", { cx: mx + r * 0.25, cy: my + r * 0.3, r: r * 0.12, fill: "rgba(150,140,110,0.3)" });
+    }
+    // put the moon over the middle of each night that shows in the dial
+    for (var di = 0; di < days.length - 1; di++) {
+      var a = days[di].set, b2 = days[di + 1].rise;
+      if (!a || !b2) continue;
+      var mid = (a + b2) / 2;
+      if (mid > t0 + 1800e3 && mid < t1 - 1800e3) moonAt(X(mid), TOP + 15, 9);
+    }
+
+    // The crew's day, in Irish clock hours. Each scene sits in the middle of its stretch of the dial.
+    var tz = (function () { var hs = hhmm(noon(0)).split(":"); return +hs[0] - 12 + +hs[1] / 60; })();
+    var at = function (off, hr) { return noon(off) + (hr - 12 - tz) * 3600e3; };
+    var SCENES = [[3, 10, "Asleep", sleep], [10, 12, "Rising to a mess aboard", wake], [12, 14, "Breakfast", breakfast], [14, 18, "Under way", underway],
+      [18, 21, "Cooking", cooking], [21, 23, "Dining like ancient Greeks", dining], [23, 27, "Drinking like very drunk ancient Greeks", revels]];
+    var nowScene = "";
+    for (var o = -1; o <= 1; o++) SCENES.forEach(function (sc) {
+      var s0 = at(o, sc[0]), s1 = at(o, sc[1]);
+      if (nowMs >= s0 && nowMs < s1) nowScene = sc[2];
+      var a0 = Math.max(s0, t0), a1 = Math.min(s1, t1);
+      if (a1 - a0 < 1.2 * 3600e3) return;
+      var cx = (X(a0) + X(a1)) / 2, ink = isDay((a0 + a1) / 2) ? "#2a2622" : "#efe6cc";
+      var g = document.createElementNS(NSV, "g"); dial.appendChild(g);
+      var t = document.createElementNS(NSV, "title"); t.textContent = sc[2]; g.appendChild(t);
+      sc[3](g, cx, BOT - 9, ink, (nowMs - s0) / (s1 - s0));
+    });
+    function P(g, tag, a) { var n = el(tag, a); g.appendChild(n); return n; }
+    function line(g, x1, y1, x2, y2, c, w) { P(g, "line", { x1: x1, y1: y1, x2: x2, y2: y2, stroke: c, "stroke-width": w || 1.3, "stroke-linecap": "round" }); }
+    function head(g, x, y, c, wreath) { P(g, "circle", { cx: x, cy: y, r: 2.6, fill: "none", stroke: c, "stroke-width": 1.2 }); if (wreath) P(g, "path", { d: "M" + (x - 3) + " " + (y - 1.5) + " Q" + x + " " + (y - 5.5) + " " + (x + 3) + " " + (y - 1.5), fill: "none", stroke: "#6aa84f", "stroke-width": 1.4 }); }
+    function figure(g, x, y, c, pose) { // y = feet
+      head(g, x, y - 17, c, pose && pose.wreath);
+      line(g, x, y - 14.5, x, y - 7, c);
+      line(g, x, y - 12, x + (pose && pose.la || -4), y - (pose && pose.lay || 9), c); line(g, x, y - 12, x + (pose && pose.ra || 4), y - (pose && pose.ray || 9), c);
+      line(g, x, y - 7, x - 3, y, c); line(g, x, y - 7, x + 3, y, c);
+    }
+    function bottle(g, x, y, tip) { P(g, "rect", { x: x - 1.2, y: y - 6, width: 2.4, height: 6, fill: "#3f8f4a", transform: tip ? "rotate(" + tip + " " + x + " " + y + ")" : "" }); P(g, "rect", { x: x - 0.5, y: y - 8, width: 1, height: 2.2, fill: "#3f8f4a", transform: tip ? "rotate(" + tip + " " + x + " " + y + ")" : "" }); }
+    function bunk(g, x, y, c) { P(g, "rect", { x: x - 12, y: y - 4, width: 24, height: 2, fill: c }); line(g, x - 12, y - 7, x - 12, y, c); }
+    function sleep(g, x, y, c) {
+      [-9, 9].forEach(function (dx, i) {
+        bunk(g, x + dx, y - i * 12, c);
+        head(g, x + dx - 8, y - i * 12 - 6.5, c); line(g, x + dx - 5.5, y - i * 12 - 6, x + dx + 9, y - i * 12 - 6, c, 2.2);
+      });
+      ["z", "Z", "z"].forEach(function (z, i) { P(g, "text", { x: x - 2 + i * 5, y: y - 26 - i * 5, "font-size": 6 + i * 2, fill: c, "font-family": "var(--mono)" }).textContent = z; });
+    }
+    function wake(g, x, y, c) {
+      bunk(g, x - 6, y, c);
+      figure(g, x - 10, y - 4, c, { la: -6, lay: 17, ra: 6, ray: 17 });            // big stretch
+      bottle(g, x + 6, y, 70); bottle(g, x + 10, y, -15); bottle(g, x + 14, y, 95);   // the mess
+      P(g, "rect", { x: x + 3, y: y - 3, width: 4, height: 3, fill: c, transform: "rotate(20 " + (x + 5) + " " + y + ")" });
+      P(g, "text", { x: x + 4, y: y - 16, "font-size": 9, fill: c, "font-family": "var(--mono)" }).textContent = "?!";
+    }
+    function breakfast(g, x, y, c) {
+      figure(g, x - 7, y, c, { ra: 8, ray: 10 });
+      line(g, x + 1, y - 10, x + 9, y - 10, c, 1); P(g, "ellipse", { cx: x + 12, cy: y - 10, rx: 4, ry: 1.3, fill: c }); // pan
+      P(g, "circle", { cx: x + 12, cy: y - 11.2, r: 1.4, fill: "#f6c445" });        // an egg
+      P(g, "rect", { x: x + 6, y: y - 6, width: 12, height: 1.4, fill: c }); line(g, x + 8, y - 6, x + 8, y, c); line(g, x + 16, y - 6, x + 16, y, c);
+      P(g, "ellipse", { cx: x + 12, cy: y - 7, rx: 3, ry: 0.8, fill: "#ffffff" });
+    }
+    function underway(g, x, y, c, p) {
+      var w = 34;
+      P(g, "path", { d: "M" + (x - w / 2) + " " + (y - 5) + " L" + (x + w / 2) + " " + (y - 5) + " L" + (x + w / 2 - 5) + " " + y + " L" + (x - w / 2 + 3) + " " + y + " Z", fill: "#f4f4f4", stroke: "#2a2622", "stroke-width": 0.6 });
+      P(g, "rect", { x: x - 8, y: y - 11, width: 12, height: 6, fill: "#e8e8f0", stroke: "#2a2622", "stroke-width": 0.6 });
+      figure(g, x + 9, y - 5, c, { la: -4, lay: 11, ra: -2, ray: 11 });             // at the helm
+      P(g, "circle", { cx: x + 6, cy: y - 11, r: 2.2, fill: "none", stroke: c, "stroke-width": 0.8 });
+      for (var k = 0; k < 8; k++) line(g, x - w / 2 - 3 - k * 3, y - 1 + (k % 2), x - w / 2 - 1 - k * 3, y - 1 + (k % 2), "#ffffff", 0.8); // wake
+      var n = Math.max(0, Math.min(4, Math.round((p > 0 ? p : 0.75) * 4)));        // bottles pile up towards 18:00
+      for (var b = 0; b < n; b++) bottle(g, x - 12 + b * 3, y - 5);
+    }
+    function cooking(g, x, y, c, p) {
+      figure(g, x - 6, y, c, { ra: 8, ray: 11, la: -3, lay: 4 });
+      P(g, "rect", { x: x + 2, y: y - 9, width: 9, height: 7, fill: c }); line(g, x + 1, y - 9, x + 12, y - 9, c, 1);   // the pot
+      line(g, x + 2, y - 1, x + 11, y - 1, "#ff7a2a", 1.6);                          // the hob
+      for (var s = 0; s < 3; s++) P(g, "path", { d: "M" + (x + 4 + s * 2.5) + " " + (y - 11) + " q2 -3 0 -6 q-2 -3 0 -6", fill: "none", stroke: "rgba(230,230,240,0.85)", "stroke-width": 0.8 });
+      bottle(g, x - 14, y);
+    }
+    function couch(g, x, y, c) { P(g, "rect", { x: x - 11, y: y - 6, width: 22, height: 2.4, fill: "#8a4b2a" }); line(g, x - 10, y - 4, x - 10, y, "#8a4b2a"); line(g, x + 10, y - 4, x + 10, y, "#8a4b2a"); line(g, x - 11, y - 10, x - 11, y - 6, "#8a4b2a", 2); }
+    function recline(g, x, y, c, tilt) { // a Greek propped on one elbow along a couch
+      head(g, x - 7, y - 11 + tilt, c, true);
+      line(g, x - 5, y - 9 + tilt, x + 7, y - 7, c); line(g, x + 7, y - 7, x + 11, y - 9, c);   // body, legs
+      line(g, x - 4, y - 8 + tilt, x - 8, y - 6, c);                                       // elbow down
+      P(g, "path", { d: "M" + (x - 5) + " " + (y - 9 + tilt) + " L" + (x + 8) + " " + (y - 7) + " L" + (x + 2) + " " + (y - 5) + " Z", fill: "rgba(255,255,255,0.85)" }); // toga
+    }
+    function grapes(g, x, y) { for (var i = 0; i < 6; i++) P(g, "circle", { cx: x + (i % 3) * 2 - (i > 2 ? -1 : 0), cy: y + Math.floor(i / 3) * 2, r: 1.1, fill: "#6b3fa0" }); }
+    function dining(g, x, y, c) {
+      couch(g, x, y, c); recline(g, x, y - 1, c, 0);
+      line(g, x - 3, y - 13, x - 1, y - 16, c, 1); P(g, "path", { d: "M" + (x - 2.5) + " " + (y - 17) + " h4 l-1 2.5 h-2 Z", fill: "#c9a227" }); // raised kylix
+      P(g, "rect", { x: x + 12, y: y - 7, width: 7, height: 1.4, fill: "#8a4b2a" }); grapes(g, x + 13, y - 11);
+    }
+    function revels(g, x, y, c) {
+      [-11, 11].forEach(function (dx, i) { couch(g, x + dx, y, c); recline(g, x + dx, y - 1, c, i ? 3 : -2); });
+      P(g, "path", { d: "M" + (x - 2) + " " + (y - 1) + " q4 -9 8 0 Z", fill: "#b5651d", transform: "rotate(-70 " + (x + 2) + " " + (y - 2) + ")" }); // tipped amphora
+      P(g, "ellipse", { cx: x + 6, cy: y - 0.5, rx: 6, ry: 1, fill: "#7a1f3d" });     // spilled wine
+      [[x - 17, y - 22], [x + 6, y - 21]].forEach(function (q) {                      // the room is spinning
+        P(g, "path", { d: "M" + q[0] + " " + q[1] + " a2 2 0 1 1 2 2 a3 3 0 1 1 -3 -3", fill: "none", stroke: "#f6c445", "stroke-width": 0.9 });
+      });
+      bottle(g, x - 2, y - 26, 30); bottle(g, x + 16, y, 100);
+    }
+
+    // bezel and markings
+    P(svg, "rect", { x: L, y: TOP, width: R - L, height: BOT - TOP, rx: 12, fill: "none", stroke: "#b8964a", "stroke-width": 2.2 });
+    P(svg, "rect", { x: L + 2, y: TOP + 2, width: R - L - 4, height: BOT - TOP - 4, rx: 10, fill: "none", stroke: "rgba(255,240,200,0.35)", "stroke-width": 0.8 });
+    for (var hm = Math.ceil(t0 / 3600e3) * 3600e3; hm <= t1; hm += 3600e3) {
+      var hs = hhmm(hm), hx = X(hm), major = ["00:00", "06:00", "12:00", "18:00"].indexOf(hs) >= 0;
+      P(svg, "line", { x1: hx, x2: hx, y1: major ? 14 : 18, y2: 21, stroke: major ? "var(--ink)" : "var(--muted)", "stroke-width": major ? 1.2 : 0.6 });
+      if (major) P(svg, "text", { x: Math.max(L + 14, Math.min(R - 14, hx)), y: 10, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }).textContent = hs;
+    }
     var nx = X(nowMs);
-    svg.appendChild(el("path", { d: "M" + (nx - 5) + " 15 L" + (nx + 5) + " 15 L" + nx + " 22 Z", fill: "var(--ink)" }));
-    svg.appendChild(el("line", { x1: nx, x2: nx, y1: 22, y2: 36, stroke: "var(--ink)", "stroke-width": 1.5 }));
+    P(svg, "path", { d: "M" + (nx - 5) + " " + (TOP - 7) + " L" + (nx + 5) + " " + (TOP - 7) + " L" + nx + " " + TOP + " Z", fill: "#b8964a" });
+    P(svg, "line", { x1: nx, x2: nx, y1: TOP, y2: BOT, stroke: "rgba(184,150,74,0.9)", "stroke-width": 1.2 });
     marks.forEach(function (ms) {
       if (ms <= t0 || ms >= t1) return;
       var x = Math.max(L + 14, Math.min(R - 14, X(ms)));
-      svg.appendChild(el("text", { x: x, y: 50, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }, hhmm(ms)));
+      P(svg, "text", { x: x, y: BOT + 13, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }).textContent = (marks.indexOf(ms) % 2 ? "↓ " : "↑ ") + hhmm(ms);
     });
+    $("sun-note").textContent = "Aboard now: " + (nowScene || "Asleep") + ". Moon: " + phName.toLowerCase() + ", " + lit + "% lit. The dial shows the next 24 hours; the gold marker is now.";
   }
+
 
   // Cruising hours between places, from shannon-river.com's chart (north to south; lower triangle).
   var TRIP_PLACES = ["Belleek", "Enniskillen", "Belturbet", "Ballyconnell", "Ballinamore", "Leitrim", "Carrick-on-Shannon", "Dromod", "Roosky",
