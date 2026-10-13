@@ -2,7 +2,7 @@
 # Usage: export_data.py <dir with collection/doc.json files> <out data.json>
 import json, os, sys
 root, out = sys.argv[1], sys.argv[2]
-keep = {"gauge": ["portumna", "banagher", "hodsons"], "food": ["derg", "mid", "ree"], "notices": ["live"], "weather": ["lakes"], "events": ["live"]}
+keep = {"gauge": ["portumna", "banagher", "hodsons", "carrick"], "food": ["derg", "mid", "ree", "key"], "notices": ["live"], "weather": ["lakes"], "events": ["live"]}
 data = {}
 for col, ids in keep.items():
     for d in ids:
