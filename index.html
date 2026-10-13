@@ -195,7 +195,6 @@ a { color: var(--water); }
 
   <div class="grid">
     <div class="col">
-
       <section class="panel wx" id="wx">
         <div class="wx-head">
           <h2 id="wx-title">Lake forecast</h2>
@@ -267,7 +266,9 @@ a { color: var(--water); }
           <p class="fine" id="events-note"></p>
         </div>
       </section>
+    </div>
 
+    <div class="col">
       <section class="panel notices">
         <div class="wx-head">
           <h2>Marine notices</h2>
@@ -275,6 +276,21 @@ a { color: var(--water); }
         </div>
         <ul class="notice-list" id="notices"></ul>
         <p class="fine"><a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">All live marine notices on waterwaysireland.org</a>. New notices are picked up from Waterways Ireland's email list every two hours.</p>
+      </section>
+    </div>
+  </div>
+
+  <p class="experiment" role="note">Untested experiment, not an aid to navigation</p>
+  <div class="grid depth-zone">
+    <div class="col">
+      <section class="panel hero" aria-live="polite">
+        <p class="label">Correction to charted depths</p>
+        <div class="big" id="offset">–</div>
+        <p class="say" id="say">Loading the latest gauge reading…</p>
+        <div class="meta">
+          <span class="pill ok" id="fresh">Checking</span>
+          <span id="src"></span>
+        </div>
       </section>
 
       <section class="panel calc">
@@ -385,16 +401,6 @@ a { color: var(--water); }
       </section>
     </div>
   </div>
-  <p class="experiment" role="note">Untested experiment, not an aid to navigation</p>
-  <section class="panel hero" aria-live="polite">
-    <p class="label">Correction to charted depths</p>
-    <div class="big" id="offset">–</div>
-    <p class="say" id="say">Loading the latest gauge reading…</p>
-    <div class="meta">
-      <span class="pill ok" id="fresh">Checking</span>
-      <span id="src"></span>
-    </div>
-  </section>
   <section class="vinny" id="vinny" aria-label="Emergency button">
     <button type="button" class="vinny-glass" id="vinny-btn">
       <span class="vinny-small">In case of emergency</span>
