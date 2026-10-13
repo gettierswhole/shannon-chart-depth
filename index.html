@@ -235,7 +235,7 @@ a { color: var(--water); }
               <p class="today-main" id="sun-main"></p>
             </div>
           </div>
-          <svg id="sun-bar" viewBox="0 0 320 100" role="img" aria-label="A 24-hour dial: night, twilight and daylight, the moon's phase, and the crew's day aboard, with now marked"></svg>
+          <svg id="sun-bar" viewBox="0 0 320 110" role="img" aria-label="A 24-hour dial: night, twilight and daylight, the moon's phase, and the crew's day aboard, with now marked"></svg>
           <p class="fine" id="sun-note"></p>
         </div>
         <div class="today-row">
@@ -981,7 +981,7 @@ a { color: var(--water); }
     // The complication: a rolling 24-hour dial in a bezel. Sky colours follow the real sun (night, three twilights,
     // daylight); the moon shows its real phase; and the crew's day plays out along it in stick figures.
     var svg = $("sun-bar"); svg.textContent = "";
-    var t0 = nowMs - 3 * 3600e3, t1 = nowMs + 21 * 3600e3, L = 6, R = 314, TOP = 22, BOT = 84, MID = (TOP + BOT) / 2;
+    var t0 = nowMs - 3 * 3600e3, t1 = nowMs + 21 * 3600e3, L = 6, R = 314, TOP = 22, BOT = 94, MID = (TOP + BOT) / 2;
     var X = function (ms) { return L + (Math.max(t0, Math.min(t1, ms)) - t0) / (t1 - t0) * (R - L); };
     var NSV = "http://www.w3.org/2000/svg", defs = document.createElementNS(NSV, "defs");
     var clip = document.createElementNS(NSV, "clipPath"); clip.setAttribute("id", "dial-clip");
@@ -1002,8 +1002,48 @@ a { color: var(--water); }
         if (b[0] === -0.833) { marks.push(s.rise); marks.push(s.set); }
       });
     }
-    add("rect", { x: L, y: BOT - 9, width: R - L, height: 9, fill: "rgba(30,70,110,0.55)" });   // the river along the bottom
     var isDay = function (ms) { return days.some(function (d) { return d.rise && ms > d.rise && ms < d.set; }); };
+    var LEAD = "#120c1c", GOLD = "#e3bf5c", JEWELS = ["#1d4e89", "#8c1c3e", "#1f6b4a", "#c9a227", "#5b2a86", "#0f7a8a", "#b4461f"];
+    var rnd = function (n) { var s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+    var tX = function (px) { return t0 + (px - L) / (R - L) * (t1 - t0); };
+    // Leaded glass: a jittered triangulation over the sky, each pane tinted a jewel colour, black lead between.
+    var cw = 13, rh = 11, gx = Math.ceil((R - L) / cw) + 1, gy = Math.ceil((BOT - 14 - TOP) / rh) + 1, pt = [];
+    for (var i = 0; i <= gx; i++) { pt[i] = []; for (var j = 0; j <= gy; j++) pt[i][j] = [L + i * cw + (i && i < gx ? (rnd(i * 31 + j) - 0.5) * 8 : 0), TOP + j * rh + (j && j < gy ? (rnd(i * 7 + j * 13) - 0.5) * 7 : 0)]; }
+    for (i = 0; i < gx; i++) for (j = 0; j < gy; j++) {
+      var a = pt[i][j], b = pt[i + 1][j], c = pt[i + 1][j + 1], d = pt[i][j + 1], flip = rnd(i * 3 + j * 17) > 0.5;
+      (flip ? [[a, b, c], [a, c, d]] : [[a, b, d], [b, c, d]]).forEach(function (tri, k) {
+        var night = !isDay(tX((tri[0][0] + tri[1][0] + tri[2][0]) / 3));
+        add("path", { d: "M" + tri.map(function (q) { return q[0].toFixed(1) + " " + q[1].toFixed(1); }).join(" L") + " Z",
+          fill: JEWELS[Math.floor(rnd(i * 11 + j * 5 + k) * JEWELS.length)], "fill-opacity": night ? 0.36 : 0.3, stroke: LEAD, "stroke-width": 0.7, "stroke-opacity": 0.55 });
+      });
+    }
+    // triskeles scattered through the sky
+    function triskele(x, y, r, c, w) {
+      for (var k = 0; k < 3; k++) {
+        var dd = "M" + x + " " + y;
+        for (var s = 1; s <= 24; s++) { var th = s / 24 * 2.6 * Math.PI, rr = r * s / 24, an = th + k * 2 * Math.PI / 3; dd += " L" + (x + rr * Math.cos(an)).toFixed(2) + " " + (y + rr * Math.sin(an)).toFixed(2); }
+        add("path", { d: dd, fill: "none", stroke: c, "stroke-width": w || 0.9, "stroke-linecap": "round" });
+      }
+    }
+    for (var tx = L + 18, tn = 0; tx < R - 10; tx += 31, tn++) {
+      var ty = TOP + 13 + (tn % 2) * 14, nt = !isDay(tX(tx));
+      triskele(tx, ty, 4 + (tn % 3), nt ? GOLD : "#8c1c3e", nt ? 0.9 : 0.7);
+      add("circle", { cx: tx + 9, cy: ty + 8, r: 1.2, fill: JEWELS[tn % JEWELS.length], stroke: LEAD, "stroke-width": 0.4 });
+    }
+    // the sun at midday: a rose window of red and gold rays
+    days.forEach(function (dy) {
+      if (dy.noon < t0 + 1800e3 || dy.noon > t1 - 1800e3) return;
+      var sx = X(dy.noon), sy = TOP + 20;
+      for (var k = 0; k < 16; k++) {
+        var a1 = k / 16 * 2 * Math.PI, a2 = (k + 1) / 16 * 2 * Math.PI, ro = k % 2 ? 11 : 15;
+        add("path", { d: "M" + sx + " " + sy + " L" + (sx + ro * Math.cos(a1)).toFixed(1) + " " + (sy + ro * Math.sin(a1)).toFixed(1) + " L" + (sx + ro * Math.cos(a2)).toFixed(1) + " " + (sy + ro * Math.sin(a2)).toFixed(1) + " Z", fill: k % 2 ? "#c9a227" : "#b4461f", stroke: LEAD, "stroke-width": 0.5 });
+      }
+      add("circle", { cx: sx, cy: sy, r: 6.5, fill: "#f6d36b", stroke: LEAD, "stroke-width": 0.9 });
+      triskele(sx, sy, 4.5, "#8c1c3e", 0.8);
+    });
+    // the river: deep glass with spiral waves
+    add("rect", { x: L, y: BOT - 14, width: R - L, height: 8, fill: "#163a5c" });
+    for (var wx = L + 2, wn = 0; wx < R; wx += 7, wn++) add("path", { d: "M" + wx + " " + (BOT - 7) + " q1 -5 5 -4 q2 1 0 3 q-1.5 1 -2 -0.5", fill: "none", stroke: wn % 2 ? "#7fc4d8" : "#3f8fb0", "stroke-width": 0.8 });
 
     // Moon phase: days since a known new moon (6 Jan 2000, 18:14 UTC), synodic month 29.530589 days.
     var SYN = 29.530588853, age = (((nowMs / 864e5 + 2440587.5 - 2451550.26) % SYN) + SYN) % SYN, ph = age / SYN;
@@ -1011,7 +1051,9 @@ a { color: var(--water); }
     var phName = age < 1.85 || age > SYN - 1.85 ? "New moon" : age < 5.54 ? "Waxing crescent" : age < 9.23 ? "First quarter" : age < 12.92 ? "Waxing gibbous" :
       age < 16.61 ? "Full moon" : age < 20.30 ? "Waning gibbous" : age < 23.99 ? "Last quarter" : "Waning crescent";
     function moonAt(mx, my, r) {
-      add("circle", { cx: mx, cy: my, r: r + 2.5, fill: "rgba(240,235,210,0.12)" });
+      for (var k = 0; k < 28; k++) { var an = k / 28 * 2 * Math.PI, r1 = r + 2.5, r2 = r + (k % 2 ? 6 : 10);
+        add("line", { x1: mx + r1 * Math.cos(an), y1: my + r1 * Math.sin(an), x2: mx + r2 * Math.cos(an), y2: my + r2 * Math.sin(an), stroke: k % 4 ? GOLD : "#b06fd0", "stroke-width": k % 2 ? 0.6 : 1, "stroke-opacity": 0.85 }); }
+      add("circle", { cx: mx, cy: my, r: r + 2, fill: "#120c1c", stroke: GOLD, "stroke-width": 0.8 });
       add("circle", { cx: mx, cy: my, r: r, fill: "#3b4462" });
       var k = Math.cos(2 * Math.PI * ph), rx = Math.abs(k) * r, waxing = ph < 0.5, gibbous = k < 0;
       var d = "M" + mx + " " + (my - r) + " A" + r + " " + r + " 0 0 " + (waxing ? 1 : 0) + " " + mx + " " + (my + r) +
@@ -1025,7 +1067,7 @@ a { color: var(--water); }
       var a = days[di].set, b2 = days[di + 1].rise;
       if (!a || !b2) continue;
       var mid = (a + b2) / 2;
-      if (mid > t0 + 1800e3 && mid < t1 - 1800e3) moonAt(X(mid), TOP + 15, 9);
+      if (mid > t0 + 1800e3 && mid < t1 - 1800e3) moonAt(X(mid), TOP + 21, 9);
     }
 
     // The crew's day, in Irish clock hours. Each scene sits in the middle of its stretch of the dial.
@@ -1042,11 +1084,11 @@ a { color: var(--water); }
       var cx = (X(a0) + X(a1)) / 2, ink = isDay((a0 + a1) / 2) ? "#2a2622" : "#efe6cc";
       var g = document.createElementNS(NSV, "g"); dial.appendChild(g);
       var t = document.createElementNS(NSV, "title"); t.textContent = sc[2]; g.appendChild(t);
-      sc[3](g, cx, BOT - 9, ink, (nowMs - s0) / (s1 - s0));
+      sc[3](g, cx, BOT - 14, ink, (nowMs - s0) / (s1 - s0));
     });
     function P(g, tag, a) { var n = el(tag, a); g.appendChild(n); return n; }
-    function line(g, x1, y1, x2, y2, c, w) { P(g, "line", { x1: x1, y1: y1, x2: x2, y2: y2, stroke: c, "stroke-width": w || 1.3, "stroke-linecap": "round" }); }
-    function head(g, x, y, c, wreath) { P(g, "circle", { cx: x, cy: y, r: 2.6, fill: "none", stroke: c, "stroke-width": 1.2 }); if (wreath) P(g, "path", { d: "M" + (x - 3) + " " + (y - 1.5) + " Q" + x + " " + (y - 5.5) + " " + (x + 3) + " " + (y - 1.5), fill: "none", stroke: "#6aa84f", "stroke-width": 1.4 }); }
+    function line(g, x1, y1, x2, y2, c, w) { P(g, "line", { x1: x1, y1: y1, x2: x2, y2: y2, stroke: c === LEAD ? "none" : (c === "#efe6cc" ? LEAD : "#fff6dd"), "stroke-width": (w || 1.3) + 1.4, "stroke-linecap": "round", "stroke-opacity": 0.7 }); P(g, "line", { x1: x1, y1: y1, x2: x2, y2: y2, stroke: c, "stroke-width": w || 1.3, "stroke-linecap": "round" }); }
+    function head(g, x, y, c, wreath) { P(g, "circle", { cx: x, cy: y, r: 2.6, fill: "none", stroke: c === "#efe6cc" ? LEAD : "#fff6dd", "stroke-width": 2.6, "stroke-opacity": 0.7 }); P(g, "circle", { cx: x, cy: y, r: 2.6, fill: "none", stroke: c, "stroke-width": 1.2 }); if (wreath) P(g, "path", { d: "M" + (x - 3) + " " + (y - 1.5) + " Q" + x + " " + (y - 5.5) + " " + (x + 3) + " " + (y - 1.5), fill: "none", stroke: "#6aa84f", "stroke-width": 1.4 }); }
     function figure(g, x, y, c, pose) { // y = feet
       head(g, x, y - 17, c, pose && pose.wreath);
       line(g, x, y - 14.5, x, y - 7, c);
@@ -1116,6 +1158,16 @@ a { color: var(--water); }
       bottle(g, x - 2, y - 26, 30); bottle(g, x + 16, y, 100);
     }
 
+    // Celtic plait along the top and bottom of the glass
+    function plait(yc) {
+      add("rect", { x: L, y: yc - 4, width: R - L, height: 8, fill: LEAD });
+      var lam = 12, amp = 2.3;
+      var strand = function (sg, xa, xb) { var dd = ""; for (var x = xa; x <= xb + 0.01; x += 1) dd += (dd ? " L" : "M") + x.toFixed(1) + " " + (yc + sg * amp * Math.sin(2 * Math.PI * (x - L) / lam)).toFixed(2); return dd; };
+      var draw = function (sg, xa, xb, col) { add("path", { d: strand(sg, xa, xb), fill: "none", stroke: LEAD, "stroke-width": 2.6 }); add("path", { d: strand(sg, xa, xb), fill: "none", stroke: col, "stroke-width": 1.3 }); };
+      draw(1, L, R, GOLD); draw(-1, L, R, "#c9a227");
+      for (var k = 0; L + k * lam / 2 < R; k++) { var xc = L + k * lam / 2; draw(k % 2 ? 1 : -1, xc - lam / 4, xc + lam / 4, k % 2 ? GOLD : "#c9a227"); }
+    }
+    plait(TOP + 4); plait(BOT - 3);
     // bezel and markings
     P(svg, "rect", { x: L, y: TOP, width: R - L, height: BOT - TOP, rx: 12, fill: "none", stroke: "#b8964a", "stroke-width": 2.2 });
     P(svg, "rect", { x: L + 2, y: TOP + 2, width: R - L - 4, height: BOT - TOP - 4, rx: 10, fill: "none", stroke: "rgba(255,240,200,0.35)", "stroke-width": 0.8 });
