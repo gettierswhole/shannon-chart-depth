@@ -170,6 +170,7 @@ a { color: var(--water); }
 .workings { font-family: var(--mono); font-size: 0.82rem; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; white-space: pre; }
 .fine { font-size: 0.85rem; color: var(--muted); margin: 0; }
 .caveats { font-size: 0.88rem; color: var(--muted); display: grid; gap: 6px; margin: 0; padding-left: 18px; }
+.experiment { margin: 8px 0 0; text-align: center; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--bad); }
 .vinny { display: grid; justify-items: center; gap: 10px; margin-top: 8px; }
 .vinny-glass { display: grid; gap: 4px; justify-items: center; width: min(100%, 320px); padding: 14px 16px; border-radius: 6px;
   background: linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15)), var(--bad-soft);
@@ -194,15 +195,6 @@ a { color: var(--water); }
 
   <div class="grid">
     <div class="col">
-      <section class="panel hero" aria-live="polite">
-        <p class="label">Correction to charted depths</p>
-        <div class="big" id="offset">–</div>
-        <p class="say" id="say">Loading the latest gauge reading…</p>
-        <div class="meta">
-          <span class="pill ok" id="fresh">Checking</span>
-          <span id="src"></span>
-        </div>
-      </section>
 
       <section class="panel wx" id="wx">
         <div class="wx-head">
@@ -393,6 +385,16 @@ a { color: var(--water); }
       </section>
     </div>
   </div>
+  <p class="experiment" role="note">Untested experiment, not an aid to navigation</p>
+  <section class="panel hero" aria-live="polite">
+    <p class="label">Correction to charted depths</p>
+    <div class="big" id="offset">–</div>
+    <p class="say" id="say">Loading the latest gauge reading…</p>
+    <div class="meta">
+      <span class="pill ok" id="fresh">Checking</span>
+      <span id="src"></span>
+    </div>
+  </section>
   <section class="vinny" id="vinny" aria-label="Emergency button">
     <button type="button" class="vinny-glass" id="vinny-btn">
       <span class="vinny-small">In case of emergency</span>
@@ -720,7 +722,7 @@ a { color: var(--water); }
     var ul = $("caveats"); ul.textContent = "";
     var poolLines = r.pools ? ["Waterways Ireland's ordinary summer levels on this stretch, in m Malin: " + r.pools.map(function (x) { return x[0] + " " + (x[1] + POOLBEG_TO_MALIN).toFixed(2); }).join("; ") + "."] : [];
     r.caveats.concat(poolLines).concat(["OPW data is raw and unchecked. A sudden jump is more likely a sensor fault than the river.",
-      "Charts age. Silt, weed and boulders move; use this as an aid, not a guarantee."]).forEach(function (t) {
+      "Charts age. Silt, weed and boulders move, so navigate by your chart, your sounder and the markers, not this page."]).forEach(function (t) {
       var li = document.createElement("li"); li.textContent = t; ul.appendChild(li);
     });
     var esb = $("esb"); esb.textContent = "";
