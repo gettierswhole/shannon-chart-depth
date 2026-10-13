@@ -3,6 +3,12 @@
 import sys
 src, out = sys.argv[1], sys.argv[2]
 h = open(src).read()
+# Accept either the page source or the published page as the artifact service returns it
+# (wrapped in its own <html><head>...</head><body> skeleton): keep only the page itself.
+if h.lstrip().lower().startswith('<!doctype') and '<body>' in h[:3000]:
+    h = h[h.index('<body>') + len('<body>'):]
+    if h.rstrip().endswith('</body></html>'):
+        h = h.rstrip()[:-len('</body></html>')]
 shim = r'''<script>
 // Public copy: stand in for the artifact database with data.json, re-read every 10 minutes.
 (function () {
