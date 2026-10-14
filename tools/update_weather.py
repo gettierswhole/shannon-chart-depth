@@ -4,7 +4,7 @@
 # Usage: update_weather.py <data.json>
 import json, re, sys, urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 FEED = "https://www.met.ie/Open_Data/xml/xInland_Lake_Forecast.xml"
 LAKES = (("derg", "Derg"), ("ree", "Ree"), ("key", "Key"))   # page id, word in the lake's <area> text
@@ -39,9 +39,62 @@ def fetch():
                     lakes[key] = entry
     return issued, lakes
 
+# Met Éireann's automatic model (HARMONIE) point forecast: produced every hour with no forecaster involved,
+# so it carries on when the written lakes forecast is late. Stored as compact hourly steps for the next 36 hours:
+# [time, wind direction deg, wind speed m/s, gust m/s, rain mm in the hour to that time].
+MODEL = "https://openaccess.pf.api.met.ie/metno-wdb2ts/locationforecast?lat={lat};long={lon}"
+POINTS = {"derg": (52.95, -8.29), "ree": (53.55, -7.98), "key": (53.98, -8.24)}
+
+def fetch_model(lat, lon, now):
+    req = urllib.request.Request(MODEL.format(lat=lat, lon=lon), headers={"User-Agent": "shannon-chart-depth (github.com/gettierswhole)"})
+    root = ET.fromstring(urllib.request.urlopen(req, timeout=60).read())
+    created = root.get("created")
+    wind, rain = {}, {}
+    for t in root.iter("time"):
+        a, b = t.get("from"), t.get("to")
+        if not a or not b:
+            continue
+        if a == b:
+            dd, ff, fg = t.find(".//windDirection"), t.find(".//windSpeed"), t.find(".//windGust")
+            if dd is not None and ff is not None:
+                wind[a] = (round(float(dd.get("deg")), 0), round(float(ff.get("mps")), 1),
+                           round(float(fg.get("mps")), 1) if fg is not None and fg.get("mps") else None)
+        else:
+            pr = t.find(".//precipitation")
+            ta, tb = datetime.fromisoformat(a.replace("Z", "+00:00")), datetime.fromisoformat(b.replace("Z", "+00:00"))
+            if pr is not None and (tb - ta).total_seconds() == 3600:
+                rain[b] = round(float(pr.get("value") or 0), 1)
+    steps = []
+    for k in sorted(wind):
+        tk = datetime.fromisoformat(k.replace("Z", "+00:00"))
+        if now - timedelta(hours=1) <= tk <= now + timedelta(hours=36):
+            d, s, g = wind[k]
+            steps.append([iso(tk), d, s, g, rain.get(k)])
+    if not created or len(steps) < 6:
+        raise ValueError("model forecast had too few hourly steps")
+    return iso(datetime.fromisoformat(created.replace("Z", "+00:00"))), steps
+
+def update_model(w, now_dt):
+    old = w.get("model") or {}
+    lakes, created, errors = {}, None, []
+    for key, (lat, lon) in POINTS.items():
+        try:
+            c, steps = fetch_model(lat, lon, now_dt)
+            lakes[key] = {"steps": steps}
+            created = max(created or c, c)
+        except Exception as e:
+            errors.append(key + ": " + type(e).__name__ + ": " + str(e)[:80])
+    if not lakes:
+        return {"modelCreated": None, "modelResult": "fetch failed: " + "; ".join(errors)}
+    if str(old.get("created", "")) >= created:
+        return {"modelCreated": created, "modelResult": "nothing newer"}
+    w["model"] = {"created": created, "fetchedAt": iso(now_dt), "lakes": lakes, "source": "Met Éireann HARMONIE point forecast"}
+    return {"modelCreated": created, "modelResult": "updated" + (" (missing " + "; ".join(errors) + ")" if errors else "")}
+
 def main(path):
     data = json.load(open(path))
-    now = iso(datetime.now(timezone.utc))
+    now_dt = datetime.now(timezone.utc)
+    now = iso(now_dt)
     w = data.setdefault("weather", {})
     old = w.get("lakes") or {}
     try:
@@ -55,12 +108,14 @@ def main(path):
             status = {"feedIssued": issued, "result": "updated"}
     except Exception as e:
         status = {"feedIssued": None, "result": "fetch failed: " + type(e).__name__ + ": " + str(e)[:160]}
+    status.update(update_model(w, now_dt))
     prev = w.get("status") or {}
-    changed = status["result"] == "updated" or {k: prev.get(k) for k in status} != status
+    changed = status["result"] == "updated" or status["modelResult"].startswith("updated") or {k: prev.get(k) for k in status} != status
     if changed:
         w["status"] = dict(status, checked=now)
         json.dump(data, open(path, "w"), ensure_ascii=False, separators=(",", ":"))
     print("weather: " + status["result"] + " (Met Éireann's file issued " + str(status["feedIssued"]) + ")")
+    print("model: " + status["modelResult"] + " (run created " + str(status["modelCreated"]) + ")")
 
 if __name__ == "__main__":
     main(sys.argv[1])

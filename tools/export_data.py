@@ -3,14 +3,14 @@
 #
 # - Gauges: the GitHub Action (tools/update_gauges.py) owns them. A gauge from the artifact
 #   is used only if it is newer than the one already in data.json, so either feed can keep it going.
-# - Lake forecast: the same Action also fetches it from Met Éireann's open data; the newer issue wins.
+# - Lake forecast and model forecast: the same Action fetches both from Met Éireann's open data; the newer one wins.
 # - Anything that came from email (venue news, events from club emails) stays on the private page:
 #   a sender address can be forged, so it is never published here.
 # - Marine notices are kept only when they link to waterwaysireland.org.
 import json, os, sys, datetime
 root, out = sys.argv[1], sys.argv[2]
 keep = {"gauge": ["portumna", "banagher", "hodsons", "carrick"], "food": ["derg", "mid", "ree", "key"],
-        "notices": ["live"], "weather": ["lakes"], "events": ["live"]}
+        "notices": ["live"], "weather": ["lakes", "model"], "events": ["live"]}
 try:
     old = json.load(open(out))
 except Exception:
@@ -26,12 +26,18 @@ for col, ids in keep.items():
         prev = (old.get(col) or {}).get(d)
         if col == "gauge" and prev and v and str(prev.get("time", "")) >= str(v.get("time", "")):
             v = prev
-        if col == "weather" and prev and v and str(prev.get("issued", "")) >= str(v.get("issued", "")):
+        if col == "weather" and d == "lakes" and prev and v and str(prev.get("issued", "")) >= str(v.get("issued", "")):
+            v = prev
+        if col == "weather" and d == "model" and prev and v and str(prev.get("created", "")) >= str(v.get("created", "")):
             v = prev
         if v is None:
             v = prev
         if v is not None:
             data.setdefault(col, {})[d] = v
+
+# The Action's record of what Met Éireann's files said at its last check.
+if (old.get("weather") or {}).get("status"):
+    data.setdefault("weather", {})["status"] = old["weather"]["status"]
 
 ev = (data.get("events") or {}).get("live")
 if isinstance(ev, dict):
