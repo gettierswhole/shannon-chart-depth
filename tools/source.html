@@ -1,67 +1,97 @@
 <title>Shannon Chart Depth</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: a wheelhouse instrument — pick the stretch, read the correction, then the staff gauge, calculator and settings. One column on a phone, two on wider screens. */
+/* Livery: Shannon Star Livery — a 1974 airliner's roof green, royal pinstripe and pine cheatline over a white Shannon cruiser hull. */
 :root {
-  --bg: #edf2f1;
-  --surface: #f9fbfa;
-  --ink: #13221e;
-  --muted: #566a64;
-  --line: #cfdad6;
-  --water: #2b6c80;
-  --water-soft: #d3e6ec;
-  --ok: #2c7a4c;
-  --warn: #9c6612;
-  --bad: #b13a2f;
-  --ok-soft: #dcefe3;
-  --warn-soft: #f6e9cf;
-  --bad-soft: #f6dcd8;
-  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --bg: #e2e8e4;
+  --surface: #fbfcf9;
+  --sunk: #eef2ef;
+  --ink: #15201b;
+  --muted: #4c5f57;
+  --line: #c6d1cb;
+  --line-strong: #7e8f87;
+  --water: #22408f;
+  --on-water: #ffffff;
+  --water-soft: #dce3f4;
+  --ok: #23703a;
+  --warn: #8a5414;
+  --bad: #b12f24;
+  --ok-soft: #dbeedf;
+  --warn-soft: #f4e6cf;
+  --bad-soft: #f7ddd9;
+  --roof: #2a7a3b;
+  --on-roof: #ffffff;
+  --royal: #22408f;
+  --cheat: #123b2a;
+  --on-cheat: #ffffff;
+  --strake: #1c2621;
+  --display: "Jost", "Futura", "Century Gothic", "Avenir Next", sans-serif;
   --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0c1513; --surface: #13201d; --ink: #e2ebe8; --muted: #93a7a1; --line: #263a35;
-    --water: #72b5c8; --water-soft: #1b3a43; --ok: #63c08a; --warn: #e2ac50; --bad: #ec7d70;
-    --ok-soft: #173326; --warn-soft: #3a2d13; --bad-soft: #3d1d19; color-scheme: dark;
+    --bg: #0b1612; --surface: #13231c; --sunk: #0f1d17; --ink: #e5ede8; --muted: #9aaea4; --line: #2c4237; --line-strong: #62786d;
+    --water: #9db4f2; --on-water: #0b1612; --water-soft: #1b2a52; --ok: #6fcb8a; --warn: #d9a15a; --bad: #f28474;
+    --ok-soft: #14301f; --warn-soft: #38270f; --bad-soft: #3f1a16;
+    --roof: #1a5a2b; --on-roof: #ffffff; --royal: #7c9bef; --cheat: #2e7a50; --on-cheat: #ffffff; --strake: #7d9389; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0c1513; --surface: #13201d; --ink: #e2ebe8; --muted: #93a7a1; --line: #263a35;
-  --water: #72b5c8; --water-soft: #1b3a43; --ok: #63c08a; --warn: #e2ac50; --bad: #ec7d70;
-  --ok-soft: #173326; --warn-soft: #3a2d13; --bad-soft: #3d1d19; color-scheme: dark;
+  --bg: #0b1612; --surface: #13231c; --sunk: #0f1d17; --ink: #e5ede8; --muted: #9aaea4; --line: #2c4237; --line-strong: #62786d;
+  --water: #9db4f2; --on-water: #0b1612; --water-soft: #1b2a52; --ok: #6fcb8a; --warn: #d9a15a; --bad: #f28474;
+  --ok-soft: #14301f; --warn-soft: #38270f; --bad-soft: #3f1a16;
+  --roof: #1a5a2b; --on-roof: #ffffff; --royal: #7c9bef; --cheat: #2e7a50; --on-cheat: #ffffff; --strake: #7d9389; color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; padding-inline: 16px; padding-block: 20px 40px; }
-.wrap { max-width: 900px; margin: 0 auto; display: grid; gap: 16px; }
-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
-h1 { font-family: var(--display); font-weight: 600; font-size: 1.9rem; letter-spacing: 0.01em; margin: 0; text-wrap: balance; }
-.sub { color: var(--muted); font-size: 0.9rem; margin: 0; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; padding-inline: 16px; padding-block: 0 40px; }
+.wrap { max-width: 900px; margin: 8px auto 0; display: grid; gap: 16px; }
+/* Masthead: the roof green, a royal pinstripe and the pine cheatline, level and then rising to the right like a cruiser's sheer */
+.masthead { margin-inline: -16px; color: var(--on-roof); }
+.roof { background: var(--roof); padding: 22px 16px 8px; }
+.roof > * { max-width: 900px; margin-inline: auto; }
+h1 { font-family: var(--display); font-weight: 600; font-size: 1.9rem; line-height: 1.05; letter-spacing: 0.005em; margin: 0 auto; text-wrap: balance; color: var(--on-roof); }
+.sub { color: var(--on-roof); font-size: 0.9rem; margin: 4px auto 0; }
+.cheatline { display: block; width: 100%; height: 24px; }
+.cheatline .c-roof { fill: var(--roof); } .cheatline .c-royal { fill: var(--royal); } .cheatline .c-cheat { fill: var(--cheat); }
+/* Strake: the double rubbing-strake rule between the depth zone and the trip zone */
+.strake { border: 0; border-top: 2px solid var(--strake); border-bottom: 2px solid var(--strake); height: 7px; margin: 0; }
 
 /* Stretch selector: ordered south to north, as the river runs upstream */
-.reaches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
-.reaches button { border: 0; border-radius: 0; background: transparent; color: var(--ink); padding: 10px 8px; text-align: left; display: grid; gap: 1px; min-width: 0; font-weight: 600; }
+.reaches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); }
+.reaches button { border: 0; border-radius: 0; background: transparent; color: var(--ink); padding: 10px 12px 14px; text-align: left; display: grid; gap: 2px; min-width: 0; font-family: var(--display); font-weight: 500; font-size: 1rem; line-height: 1.25; }
 .reaches button + button { border-left: 1px solid var(--line); }
 @media (max-width: 520px) { .reaches { grid-template-columns: repeat(2, minmax(0, 1fr)); } .reaches button:nth-child(3) { border-left: 0; } .reaches button:nth-child(n+3) { border-top: 1px solid var(--line); } }
-.reaches button span { font-weight: 400; font-size: 0.78rem; color: var(--muted); }
-.reaches button[aria-pressed="true"] { background: var(--water); color: var(--surface); }
-.reaches button[aria-pressed="true"] span { color: var(--surface); opacity: 0.85; }
+.reaches button span { font-family: var(--body); font-weight: 400; font-size: 0.78rem; color: var(--muted); }
+.reaches button[aria-pressed="true"] { background: var(--roof); color: var(--on-roof); box-shadow: inset 0 -4px 0 var(--cheat), inset 0 -7px 0 var(--royal); }
+.reaches button[aria-pressed="true"] span { color: var(--on-roof); }
 
 .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
 @media (min-width: 760px) { .grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: start; } }
 .col { display: grid; gap: 16px; min-width: 0; }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; }
-.label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; margin: 0 0 6px; }
-h2 { font-family: var(--display); font-weight: 600; font-size: 1.3rem; margin: 0 0 10px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; min-width: 0; }
+.label { font-family: var(--display); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); font-weight: 600; margin: 0 0 6px; }
+h2 { font-family: var(--display); font-weight: 500; font-size: 1.3rem; line-height: 1.2; margin: 0 0 10px; text-wrap: balance; }
 
 .hero { display: grid; gap: 10px; }
-.big { font-family: var(--display); font-weight: 600; font-size: clamp(3.6rem, 16vw, 5.4rem); line-height: 0.95; font-variant-numeric: tabular-nums; color: var(--water); letter-spacing: -0.01em; }
-.big .unit { font-size: 0.42em; color: var(--muted); margin-left: 6px; font-weight: 500; }
+.big { font-family: var(--display); font-weight: 500; font-size: clamp(3.6rem, 16vw, 5.4rem); line-height: 0.95; font-variant-numeric: tabular-nums; color: var(--water); letter-spacing: -0.01em; }
+.big .unit { font-size: 0.42em; color: var(--muted); margin-left: 6px; font-weight: 400; letter-spacing: 0; }
 .big.pending { font-size: clamp(2.4rem, 10vw, 3.2rem); color: var(--muted); }
-.say { font-size: 1.1rem; margin: 0; max-width: 34em; }
+/* Lead-line checks */
+.checks { display: grid; gap: 12px; }
+.checks .fields + .fields { margin-top: 12px; }
+.checks .row { margin-top: 12px; }
+.check-sum { margin: 0; font-size: 0.98rem; }
+.check-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.check-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--sunk); font-size: 0.9rem; }
+.check-list li > div { min-width: 0; }
+.check-list .when { color: var(--muted); font-size: 0.82rem; }
+.check-list .imp { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 0.85rem; color: var(--muted); }
+.check-list button { padding: 4px 10px; font-size: 0.8rem; }
+.say { font-size: 1.125rem; line-height: 1.45; margin: 0; max-width: 34em; }
 .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 0.85rem; color: var(--muted); }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
@@ -74,7 +104,7 @@ h2 { font-family: var(--display); font-weight: 600; font-size: 1.3rem; margin: 0
 .wx-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
 .wx-head h2 { margin: 0; }
 .wx dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: 0.95rem; }
-.wx dt { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; padding-top: 2px; }
+.wx dt { color: var(--muted); font-family: var(--display); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; padding-top: 3px; }
 .wx dd { margin: 0; }
 .wx h3 { font-size: 0.95rem; margin: 6px 0 2px; }
 .today { display: grid; gap: 14px; }
@@ -87,21 +117,21 @@ h2 { font-family: var(--display); font-weight: 600; font-size: 1.3rem; margin: 0
 .moor { text-align: right; }
 .moor-time { color: var(--bad); font-weight: 500; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 0.95rem; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); }
-.chip.past { color: var(--muted); text-decoration: line-through; opacity: 0.7; }
-.chip.next { border-color: var(--water); background: var(--water); color: var(--surface); font-weight: 500; }
+.chip { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 0.95rem; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--sunk); }
+.chip.past { color: var(--muted); text-decoration: line-through; }
+.chip.next { border-color: var(--water); background: var(--water); color: var(--on-water); font-weight: 500; }
 .contacts { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 0.92rem; }
 .contacts li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; }
 .contacts .num { font-family: var(--mono); user-select: all; }
 .food { display: grid; gap: 12px; }
-.food-menu { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.food-menu { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
 .food-menu + .food-menu { margin-top: 10px; }
 .food-menu > summary { cursor: pointer; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-weight: 600; }
 .food-menu > summary .food-title { font-family: var(--display); font-size: 1.15rem; }
 .food-menu > summary .food-count { font-size: 0.82rem; color: var(--muted); font-weight: 400; margin-left: auto; }
 .food-menu[open] > summary { margin-bottom: 10px; }
-.food h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 4px 0 0; }
-.venue { display: grid; gap: 3px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.food h3 { font-family: var(--display); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 4px 0 0; }
+.venue { display: grid; gap: 3px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--sunk); }
 .venue-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 10px; }
 .venue-name { font-weight: 600; }
 .venue .where { font-size: 0.82rem; color: var(--muted); }
@@ -117,35 +147,36 @@ h2 { font-family: var(--display); font-weight: 600; font-size: 1.3rem; margin: 0
 .rate-gap.ok { color: var(--ok); background: var(--ok-soft); }
 .rate-gap.warn { color: var(--warn); background: var(--warn-soft); }
 .rate-gap.bad { color: var(--bad); background: var(--bad-soft); }
-.scorecard { font-size: 0.88rem; padding: 8px 12px; border-radius: 8px; background: var(--water-soft); }
+.scorecard { font-size: 0.88rem; padding: 8px 12px; border-radius: 10px; background: var(--water-soft); }
 .notices { display: grid; gap: 10px; }
 .notice-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.notice-list li { display: grid; gap: 2px; padding-left: 10px; border-left: 3px solid var(--line); }
-.notice-list li.urgent { border-left-color: var(--bad); }
-.notice-list li.active { border-left-color: var(--warn); }
+.notice-list li { display: grid; gap: 2px; padding-left: 22px; position: relative; }
+.notice-list li::before { content: ""; position: absolute; left: 0; top: 5px; width: 10px; height: 14px; border-radius: 4px; background: var(--line-strong); }
+.notice-list li.urgent::before { background: var(--bad); }
+.notice-list li.active::before { background: var(--warn); }
 .notice-list a { font-weight: 600; text-decoration: none; }
 .notice-list a:hover { text-decoration: underline; }
 .notice-list span { font-size: 0.9rem; color: var(--muted); }
-.ev-head { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 6px 0 8px; }
+.ev-head { font-family: var(--display); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 6px 0 8px; }
 .venue .news { font-size: 0.88rem; padding: 4px 8px; border-radius: 6px; background: var(--warn-soft); }
-.alert { margin: 0; padding: 8px 12px; border-radius: 8px; background: var(--bad-soft); color: var(--bad); font-weight: 600; font-size: 0.92rem; }
+.alert { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--bad-soft); color: var(--bad); font-weight: 600; font-size: 0.92rem; }
 .calc { display: grid; gap: 14px; }
 .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 label.f { display: grid; gap: 4px; font-size: 0.9rem; font-weight: 600; }
 label.f small { font-weight: 400; color: var(--muted); }
-input[type=number], input[type=time], select { font-family: var(--mono); font-size: 1.15rem; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); width: 100%; min-width: 0; }
+input[type=number], input[type=time], input[type=text], input[type=datetime-local], select { font-family: var(--mono); font-size: 1.15rem; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--sunk); color: var(--ink); width: 100%; min-width: 0; }
 select { font-family: var(--body); font-size: 1rem; }
 input:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px solid var(--water); outline-offset: 2px; }
 .result { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.res { border-top: 1px solid var(--line); padding-top: 10px; }
-.res .v { font-family: var(--display); font-weight: 600; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.res { border-top: 2px solid var(--strake); padding-top: 8px; }
+.res .v { font-family: var(--display); font-weight: 500; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
 .res .ft { color: var(--muted); font-size: 0.85rem; }
 .res.state-ok .v { color: var(--ok); } .res.state-warn .v { color: var(--warn); } .res.state-bad .v { color: var(--bad); }
 
 .gauge-wrap { display: flex; gap: 14px; align-items: flex-start; }
 .gauge-wrap svg { flex: 0 0 auto; width: 150px; height: auto; }
 .gauge-notes { font-size: 0.88rem; color: var(--muted); display: grid; gap: 8px; min-width: 0; }
-.gauge-notes b { color: var(--ink); font-weight: 600; }
+.gauge-notes b { color: var(--ink); font-weight: 500; }
 .spark { margin-top: 14px; }
 .spark svg { width: 100%; height: auto; display: block; }
 
@@ -155,10 +186,11 @@ summary { cursor: pointer; font-weight: 600; }
 .stack { display: grid; gap: 10px; margin-top: 12px; font-size: 0.92rem; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
 .row label.f { flex: 1 1 160px; }
-button { font: inherit; font-size: 0.9rem; font-weight: 600; padding: 9px 14px; border-radius: 8px; border: 1px solid var(--water); background: var(--water); color: var(--surface); cursor: pointer; }
-button.ghost { background: transparent; color: var(--water); }
+button { font: inherit; font-size: 0.9rem; font-weight: 600; padding: 9px 14px; border-radius: 10px; border: 1px solid var(--cheat); background: var(--cheat); color: var(--on-cheat); cursor: pointer; }
+button.ghost { background: transparent; border-color: var(--water); color: var(--water); }
+button:disabled { background: var(--sunk); border-color: var(--line); color: var(--muted); cursor: default; }
 a { color: var(--water); }
-.workings { font-family: var(--mono); font-size: 0.82rem; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; white-space: pre; }
+.workings { font-family: var(--mono); font-size: 0.82rem; background: var(--sunk); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; overflow-x: auto; white-space: pre; }
 .fine { font-size: 0.85rem; color: var(--muted); margin: 0; }
 .caveats { font-size: 0.88rem; color: var(--muted); display: grid; gap: 6px; margin: 0; padding-left: 18px; }
 .experiment { margin: -4px 0 4px; text-align: center; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--bad); }
@@ -175,22 +207,31 @@ a { color: var(--water); }
 @media (prefers-reduced-motion: no-preference) { .waterfill { transition: y 0.6s ease, height 0.6s ease; } }
 </style>
 
-<div class="wrap">
-  <header>
+<header class="masthead">
+  <div class="roof">
     <h1>Shannon Chart Depth</h1>
     <p class="sub">CSIG charted depths corrected for today's water level</p>
-    <p class="alert" id="offline" hidden>No signal: showing the last data saved on this phone. Check the reading times before relying on it.</p>
-  </header>
+  </div>
+  <svg class="cheatline" viewBox="0 0 1000 24" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <path class="c-roof" d="M0 0H1000V2C930 8 800 12 600 12H0Z"/>
+    <path class="c-royal" d="M0 12H600C800 12 930 8 1000 2V5C930 11 800 15 600 15H0Z"/>
+    <path class="c-cheat" d="M0 15H600C800 15 930 11 1000 5V12C930 18 800 22 600 22H0Z"/>
+  </svg>
+</header>
+
+<div class="wrap">
+  <p class="alert" id="offline" hidden>No signal: showing the last data saved on this phone. Check the reading times before relying on it.</p>
 
   <nav class="reaches" id="reaches" aria-label="Stretch of river"></nav>
 
   <div class="grid depth-zone">
     <div class="col">
       <section class="panel hero" aria-live="polite">
-        <p class="label">Correction to charted depths</p>
+        <p class="label" id="hero-label">Correction to charted depths</p>
         <div class="big" id="offset">–</div>
         <p class="say" id="say">Loading the latest gauge reading…</p>
         <div class="meta">
+          <span class="pill warn" id="basis" hidden></span>
           <span class="pill ok" id="fresh">Checking</span>
           <span id="src"></span>
         </div>
@@ -219,6 +260,46 @@ a { color: var(--water); }
             <div class="ft" id="clear-ft"></div>
           </div>
         </div>
+      </section>
+      <section class="panel checks" id="checks">
+        <h2>Check it with your lead line</h2>
+        <p class="fine" id="chk-intro"></p>
+        <div id="chk-form">
+          <div class="fields">
+            <label class="f" for="chk-spot">Charted spot depth <small>metres, from the CSIG chart</small>
+              <input id="chk-spot" type="number" inputmode="decimal" step="0.1" min="0">
+            </label>
+            <label class="f" for="chk-lead">Lead line reads <small>at the water surface</small>
+              <input id="chk-lead" type="number" inputmode="decimal" step="any" min="0">
+            </label>
+            <label class="f" for="chk-unit">Line marked in <small>remembered on this device</small>
+              <select id="chk-unit"><option value="m">metres</option><option value="ft">feet</option></select>
+            </label>
+          </div>
+          <div class="fields">
+            <label class="f" for="chk-where">Where <small>optional, e.g. off Dromineer</small>
+              <input id="chk-where" type="text" maxlength="60" autocomplete="off">
+            </label>
+            <label class="f" for="chk-when">When <small>leave blank for now</small>
+              <input id="chk-when" type="datetime-local">
+            </label>
+          </div>
+          <div class="row"><button id="chk-save" type="button">Save this check</button></div>
+        </div>
+        <p class="fine" id="chk-msg" role="status"></p>
+        <p class="check-sum" id="chk-sum"></p>
+        <ul class="check-list" id="chk-list"></ul>
+        <details id="chk-how">
+          <summary>How to take a good check</summary>
+          <ul class="caveats" style="margin-top:8px">
+            <li>Pick a charted spot depth on a flat, even bottom, away from drop-offs, so being a boat-length off the spot doesn't matter.</li>
+            <li>Stop the boat. Lower the lead until the line goes slack, then lift until it just touches, with the line straight up and down.</li>
+            <li>Read the mark at the water surface, not at the deck or the gunwale.</li>
+            <li>Take three casts and enter the middle one. Soft mud and weed let the lead sink, so a firm bottom gives a truer reading.</li>
+            <li>Choose a calm spell: wind piles water up at the downwind end of a lake.</li>
+            <li>Check the rope's marks against a tape now and then. Rope stretches and shrinks when it's wet.</li>
+          </ul>
+        </details>
       </section>
     </div>
 
@@ -257,16 +338,6 @@ a { color: var(--water); }
                 <input id="feet" type="number" inputmode="decimal" step="0.05">
               </label>
               <button id="use-feet" type="button">Use this reading</button>
-            </div>
-            <p class="fine">Or check against your sounder, as the CSIG suggest: on a flat stretch of lake, compare a charted spot depth with what your sounder reads. Add your transducer depth so the sounder gives depth below the surface.</p>
-            <div class="row">
-              <label class="f" for="spot">Charted spot depth <small>metres</small>
-                <input id="spot" type="number" inputmode="decimal" step="0.1" min="0">
-              </label>
-              <label class="f" for="sounder">Sounder reads <small>metres below surface</small>
-                <input id="sounder" type="number" inputmode="decimal" step="0.1" min="0">
-              </label>
-              <button id="use-sounder" type="button">Use this check</button>
             </div>
             <div class="row" id="manual-active" hidden>
               <p class="fine" id="manual-note"></p>
@@ -307,6 +378,7 @@ a { color: var(--water); }
     </div>
   </div>
   <p class="experiment" role="note">Untested experiment, not an aid to navigation</p>
+  <hr class="strake">
 
   <div class="grid">
     <div class="col">
@@ -416,11 +488,12 @@ a { color: var(--water); }
       id: "derg", name: "Lough Derg", span: "Killaloe – Meelick",
       gauge: { doc: "portumna", station: "25341", name: "Portumna Bridge", zero: 29.169 },
       cills: [
-        { name: "Killaloe lower cill", poolbeg: 30.97 },
-        { name: "Killaloe upper cill", poolbeg: 30.52 }
+        { name: "Killaloe cill (lower?)", poolbeg: 30.97 },
+        { name: "Killaloe cill (upper?)", poolbeg: 30.52 }
       ],
       feet: 8,
-      unc: 0.05, uncWhy: "±5 cm: the cill-plus-8-ft datum and Waterways Ireland's summer level agree to 3 cm, the Poolbeg to Malin conversion adds a cm or two, and the gauge is at Portumna, not where you are.",
+      unc: 0.10, uncWhy: "±10 cm until you check it. The published datum and Waterways Ireland's summer level at Portumna agree to 3 cm, but the CSIG name different cills in different places and nobody has checked either against the water. The gauge is also at Portumna, not where you are.",
+      lake: true, alts: [{ label: "8 ft over the other Killaloe cill", cill: 1, feet: 8 }],
       weather: ["derg"],
       sunAt: [52.95, -8.29],
       bridge: true,
@@ -433,7 +506,7 @@ a { color: var(--water); }
         ["Pier Head, Killaloe level", "06-Pier-Head-Killaloe.pdf"],
         ["Portumna Bridge level", "05-Portumna-Bridge.pdf"]
       ],
-      datumHelp: "CSIG depths here are reduced to 8 ft on the gauge at the entrance to the old canal in Killaloe, as the CSIG's lead mapper confirmed on the IWAI forum in 2018 and 2019. He reckons the lake has averaged about 9 ft 6 in on that gauge, 18 in above datum, since charting began. Waterways Ireland's ordinary summer level at Portumna, 33.38 m Poolbeg (30.67 m Malin), is within 3 cm of this datum. Oddly, the lock table lists the lower cill higher than the upper one; switch cills only if the CSIG confirm they mean the other.",
+      datumHelp: "The CSIG reduce their depths to ordinary summer level. For Lough Derg their lead mapper put it at 8 ft on the gauge at the entrance to the old canal in Killaloe. His 2018 forum post says 8 ft over the lower cill; the CSIG's own 2020 article names the sill at the upper gate. The lock table lists the 'lower' cill higher than the 'upper' one, which is odd. Its 30.97 m Poolbeg figure gives 30.70 m Malin, within 3 cm of Waterways Ireland's summer level at Portumna (30.67 m); the other gives 30.25 m. Your own lead-line checks settle it, and replace this figure once you have them.",
       manualHelp: "Copy the OD level from the <a href=\"https://waterlevel.ie/0000025341/\" target=\"_blank\" rel=\"noopener\">Portumna Bridge page on waterlevel.ie</a>. A staff gauge reading under 5 m has the gauge zero of 29.169 m added for you.",
       feetHelp: "At Killaloe, read the gauge at the canal entrance. It is marked in feet over the cill, so 8 ft is chart datum.",
       caveats: [
@@ -450,7 +523,8 @@ a { color: var(--water); }
       ],
       feet: null,
       osl: { name: "Banagher ordinary summer level", poolbeg: 35.36 },
-      unc: 0.15, uncWhy: "±15 cm: there is no CSIG datum here, so this is measured against Waterways Ireland's summer level, and the river slopes between Meelick and Athlone.",
+      unc: 0.15, uncWhy: "There is no chart datum here, so ±15 cm is a rough allowance, not a measured one. The CSIG average their river depths; this compares the river with Waterways Ireland's summer level at Banagher, and OPW and Waterways Ireland readings there have disagreed by about 20 cm.",
+      river: true,
       weather: ["derg", "ree"],
       sunAt: [53.25, -8.02],
       bridge: true,
@@ -475,7 +549,8 @@ a { color: var(--water); }
         { name: "Athlone upper cill", poolbeg: 35.35 }
       ],
       feet: 7,
-      unc: 0.10, uncWhy: "±10 cm: IWAI members' estimates of the datum span 34.70 to 34.87 m. If the CSIG's 2019 figure of 5 ft is the right one instead, there is about 60 cm more water than shown.",
+      unc: 0.10, uncWhy: "±10 cm until you check it, plus one bigger doubt. The CSIG's lead mapper gave 7 ft over the Athlone cill in 2018 and 5 ft in 2019. This uses 7 ft, which is Waterways Ireland's summer level and shows less water. If 5 ft is right there's about 60 cm more. A lead-line check tells them apart.",
+      lake: true, alts: [{ label: "5 ft over the Athlone cill (the 2019 figure)", cill: 0, feet: 5, hero: true }],
       weather: ["ree"],
       sunAt: [53.55, -7.98],
       bridge: false,
@@ -535,7 +610,8 @@ a { color: var(--water); }
       cills: [],
       feet: null,
       osl: { name: "Carrick ordinary summer level", poolbeg: 42.98 },
-      unc: 0.15, uncWhy: "±15 cm: no CSIG datum has been published for this stretch, so this is measured against Waterways Ireland's summer level at Carrick.",
+      unc: 0.15, uncWhy: "There is no chart datum here, so ±15 cm is a rough allowance, not a measured one. This compares the river with Waterways Ireland's summer level at Carrick, which only covers the pool between Clarendon and Albert locks.",
+      river: true,
       pools: [
         ["Lough Key (above Clarendon Lock)", 44.20],
         ["Clarendon Lock to Albert Lock: Cootehall, Leitrim, Carrick, Jamestown", 42.98],
@@ -624,7 +700,84 @@ a { color: var(--water); }
     if (!isFinite(t) || typeof m.level !== "number" || Date.now() - t > MANUAL_MAX) { save("shannon.manual." + r.id, null); return null; }
     return m;
   }
-  function uncOf(r) { return r.unc || 0.1; }
+  // Lead-line checks: your own depth measurements at charted spots. Each one, with the gauge reading at that moment,
+  // gives the level the chart is drawn to in gauge terms, so the correction no longer rests on anyone's published datum.
+  var CHECKS_KEY = "shannon.checks", CHECKS_GONE = "shannon.checks.deleted";
+  function cleanChecks(list) {
+    return (Array.isArray(list) ? list : []).filter(function (c) {
+      return c && typeof c.id === "string" && typeof c.reach === "string" && typeof c.lead === "number" &&
+        typeof c.spot === "number" && c.time && isFinite(new Date(c.time).getTime());
+    });
+  }
+  function mergeChecks(a, b, gone) {
+    var seen = {}, outList = [];
+    a.concat(b).forEach(function (c) {
+      if (gone.indexOf(c.id) >= 0) return;
+      var have = seen[c.id];
+      if (!have) { seen[c.id] = c; outList.push(c); }
+      else if (!have.gauge && c.gauge) have.gauge = c.gauge;
+    });
+    outList.sort(function (x, y) { return new Date(x.time) - new Date(y.time); });
+    return outList;
+  }
+  state.checks = cleanChecks(loadJSON(CHECKS_KEY));
+  state.checksGone = (loadJSON(CHECKS_GONE) || []).filter(function (x) { return typeof x === "string"; });
+  state.checksWhere = "device";
+  state.chkMsg = "";
+  // The gauge level at time t: a reading within 45 minutes, or a straight line between readings up to 3 hours apart.
+  function gaugeAt(doc, t) {
+    var pts = (state.histories[doc] || []).map(function (p) { return { t: new Date(p.t).getTime(), v: p.v }; });
+    var f = state.feeds[doc];
+    if (f) pts.push({ t: new Date(f.time).getTime(), v: f.level });
+    pts = pts.filter(function (p) { return isFinite(p.t) && typeof p.v === "number"; }).sort(function (a, b) { return a.t - b.t; });
+    if (!pts.length) return null;
+    var best = pts[0];
+    pts.forEach(function (p) { if (Math.abs(p.t - t) < Math.abs(best.t - t)) best = p; });
+    if (Math.abs(best.t - t) <= 45 * 60e3) return { level: best.v, time: new Date(best.t).toISOString() };
+    for (var j = 0; j < pts.length - 1; j++) {
+      var a = pts[j], b = pts[j + 1];
+      if (a.t <= t && t <= b.t && b.t - a.t <= 3 * 3600e3) {
+        return { level: Math.round((a.v + (b.v - a.v) * (t - a.t) / (b.t - a.t)) * 1000) / 1000, time: new Date(t).toISOString() };
+      }
+    }
+    return null;
+  }
+  function storeChecks() {
+    save(CHECKS_KEY, JSON.stringify(state.checks));
+    save(CHECKS_GONE, JSON.stringify(state.checksGone.slice(-200)));
+    if (!state.checksDb) { state.checksWhere = "device"; return; }
+    state.checksDb.set({ checks: state.checks, deleted: state.checksGone.slice(-200), updated: new Date().toISOString() })
+      .then(function () { state.checksWhere = "page"; renderChecks(); }, function () { state.checksWhere = "device"; renderChecks(); });
+  }
+  function resolveChecks() {
+    var changed = false;
+    state.checks.forEach(function (c) {
+      if (c.gauge) return;
+      var r = byId(c.reach);
+      if (!r) return;
+      var g = gaugeAt(r.gauge.doc, new Date(c.time).getTime());
+      if (g) { c.gauge = g; changed = true; }
+    });
+    if (changed) storeChecks();
+  }
+  function checksFor(r) { return state.checks.filter(function (c) { return c.reach === r.id; }); }
+  function checkDatum(c) { return c.gauge ? c.gauge.level - (c.lead - c.spot) : null; }
+  function median(a) {
+    var s = a.slice().sort(function (x, y) { return x - y; }), n = s.length;
+    return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2;
+  }
+  // The level the chart is drawn to, measured by your checks: the median, with the spread as the uncertainty.
+  function checkedOf(r) {
+    if (!r.lake) return null;
+    var ds = checksFor(r).map(checkDatum).filter(function (d) { return d != null; });
+    if (!ds.length) return null;
+    var lo = Math.min.apply(null, ds), hi = Math.max.apply(null, ds);
+    var unc = ds.length === 1 ? 0.10 : Math.max(0.05, Math.round(((hi - lo) / 2 + 0.03) * 100) / 100);
+    return { datum: median(ds), n: ds.length, spread: hi - lo, unc: unc };
+  }
+  function datumWith(r, ci, feet) { return r.cills[ci].malin + feet * FOOT; }
+  function effDatum(r) { var c = checkedOf(r); return c ? c.datum : datumOf(r); }
+  function uncOf(r) { var c = checkedOf(r); return c ? c.unc : (r.unc || 0.1); }
   function reading(r) { return manualOf(r) || state.feeds[r.gauge.doc]; }
   function byId(id) { for (var i = 0; i < REACHES.length; i++) if (REACHES[i].id === id) return REACHES[i]; return null; }
 
@@ -644,7 +797,7 @@ a { color: var(--water); }
   }
   // The correction used by the calculator: measured where there is a datum, estimated otherwise.
   function correctionOf(r) {
-    var d = datumOf(r);
+    var d = effDatum(r);
     if (d != null) return reading(r).level - d;
     var est = estimateOf(r);
     return est ? est.off : null;
@@ -678,7 +831,7 @@ a { color: var(--water); }
       b.setAttribute("aria-pressed", r.id === state.reach ? "true" : "false");
       b.textContent = r.name;
       var s = document.createElement("span"); s.textContent = r.span; b.appendChild(s);
-      b.addEventListener("click", function () { state.reach = r.id; save("shannon.reach", r.id); buildSelector(); buildReachPanels(); render(); });
+      b.addEventListener("click", function () { state.reach = r.id; state.chkMsg = ""; save("shannon.reach", r.id); buildSelector(); buildReachPanels(); render(); });
       nav.appendChild(b);
     });
   }
@@ -699,7 +852,7 @@ a { color: var(--water); }
     var ul = $("caveats"); ul.textContent = "";
     var poolLines = r.pools ? ["Waterways Ireland's ordinary summer levels on this stretch, in m Malin: " + r.pools.map(function (x) { return x[0] + " " + (x[1] + POOLBEG_TO_MALIN).toFixed(2); }).join("; ") + "."] : [];
     r.caveats.concat(poolLines).concat(["OPW data is raw and unchecked. A sudden jump is more likely a sensor fault than the river.",
-      "Charts age. Silt, weed and boulders move, so navigate by your chart, your sounder and the markers, not this page."]).forEach(function (t) {
+      "Charts age. Silt, weed and boulders move, so navigate by your chart, your lead line and the markers, not this page."]).forEach(function (t) {
       var li = document.createElement("li"); li.textContent = t; ul.appendChild(li);
     });
     var esb = $("esb"); esb.textContent = "";
@@ -1474,7 +1627,8 @@ a { color: var(--water); }
   function render() {
     var r = reach(), s = settings(r), cill = r.cills[s.cill];
     var rd = reading(r), man = manualOf(r);
-    var datum = datumOf(r);
+    var pub = datumOf(r), cd = checkedOf(r);
+    var datum = cd ? cd.datum : pub;
 
     // Workings
     var w;
@@ -1493,9 +1647,13 @@ a { color: var(--water); }
     } else {
       w += "+ ? ft".padEnd(22) + "from your chart\n" + "Chart datum".padEnd(22) + "not set";
     }
+    if (cd) {
+      w += "\n\n" + ("Your checks (" + cd.n + ")").padEnd(22) + cd.datum.toFixed(3) + " m OD Malin\n" +
+        "Against this datum".padEnd(22) + signed(cd.datum - pub, 3) + " m";
+    }
     $("workings").textContent = w;
-    $("datum-note").textContent = s.feet != null && s.feet !== r.feet && r.feet != null ?
-      "You've changed this from the CSIG figure of " + r.feet + " ft." : "";
+    $("datum-note").textContent = (cd ? "Your lead-line checks are in use instead of this figure. Delete them to go back to it. " : "") +
+      (s.feet != null && s.feet !== r.feet && r.feet != null ? "You've changed this from the CSIG figure of " + r.feet + " ft." : "");
 
     // Freshness
     var age = Date.now() - new Date(rd.time).getTime();
@@ -1515,15 +1673,20 @@ a { color: var(--water); }
     $("g-level").textContent = rd.level.toFixed(3) + " m";
     $("g-cill").textContent = cill ? ftIn(rd.level - cill.malin) + " (" + cill.name.replace(/ cill$/, "") + ")" : "No cill set for this stretch";
 
+    var basis = $("basis");
+    basis.hidden = false;
+    $("hero-label").textContent = isOsl(r) ? "River against summer level" : "Correction to charted depths";
     if (isOsl(r)) {
       var eoff = rd.level - datum, ecm = Math.round(Math.abs(eoff) * 100);
+      basis.className = "pill warn"; basis.textContent = "Not a chart datum";
       $("offset").className = "big";
-      $("offset").innerHTML = signed(eoff, 2) + '<span class="unit">m ±' + uncOf(r).toFixed(2) + ' est.</span>';
-      $("say").textContent = "Estimated. CSIG charts average the depths on this stretch, so this compares " + r.gauge.name +
-        " with its ordinary summer level instead: roughly " +
-        (ecm === 0 ? "no change to" : (eoff > 0 ? "add " : "take ") + ecm + " cm " + (eoff > 0 ? "to" : "off")) +
-        " charted depths, give or take " + Math.round(uncOf(r) * 100) + " cm. Treat it as a rough guide.";
-      $("g-datum").textContent = datum.toFixed(3) + " m (est.)";
+      $("offset").innerHTML = signed(eoff, 2) + '<span class="unit">m</span>';
+      $("say").textContent = "Not a chart correction. CSIG depths on river stretches are averaged, not drawn to one level. " +
+        r.gauge.name + " is " + (ecm === 0 ? "at" : ecm + " cm " + (eoff > 0 ? "above" : "below")) + " Waterways Ireland's summer level" +
+        (eoff < -0.005 ? ", so expect less water than charted, perhaps by about that much. The calculator takes it off charted depths." :
+          eoff > 0.005 ? ". The calculator doesn't add it to charted depths, because on a river the extra water isn't spread evenly." : ".") +
+        " Where it's tight, trust your lead line.";
+      $("g-datum").textContent = datum.toFixed(3) + " m (summer level)";
       if (!man) {
         pill.className = age < 12 * 3600e3 ? "pill warn" : "pill bad";
         pill.textContent = "Estimated, " + ageText(age);
@@ -1535,23 +1698,39 @@ a { color: var(--water); }
       $("g-datum").textContent = "not set";
     } else {
       var off = rd.level - datum;
-      var cm = Math.round(Math.abs(off) * 100);
+      var cm = Math.round(Math.abs(off) * 100), u = Math.round(uncOf(r) * 100);
       $("offset").className = "big";
       $("offset").innerHTML = signed(off, 2) + '<span class="unit">m ±' + uncOf(r).toFixed(2) + '</span>';
+      var act = cm === 0 ? "Charted depths are what you have" :
+        (off > 0 ? "Add " + cm + " cm to" : "Take " + cm + " cm off") + " charted depths";
       var say;
-      if (cm === 0) say = "The water is at chart datum. Charted depths are what you have.";
-      else if (off > 0) say = "The water is " + cm + " cm above chart datum. Add " + cm + " cm to every charted depth.";
-      else say = "The water is " + cm + " cm below chart datum. Take " + cm + " cm off every charted depth.";
-      var u = Math.round(uncOf(r) * 100);
-      say += " Allow ±" + u + " cm for uncertainty in the datum.";
+      if (cd) {
+        basis.className = "pill ok"; basis.textContent = "Checked by you (" + cd.n + ")";
+        say = "From your " + (cd.n === 1 ? "lead-line check" : cd.n + " lead-line checks") + ", the water is " +
+          (cm === 0 ? "at" : cm + " cm " + (off > 0 ? "above" : "below")) + " the level the chart is drawn to. " + act + ", give or take " + u + " cm.";
+        if (cd.n === 1) say += " One check can mislead, so take two or three more at different spots.";
+      } else {
+        basis.className = "pill warn"; basis.textContent = "Unconfirmed datum";
+        say = "Unconfirmed: this uses the published datum, which nobody has checked against the water. The water is " +
+          (cm === 0 ? "at it" : cm + " cm " + (off > 0 ? "above" : "below") + " it") + ". " + act + ", give or take " + u + " cm.";
+        (r.alts || []).forEach(function (a) {
+          if (!a.hero) return;
+          var more = Math.round((datum - datumWith(r, a.cill, a.feet)) * 100);
+          if (more > 0) say += " If the CSIG's other figure (" + a.feet + " ft) is the right one, there's about " + more + " cm more water than this.";
+        });
+        say += " A lead-line check settles it.";
+      }
       $("say").textContent = say;
-      $("g-datum").textContent = datum.toFixed(3) + " m ±" + uncOf(r).toFixed(2);
+      $("g-datum").textContent = datum.toFixed(3) + " m " + (cd ? "(your checks)" : "±" + uncOf(r).toFixed(2) + " (unconfirmed)");
     }
     if (man && datum != null) {
       var live = state.feeds[r.gauge.doc], la = Date.now() - new Date(live.time).getTime();
       $("say").textContent += " The " + r.gauge.name + " gauge says " + signed(live.level - datum, 2) + " m (" + ageText(la) + ").";
     }
-    $("unc-why").textContent = r.uncWhy || "";
+    $("unc-why").textContent = cd ? (cd.n === 1 ?
+      "±10 cm: one check, so this allows for misreading the line, the charted spot and the wind. More checks narrow it." :
+      "±" + Math.round(cd.unc * 100) + " cm: the spread of your " + cd.n + " checks, plus a few centimetres for reading the line and the chart.") :
+      (r.uncWhy || "");
     showOnline();
     renderWeather();
     renderTrip();
@@ -1560,6 +1739,7 @@ a { color: var(--water); }
     drawGauge(rd.level, datum);
     drawSpark(state.histories[r.gauge.doc] || [], datum);
     calc();
+    renderChecks();
 
     $("manual-active").hidden = !man;
     if (man) $("manual-note").textContent = "Using your " +
@@ -1576,9 +1756,12 @@ a { color: var(--water); }
       $("depth").textContent = "–"; $("depth-ft").textContent = corr == null ? "Needs the chart datum" : "";
       $("clear").textContent = "–"; $("clear-ft").textContent = ""; clr.className = "res"; return;
     }
+    var capped = estd && corr > 0;
+    if (capped) corr = 0;
     var depth = ch + corr, u = uncOf(r);
     $("depth").textContent = depth.toFixed(2) + " m";
-    $("depth-ft").textContent = (depth * FT).toFixed(1) + " ft · could be " + Math.max(0, depth - u).toFixed(2) + "–" + (depth + u).toFixed(2) + " m" + (estd ? " · estimated" : "");
+    $("depth-ft").textContent = (depth * FT).toFixed(1) + " ft · could be " + Math.max(0, depth - u).toFixed(2) + "–" + (depth + u).toFixed(2) + " m" +
+      (capped ? " · high water not added" : estd ? " · estimated" : "");
     if (!isFinite(dr)) { $("clear").textContent = "–"; $("clear-ft").textContent = "Enter your draft"; clr.className = "res"; return; }
     // Judged on the worst case: the shallow end of the band.
     var c = depth - dr, worst = c - u, st, word;
@@ -1610,7 +1793,7 @@ a { color: var(--water); }
     var y = function (rel) { return bot - (rel - lo) / (hi - lo) * (bot - top); };
     var rel = level - ref, clamped = Math.max(lo, Math.min(hi, rel));
     var x0 = 54, w = 34;
-    svg.appendChild(el("rect", { x: x0, y: top, width: w, height: bot - top, fill: "var(--bg)", stroke: "var(--line)" }));
+    svg.appendChild(el("rect", { x: x0, y: top, width: w, height: bot - top, fill: "var(--sunk)", stroke: "var(--line-strong)" }));
     svg.appendChild(el("rect", { "class": "waterfill", x: x0 + 1, y: y(clamped), width: w - 2, height: bot - y(clamped), fill: "var(--water-soft)" }));
     svg.appendChild(el("line", { x1: x0, x2: x0 + w, y1: y(clamped), y2: y(clamped), stroke: "var(--water)", "stroke-width": 2.5 }));
     for (var i = 0; i <= 15; i++) {
@@ -1624,7 +1807,7 @@ a { color: var(--water); }
     }
     var note = rel > hi ? "off scale ↑" : rel < lo ? "off scale ↓" : "Water";
     svg.appendChild(el("text", { x: x0 + w + 6, y: y(clamped) + 14, "font-size": 11, fill: "var(--water)", "font-weight": 600, "font-family": "var(--body)" }, note));
-    svg.appendChild(el("text", { x: 4, y: top - 4, "font-size": 9, fill: "var(--muted)", "font-family": "var(--body)" }, datum == null ? "m from now" : "m from datum"));
+    svg.appendChild(el("text", { x: 2, y: top - 9, "font-size": 9, fill: "var(--muted)", "font-family": "var(--body)" }, datum == null ? "m from now" : "m from datum"));
   }
 
   function drawSpark(h, datum) {
@@ -1688,15 +1871,93 @@ a { color: var(--water); }
     if (!cill) { warn("No cill heights are set for this stretch, so feet over the cill can't be used here."); return; }
     setManual({ level: cill.malin + f * FOOT, time: new Date().toISOString(), feet: f });
   });
-  $("use-sounder").addEventListener("click", function () {
-    var r = reach(), datum = datumOf(r);
-    var spot = parseFloat($("spot").value), snd = parseFloat($("sounder").value);
-    if (!isFinite(spot) || !isFinite(snd)) return;
-    if (datum == null) { warn("This stretch has no chart datum, so a sounder check can't set a level here."); return; }
-    if (Math.abs(snd - spot) > 2) { warn("Those differ by more than 2 m. Check you're on the charted spot and that the sounder shows depth below the surface."); return; }
-    setManual({ level: datum + (snd - spot), time: new Date().toISOString(), sounder: Math.round((snd - spot) * 100) });
+  $("clear-manual").addEventListener("click", function () { $("manual").value = ""; $("feet").value = ""; setManual(null); });
+
+  // Lead-line checks
+  function cmText(m) { return signed(m, 2) + " m"; }
+  function renderChecks() {
+    var r = reach(), lake = !!r.lake;
+    $("chk-form").hidden = !lake;
+    $("chk-how").hidden = !lake;
+    $("chk-intro").textContent = lake ?
+      "Measure the depth at a charted spot. The page notes the " + r.gauge.name + " gauge at that moment and carries your correction forward as the lake rises and falls, so it no longer rests on anyone's published datum." :
+      "Chart depths on river stretches are averaged, not drawn to one level, so a check here would only hold at the spot you took it. On the river, trust the lead line in front of you.";
+    var list = $("chk-list"); list.textContent = "";
+    var sum = $("chk-sum"), msg = $("chk-msg");
+    if (!lake) { sum.textContent = ""; msg.textContent = ""; return; }
+    var mine = checksFor(r).slice().reverse();
+    mine.forEach(function (c) {
+      var li = document.createElement("li"), left = document.createElement("div"), right = document.createElement("div");
+      var top = document.createElement("b"); top.className = "mono"; top.textContent = cmText(c.lead - c.spot);
+      left.appendChild(top);
+      left.appendChild(document.createTextNode(" line against chart"));
+      var when = document.createElement("div"); when.className = "when";
+      var line = c.unit === "ft" ? c.raw + " ft (" + c.lead.toFixed(2) + " m)" : c.lead.toFixed(2) + " m";
+      when.textContent = fmtTime(c.time) + (c.where ? " · " + c.where : "") + " · line " + line + ", chart " + c.spot.toFixed(1) + " m";
+      left.appendChild(when);
+      var imp = document.createElement("span"); imp.className = "imp";
+      var d = checkDatum(c);
+      imp.textContent = d == null ? "Waiting for the gauge reading" : "Gauge " + c.gauge.level.toFixed(3) + " → datum " + d.toFixed(3);
+      right.appendChild(imp);
+      var del = document.createElement("button"); del.type = "button"; del.className = "ghost"; del.textContent = "Delete";
+      del.style.marginLeft = "10px";
+      del.addEventListener("click", function () {
+        if (!del.dataset.armed) {
+          del.dataset.armed = "1"; del.textContent = "Delete?";
+          setTimeout(function () { if (del.isConnected) { delete del.dataset.armed; del.textContent = "Delete"; } }, 4000);
+          return;
+        }
+        state.checksGone.push(c.id);
+        state.checks = state.checks.filter(function (x) { return x.id !== c.id; });
+        state.chkMsg = "Check deleted.";
+        storeChecks(); render();
+      });
+      right.appendChild(del);
+      li.appendChild(left); li.appendChild(right); list.appendChild(li);
+    });
+    var cd = checkedOf(r), pubD = datumWith(r, 0, r.feet);
+    if (!cd) {
+      sum.textContent = mine.length ? "Your check will count once the page has the " + r.gauge.name + " reading for that time." :
+        "No checks yet on " + r.name + ". Until you take one, the page uses the published datum." +
+        ((r.alts || []).some(function (a) { return a.hero; }) ? " The CSIG have given two figures here, about 60 cm apart, and one good check tells you which is right." : "");
+    } else {
+      var opts = [{ label: "the published datum, " + r.feet + " ft over the " + r.cills[0].name.replace(/ \(.*\)$/, ""), v: pubD }];
+      (r.alts || []).forEach(function (a) { opts.push({ label: a.label, v: datumWith(r, a.cill, a.feet) }); });
+      opts.forEach(function (o) { o.gap = Math.abs(cd.datum - o.v); });
+      var near = opts.slice().sort(function (a, b) { return a.gap - b.gap; })[0];
+      var t = "Your " + (cd.n === 1 ? "check puts" : cd.n + " checks put") + " the chart's level at " + cd.datum.toFixed(3) + " m" +
+        (cd.n > 1 ? " (spread " + Math.round(cd.spread * 100) + " cm)" : "") + ": " +
+        opts.map(function (o) { return Math.round(o.gap * 100) + " cm from " + o.label + " (" + o.v.toFixed(3) + ")"; }).join(", and ") + ". ";
+      t += near.gap <= 0.10 ? "That backs " + near.label + "." :
+        "That doesn't match either published figure. Check the line's marks and the spot depths, and take a few more.";
+      sum.textContent = t;
+    }
+    msg.textContent = (state.chkMsg ? state.chkMsg + " " : "") +
+      (mine.length ? (state.checksWhere === "page" ? "Your checks are saved to this page." : "Your checks are saved on this device only.") : "");
+  }
+  $("chk-unit").value = load("shannon.leadunit") === "ft" ? "ft" : "m";
+  $("chk-unit").addEventListener("change", function () { save("shannon.leadunit", $("chk-unit").value); });
+  $("chk-save").addEventListener("click", function () {
+    var r = reach();
+    if (!r.lake) return;
+    var spot = parseFloat($("chk-spot").value), raw = parseFloat($("chk-lead").value), unit = $("chk-unit").value;
+    function say(t) { state.chkMsg = t; renderChecks(); }
+    if (!isFinite(spot) || !isFinite(raw)) return say("Enter both the charted depth and what the line reads.");
+    var lead = unit === "ft" ? raw * FOOT : raw;
+    if (spot <= 0 || spot > 15 || lead <= 0 || lead > 15) return say("Those depths look out of range. Enter the chart in metres and the line in " + (unit === "ft" ? "feet" : "metres") + ".");
+    if (Math.abs(lead - spot) > 1.5) return say("The line and the chart differ by " + Math.abs(lead - spot).toFixed(2) + " m, more than any doubt about the datum explains. Check you're on the charted spot, the line is vertical, you're reading it at the surface, and the unit is right.");
+    var when = $("chk-when").value, t = when ? new Date(when) : new Date();
+    if (!isFinite(t.getTime())) return say("That time isn't valid.");
+    if (t.getTime() > Date.now() + 10 * 60e3) return say("That time is in the future.");
+    if (Date.now() - t.getTime() > 6 * 864e5) return say("The gauge history only goes back a week, so enter checks from the last six days.");
+    var c = { id: "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), reach: r.id, time: t.toISOString(),
+      lead: Math.round(lead * 1000) / 1000, spot: spot, unit: unit, raw: raw, where: $("chk-where").value.trim().slice(0, 60), gauge: null };
+    c.gauge = gaugeAt(r.gauge.doc, t.getTime());
+    state.checks = mergeChecks(state.checks, [c], state.checksGone);
+    $("chk-lead").value = ""; $("chk-spot").value = ""; $("chk-where").value = ""; $("chk-when").value = "";
+    state.chkMsg = c.gauge ? "Saved." : "Saved. It will count once the page has the " + r.gauge.name + " reading for that time.";
+    storeChecks(); render();
   });
-  $("clear-manual").addEventListener("click", function () { $("manual").value = ""; $("feet").value = ""; $("spot").value = ""; $("sounder").value = ""; setManual(null); });
 
   // Carry over settings from the single-lake version of this page.
   (function migrate() {
@@ -1722,6 +1983,7 @@ a { color: var(--water); }
           if (typeof data.level !== "number" || !data.time) return;
           state.feeds[key] = { level: data.level, time: data.time };
           state.histories[key] = Array.isArray(data.history) ? data.history.filter(function (p) { return p && typeof p.v === "number" && p.t; }) : [];
+          resolveChecks();
           render();
         }, function () { /* keep the last reading shown */ });
       });
@@ -1745,6 +2007,21 @@ a { color: var(--water); }
           render();
         }, function () {});
       });
+      // Your lead-line checks: saved to the page for its owner, and on this device for everyone.
+      state.checksDb = db.doc("checks/mine");
+      state.checksDb.onSnapshot(function (snap) {
+        var data = snap.exists ? snap.data() : null;
+        var remote = cleanChecks(data && data.checks);
+        var gone = data && Array.isArray(data.deleted) ? data.deleted.filter(function (x) { return typeof x === "string"; }) : [];
+        gone.forEach(function (id) { if (state.checksGone.indexOf(id) < 0) state.checksGone.push(id); });
+        var merged = mergeChecks(remote, state.checks, state.checksGone);
+        state.checks = merged;
+        if (data) state.checksWhere = "page";
+        if (JSON.stringify(merged) !== JSON.stringify(remote)) storeChecks();
+        else { save(CHECKS_KEY, JSON.stringify(merged)); save(CHECKS_GONE, JSON.stringify(state.checksGone.slice(-200))); }
+        resolveChecks();
+        render();
+      }, function () {});
       // Your own star ratings, saved for the reviewer experiment.
       state.db = db;
       db.doc("ratings/mine").onSnapshot(function (snap) {
@@ -1944,4 +2221,3 @@ a { color: var(--water); }
   });
 })();
 </script>
-
