@@ -1662,8 +1662,10 @@ a { color: var(--water); }
       pill.className = age < MANUAL_RED ? "pill warn" : "pill bad";
       pill.textContent = "Your reading, " + ageText(age) + " · back to the gauge at " + hhmm(new Date(man.time).getTime() + MANUAL_MAX);
     }
-    else if (age < 3 * 3600e3) { pill.className = "pill ok"; pill.textContent = "Current, " + ageText(age); }
-    else if (age < 12 * 3600e3) { pill.className = "pill warn"; pill.textContent = ageText(age); }
+    // This page is refreshed at 07:40, 13:40 and 18:40, so a reading up to 7 h old is the latest it has during the day,
+    // and up to 16 h old overnight; older than that means a refresh was missed.
+    else if (age < 7 * 3600e3) { pill.className = "pill ok"; pill.textContent = "Current, " + ageText(age); }
+    else if (age < 16 * 3600e3) { pill.className = "pill warn"; pill.textContent = ageText(age); }
     else { pill.className = "pill bad"; pill.textContent = "Out of date, " + ageText(age); }
     $("src").innerHTML = (man ? "Entered by you" : r.gauge.name + " gauge (OPW " + r.gauge.station + ")") +
       ' · <span class="mono">' + rd.level.toFixed(3) + " m</span> · " + fmtTime(rd.time);
@@ -1688,7 +1690,7 @@ a { color: var(--water); }
         " Where it's tight, trust your lead line.";
       $("g-datum").textContent = datum.toFixed(3) + " m (summer level)";
       if (!man) {
-        pill.className = age < 12 * 3600e3 ? "pill warn" : "pill bad";
+        pill.className = age < 16 * 3600e3 ? "pill warn" : "pill bad";
         pill.textContent = "Estimated, " + ageText(age);
       }
     } else if (datum == null) {
