@@ -46,8 +46,17 @@ MODEL = "https://openaccess.pf.api.met.ie/metno-wdb2ts/locationforecast?lat={lat
 POINTS = {"derg": (52.95, -8.29), "ree": (53.55, -7.98), "key": (53.98, -8.24)}
 
 def fetch_model(lat, lon, now):
-    req = urllib.request.Request(MODEL.format(lat=lat, lon=lon), headers={"User-Agent": "shannon-chart-depth (github.com/gettierswhole)"})
-    root = ET.fromstring(urllib.request.urlopen(req, timeout=60).read())
+    # The service's documented address is plain http; its https end often drops the connection. Try https first.
+    body = None
+    for url in (MODEL.format(lat=lat, lon=lon), MODEL.format(lat=lat, lon=lon).replace("https://", "http://", 1)):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "shannon-chart-depth (github.com/gettierswhole)"})
+            body = urllib.request.urlopen(req, timeout=60).read()
+            break
+        except Exception:
+            if url.startswith("http://"):
+                raise
+    root = ET.fromstring(body)
     created = root.get("created")
     wind, rain = {}, {}
     for t in root.iter("time"):
