@@ -3,6 +3,7 @@
 #
 # - Gauges: the GitHub Action (tools/update_gauges.py) owns them. A gauge from the artifact
 #   is used only if it is newer than the one already in data.json, so either feed can keep it going.
+# - Lake forecast: the same Action also fetches it from Met Éireann's open data; the newer issue wins.
 # - Anything that came from email (venue news, events from club emails) stays on the private page:
 #   a sender address can be forged, so it is never published here.
 # - Marine notices are kept only when they link to waterwaysireland.org.
@@ -24,6 +25,8 @@ for col, ids in keep.items():
             v = j.get("data", j) if isinstance(j, dict) and "data" in j and "version" in j else j
         prev = (old.get(col) or {}).get(d)
         if col == "gauge" and prev and v and str(prev.get("time", "")) >= str(v.get("time", "")):
+            v = prev
+        if col == "weather" and prev and v and str(prev.get("issued", "")) >= str(v.get("issued", "")):
             v = prev
         if v is None:
             v = prev
