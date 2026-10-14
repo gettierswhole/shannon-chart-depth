@@ -169,7 +169,7 @@ a { color: var(--water); }
 .workings { font-family: var(--mono); font-size: 0.82rem; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; white-space: pre; }
 .fine { font-size: 0.85rem; color: var(--muted); margin: 0; }
 .caveats { font-size: 0.88rem; color: var(--muted); display: grid; gap: 6px; margin: 0; padding-left: 18px; }
-.experiment { margin: 8px 0 0; text-align: center; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--bad); }
+.experiment { margin: -4px 0 4px; text-align: center; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--bad); }
 .vinny { display: grid; justify-items: center; gap: 10px; margin-top: 8px; }
 .vinny-glass { display: grid; gap: 4px; justify-items: center; width: min(100%, 320px); padding: 14px 16px; border-radius: 6px;
   background: linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15)), var(--bad-soft);
@@ -192,94 +192,6 @@ a { color: var(--water); }
 
   <nav class="reaches" id="reaches" aria-label="Stretch of river"></nav>
 
-  <div class="grid">
-    <div class="col">
-      <section class="panel wx" id="wx">
-        <div class="wx-head">
-          <h2 id="wx-title">Lake forecast</h2>
-          <span class="pill ok" id="wx-wind" hidden></span>
-        </div>
-        <div id="wx-body"><p class="fine">No forecast stored yet.</p></div>
-        <p class="fine" id="wx-meta"></p>
-        <p class="fine" id="wx-hourly" hidden></p>
-      </section>
-
-      <section class="panel calc" id="trip">
-        <div class="wx-head">
-          <h2>Time to travel</h2>
-          <button type="button" class="linkish" id="trip-swap">Swap ⇅</button>
-        </div>
-        <div class="fields">
-          <label class="f">From <select id="trip-from"></select></label>
-          <label class="f">To <select id="trip-to"></select></label>
-          <label class="f">Leaving at <input type="time" id="trip-dep" step="300"></label>
-        </div>
-        <div class="result">
-          <div class="res" id="trip-hrs-box"><div class="label">Cruising</div><div class="v" id="trip-hrs">–</div><div class="ft" id="trip-hrs-ft"></div></div>
-          <div class="res" id="trip-eta-box"><div class="label">Arrive about</div><div class="v" id="trip-eta">–</div><div class="ft" id="trip-eta-ft"></div></div>
-        </div>
-        <p class="fine">Cruising hours from the shannon-river.com distance chart, counted only between sunrise and 30 minutes before sunset, plus 20 minutes per lock, Waterways Ireland lock hours and lunch breaks, Portumna Bridge openings and announced closures. Allow extra for the weather.</p>
-      </section>
-
-      <section class="panel today" id="today">
-        <div class="wx-head">
-          <h2>Today on the river</h2>
-          <span class="fine" id="today-date"></span>
-        </div>
-        <p class="alert" id="closure-alert" hidden></p>
-        <div class="sun">
-          <div class="today-row">
-            <div>
-              <p class="label" id="sun-label">Daylight</p>
-              <p class="today-main" id="sun-main"></p>
-            </div>
-          </div>
-          <svg id="sun-bar" viewBox="0 0 320 110" role="img" aria-label="A 24-hour dial in leaded glass: night, twilight and daylight, the moon's phase, and the crew's day aboard, with now marked"></svg>
-          <p class="fine" id="sun-note" hidden></p>
-        </div>
-        <div class="today-row">
-          <div>
-            <p class="label">Locks</p>
-            <p class="today-main" id="lock-hours"></p>
-          </div>
-        </div>
-        <div class="today-row" id="bridge-box">
-          <div>
-            <p class="label">Portumna Bridge openings</p>
-            <div class="chips" id="bridge-times"></div>
-          </div>
-          <span class="pill ok" id="bridge-next"></span>
-        </div>
-        <div>
-          <p class="label">Phone</p>
-          <ul class="contacts" id="contacts"></ul>
-        </div>
-        <div id="food-box" hidden>
-          <div class="food" id="food"></div>
-          <p class="fine" id="food-asof" hidden>Hours, phones and menus from each venue's own website, checked 13 Oct 2026. Star ratings and reviews are on each venue's Google listing.</p>
-        </div>
-        <p class="fine" id="today-note" hidden></p>
-        <div id="events-box" hidden>
-          <h3 class="ev-head">Events on the water</h3>
-          <ul class="notice-list" id="events"></ul>
-          <p class="fine" id="events-note"></p>
-        </div>
-      </section>
-    </div>
-
-    <div class="col">
-      <section class="panel notices">
-        <div class="wx-head">
-          <h2>Marine notices</h2>
-          <span class="fine" id="notices-asof">Live notices as of 13 Oct 2026</span>
-        </div>
-        <ul class="notice-list" id="notices"></ul>
-        <p class="fine"><a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">All live marine notices on waterwaysireland.org</a>. New notices are picked up from Waterways Ireland's email list every two hours.</p>
-      </section>
-    </div>
-  </div>
-
-  <p class="experiment" role="note">Untested experiment, not an aid to navigation</p>
   <div class="grid depth-zone">
     <div class="col">
       <section class="panel hero" aria-live="polite">
@@ -290,6 +202,7 @@ a { color: var(--water); }
           <span class="pill ok" id="fresh">Checking</span>
           <span id="src"></span>
         </div>
+        <p class="fine">Under-keel figures are judged on the shallow end of the band, with no allowance for squat or waves.</p>
       </section>
 
       <section class="panel calc">
@@ -384,6 +297,7 @@ a { color: var(--water); }
               </label>
             </div>
             <p class="fine" id="datum-note"></p>
+            <p class="fine" id="unc-why"></p>
           </div>
         </details>
       </section>
@@ -400,6 +314,95 @@ a { color: var(--water); }
       </section>
     </div>
   </div>
+  <p class="experiment" role="note">Untested experiment, not an aid to navigation</p>
+
+  <div class="grid">
+    <div class="col">
+      <section class="panel wx" id="wx">
+        <div class="wx-head">
+          <h2 id="wx-title">Lake forecast</h2>
+          <span class="pill ok" id="wx-wind" hidden></span>
+        </div>
+        <div id="wx-body"><p class="fine">No forecast stored yet.</p></div>
+        <p class="fine" id="wx-meta"></p>
+        <p class="fine" id="wx-hourly" hidden></p>
+      </section>
+
+      <section class="panel calc" id="trip">
+        <div class="wx-head">
+          <h2>Time to travel</h2>
+          <button type="button" class="linkish" id="trip-swap">Swap ⇅</button>
+        </div>
+        <div class="fields">
+          <label class="f">From <select id="trip-from"></select></label>
+          <label class="f">To <select id="trip-to"></select></label>
+          <label class="f">Leaving at <input type="time" id="trip-dep" step="300"></label>
+        </div>
+        <div class="result">
+          <div class="res" id="trip-hrs-box"><div class="label">Cruising</div><div class="v" id="trip-hrs">–</div><div class="ft" id="trip-hrs-ft"></div></div>
+          <div class="res" id="trip-eta-box"><div class="label">Arrive about</div><div class="v" id="trip-eta">–</div><div class="ft" id="trip-eta-ft"></div></div>
+        </div>
+        <p class="fine">Cruising hours from the shannon-river.com distance chart, counted only between sunrise and 30 minutes before sunset, plus 20 minutes per lock, Waterways Ireland lock hours and lunch breaks, Portumna Bridge openings and announced closures. Allow extra for the weather.</p>
+      </section>
+
+      <section class="panel today" id="today">
+        <div class="wx-head">
+          <h2>Today on the river</h2>
+          <span class="fine" id="today-date"></span>
+        </div>
+        <p class="alert" id="closure-alert" hidden></p>
+        <div class="sun">
+          <div class="today-row">
+            <div>
+              <p class="label" id="sun-label">Daylight</p>
+              <p class="today-main" id="sun-main"></p>
+            </div>
+          </div>
+          <svg id="sun-bar" viewBox="0 0 320 110" role="img" aria-label="A 24-hour dial in leaded glass: night, twilight and daylight, the moon's phase, and the crew's day aboard, with now marked"></svg>
+          <p class="fine" id="sun-note" hidden></p>
+        </div>
+        <div class="today-row">
+          <div>
+            <p class="label">Locks</p>
+            <p class="today-main" id="lock-hours"></p>
+          </div>
+        </div>
+        <div class="today-row" id="bridge-box">
+          <div>
+            <p class="label">Portumna Bridge openings</p>
+            <div class="chips" id="bridge-times"></div>
+          </div>
+          <span class="pill ok" id="bridge-next"></span>
+        </div>
+        <div>
+          <p class="label">Phone</p>
+          <ul class="contacts" id="contacts"></ul>
+        </div>
+        <div id="food-box" hidden>
+          <div class="food" id="food"></div>
+          <p class="fine" id="food-asof" hidden>Hours, phones and menus from each venue's own website, checked 13 Oct 2026. Star ratings and reviews are on each venue's Google listing.</p>
+        </div>
+        <p class="fine" id="today-note" hidden></p>
+        <div id="events-box" hidden>
+          <h3 class="ev-head">Events on the water</h3>
+          <ul class="notice-list" id="events"></ul>
+          <p class="fine" id="events-note"></p>
+        </div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="panel notices">
+        <div class="wx-head">
+          <h2>Marine notices</h2>
+          <span class="fine" id="notices-asof">Live notices as of 13 Oct 2026</span>
+        </div>
+        <ul class="notice-list" id="notices"></ul>
+        <p class="fine"><a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">All live marine notices on waterwaysireland.org</a>. New notices are picked up from Waterways Ireland's email list every two hours.</p>
+      </section>
+    </div>
+  </div>
+
   <section class="vinny" id="vinny" aria-label="Emergency button">
     <button type="button" class="vinny-glass" id="vinny-btn">
       <span class="vinny-small">In case of emergency</span>
@@ -461,6 +464,7 @@ a { color: var(--water); }
         { name: "Killaloe upper cill", poolbeg: 30.52 }
       ],
       feet: 8,
+      unc: 0.05, uncWhy: "±5 cm: the cill-plus-8-ft datum and Waterways Ireland's summer level agree to 3 cm, the Poolbeg to Malin conversion adds a cm or two, and the gauge is at Portumna, not where you are.",
       weather: ["derg"],
       sunAt: [52.95, -8.29],
       bridge: true,
@@ -490,6 +494,7 @@ a { color: var(--water); }
       ],
       feet: null,
       osl: { name: "Banagher ordinary summer level", poolbeg: 35.36 },
+      unc: 0.15, uncWhy: "±15 cm: there is no CSIG datum here, so this is measured against Waterways Ireland's summer level, and the river slopes between Meelick and Athlone.",
       weather: ["derg", "ree"],
       sunAt: [53.25, -8.02],
       bridge: true,
@@ -514,6 +519,7 @@ a { color: var(--water); }
         { name: "Athlone upper cill", poolbeg: 35.35 }
       ],
       feet: 7,
+      unc: 0.10, uncWhy: "±10 cm: IWAI members' estimates of the datum span 34.70 to 34.87 m. If the CSIG's 2019 figure of 5 ft is the right one instead, there is about 60 cm more water than shown.",
       weather: ["ree"],
       sunAt: [53.55, -7.98],
       bridge: false,
@@ -573,6 +579,7 @@ a { color: var(--water); }
       cills: [],
       feet: null,
       osl: { name: "Carrick ordinary summer level", poolbeg: 42.98 },
+      unc: 0.15, uncWhy: "±15 cm: no CSIG datum has been published for this stretch, so this is measured against Waterways Ireland's summer level at Carrick.",
       pools: [
         ["Lough Key (above Clarendon Lock)", 44.20],
         ["Clarendon Lock to Albert Lock: Cootehall, Leitrim, Carrick, Jamestown", 42.98],
@@ -652,7 +659,16 @@ a { color: var(--water); }
   }
   // A stretch with no CSIG datum, measured against an ordinary summer level instead.
   function isOsl(r) { return !!r.osl && settings(r).feet == null; }
-  function manualOf(r) { return loadJSON("shannon.manual." + r.id); }
+  var MANUAL_RED = 3 * 3600e3, MANUAL_MAX = 12 * 3600e3;
+  // Your own reading wins over the gauge for 12 hours at most, then the page goes back to the gauge on its own.
+  function manualOf(r) {
+    var m = loadJSON("shannon.manual." + r.id);
+    if (!m) return null;
+    var t = new Date(m.time).getTime();
+    if (!isFinite(t) || typeof m.level !== "number" || Date.now() - t > MANUAL_MAX) { save("shannon.manual." + r.id, null); return null; }
+    return m;
+  }
+  function uncOf(r) { return r.unc || 0.1; }
   function reading(r) { return manualOf(r) || state.feeds[r.gauge.doc]; }
   function byId(id) { for (var i = 0; i < REACHES.length; i++) if (REACHES[i].id === id) return REACHES[i]; return null; }
 
@@ -1528,7 +1544,10 @@ a { color: var(--water); }
     // Freshness
     var age = Date.now() - new Date(rd.time).getTime();
     var pill = $("fresh");
-    if (man) { pill.className = "pill warn"; pill.textContent = "Your reading, " + ageText(age); }
+    if (man) {
+      pill.className = age < MANUAL_RED ? "pill warn" : "pill bad";
+      pill.textContent = "Your reading, " + ageText(age) + " · back to the gauge at " + hhmm(new Date(man.time).getTime() + MANUAL_MAX);
+    }
     else if (age < 3 * 3600e3) { pill.className = "pill ok"; pill.textContent = "Current, " + ageText(age); }
     else if (age < 12 * 3600e3) { pill.className = "pill warn"; pill.textContent = ageText(age); }
     else { pill.className = "pill bad"; pill.textContent = "Out of date, " + ageText(age); }
@@ -1543,11 +1562,11 @@ a { color: var(--water); }
     if (isOsl(r)) {
       var eoff = rd.level - datum, ecm = Math.round(Math.abs(eoff) * 100);
       $("offset").className = "big";
-      $("offset").innerHTML = signed(eoff, 2) + '<span class="unit">m est.</span>';
+      $("offset").innerHTML = signed(eoff, 2) + '<span class="unit">m ±' + uncOf(r).toFixed(2) + ' est.</span>';
       $("say").textContent = "Estimated. CSIG charts average the depths on this stretch, so this compares " + r.gauge.name +
         " with its ordinary summer level instead: roughly " +
         (ecm === 0 ? "no change to" : (eoff > 0 ? "add " : "take ") + ecm + " cm " + (eoff > 0 ? "to" : "off")) +
-        " charted depths. Treat it as a rough guide.";
+        " charted depths, give or take " + Math.round(uncOf(r) * 100) + " cm. Treat it as a rough guide.";
       $("g-datum").textContent = datum.toFixed(3) + " m (est.)";
       if (!man) {
         pill.className = age < 12 * 3600e3 ? "pill warn" : "pill bad";
@@ -1562,14 +1581,21 @@ a { color: var(--water); }
       var off = rd.level - datum;
       var cm = Math.round(Math.abs(off) * 100);
       $("offset").className = "big";
-      $("offset").innerHTML = signed(off, 2) + '<span class="unit">m</span>';
+      $("offset").innerHTML = signed(off, 2) + '<span class="unit">m ±' + uncOf(r).toFixed(2) + '</span>';
       var say;
       if (cm === 0) say = "The water is at chart datum. Charted depths are what you have.";
       else if (off > 0) say = "The water is " + cm + " cm above chart datum. Add " + cm + " cm to every charted depth.";
       else say = "The water is " + cm + " cm below chart datum. Take " + cm + " cm off every charted depth.";
+      var u = Math.round(uncOf(r) * 100);
+      say += " Allow ±" + u + " cm for uncertainty in the datum.";
       $("say").textContent = say;
-      $("g-datum").textContent = datum.toFixed(3) + " m";
+      $("g-datum").textContent = datum.toFixed(3) + " m ±" + uncOf(r).toFixed(2);
     }
+    if (man && datum != null) {
+      var live = state.feeds[r.gauge.doc], la = Date.now() - new Date(live.time).getTime();
+      $("say").textContent += " The " + r.gauge.name + " gauge says " + signed(live.level - datum, 2) + " m (" + ageText(la) + ").";
+    }
+    $("unc-why").textContent = r.uncWhy || "";
     showOnline();
     renderWeather();
     renderTrip();
@@ -1594,17 +1620,18 @@ a { color: var(--water); }
       $("depth").textContent = "–"; $("depth-ft").textContent = corr == null ? "Needs the chart datum" : "";
       $("clear").textContent = "–"; $("clear-ft").textContent = ""; clr.className = "res"; return;
     }
-    var depth = ch + corr;
+    var depth = ch + corr, u = uncOf(r);
     $("depth").textContent = depth.toFixed(2) + " m";
-    $("depth-ft").textContent = (depth * FT).toFixed(1) + " ft" + (estd ? " · estimated" : "");
+    $("depth-ft").textContent = (depth * FT).toFixed(1) + " ft · could be " + Math.max(0, depth - u).toFixed(2) + "–" + (depth + u).toFixed(2) + " m" + (estd ? " · estimated" : "");
     if (!isFinite(dr)) { $("clear").textContent = "–"; $("clear-ft").textContent = "Enter your draft"; clr.className = "res"; return; }
-    var c = depth - dr, st, word;
+    // Judged on the worst case: the shallow end of the band.
+    var c = depth - dr, worst = c - u, st, word;
     $("clear").textContent = signed(c, 2) + " m";
-    if (c < 0.3) { st = "bad"; word = c < 0 ? "Aground" : "Too tight"; }
-    else if (c < 0.6) { st = "warn"; word = "Go slow"; }
-    else { st = "ok"; word = "Comfortable"; }
+    if (worst < 0.3) { st = "bad"; word = worst < 0 ? "Could touch" : "Too tight"; }
+    else if (worst < 0.6) { st = "warn"; word = "Go slow"; }
+    else { st = "ok"; word = "Should be fine"; }
     clr.className = "res state-" + st;
-    $("clear-ft").textContent = (c * FT).toFixed(1) + " ft · " + word;
+    $("clear-ft").textContent = "At worst " + signed(worst, 2) + " m · " + word;
   }
 
   var NS = "http://www.w3.org/2000/svg";
@@ -1961,6 +1988,7 @@ a { color: var(--water); }
   });
 })();
 </script>
+
 
 </body>
 </html>
