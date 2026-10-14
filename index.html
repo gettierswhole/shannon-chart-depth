@@ -6,7 +6,6 @@
 <meta name="description" content="Live Shannon water levels against CSIG chart datum, with lake forecasts, lock times, marine notices and places to eat ashore.">
 </head>
 <body>
-
 <title>Shannon Chart Depth</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -933,6 +932,9 @@ a { color: var(--water); }
     if (r.hourly) { hl.hidden = false; hl.innerHTML = '<a href="' + r.hourly[1] + '" target="_blank" rel="noopener">' + r.hourly[0] + "</a> on met.ie"; }
     else hl.hidden = true;
     $("wx-title").textContent = r.weather.length > 1 ? "Lake forecasts" : LAKE_NAMES[r.weather[0]] + " forecast";
+    // When Met Éireann's written forecast is over 18 hours old or missing, show their automatic model forecast instead.
+    var stale = !w || !w.lakes || !w.issued || Date.now() - new Date(w.issued).getTime() > 18 * 3600e3;
+    if (stale && renderModel(r, w, body, pill)) return;
     if (!w || !w.lakes) { pill.hidden = true; return; }
     body.textContent = "";
     var top = null;
@@ -964,6 +966,71 @@ a { color: var(--water); }
     var age = Date.now() - new Date(w.issued).getTime();
     $("wx-meta").innerHTML = "Issued " + fmtTime(w.issued) + (age > 18 * 3600e3 ? " · <b>may be out of date</b>" : "") +
       '. Source: <a href="https://www.met.ie/forecasts/marine-inland-lakes/inland-lakes" target="_blank" rel="noopener">Met Éireann inland lakes forecast</a>.';
+  }
+
+  // Met Éireann's model (HARMONIE) point forecast for each lake: hourly [time, direction °, wind m/s, gust m/s, rain mm],
+  // fetched every 30 minutes by the GitHub script. Summarised here into Met Éireann's own periods and the Beaufort scale.
+  var BFT = [0.5, 1.6, 3.4, 5.5, 8.0, 10.8, 13.9, 17.2, 20.8, 24.5, 28.5, 32.7];
+  function beaufort(mps) { var f = 0; while (f < BFT.length && mps >= BFT[f]) f++; return f; }
+  var COMPASS = ["Northerly", "Northeasterly", "Easterly", "Southeasterly", "Southerly", "Southwesterly", "Westerly", "Northwesterly"];
+  function noonUTC(off) { var p = dublinISO(off).split("-"); return Date.UTC(+p[0], +p[1] - 1, +p[2], 12); }
+  function modelPeriods(r) {
+    var lat = r.sunAt[0], lon = r.sunAt[1], now = Date.now();
+    var d0 = sunTimes(noonUTC(0), lat, lon, -0.833), d1 = sunTimes(noonUTC(1), lat, lon, -0.833);
+    if (!d0 || !d1) return [];
+    if (now < d0.rise) return [["Until dawn", now, d0.rise], ["Today", d0.rise, d0.set], ["Overnight", d0.set, d1.rise]];
+    if (now < d0.set) return [["Until nightfall", now, d0.set], ["Overnight", d0.set, d1.rise], ["Tomorrow", d1.rise, d1.set]];
+    return [["Overnight", now, d1.rise], ["Tomorrow", d1.rise, d1.set]];
+  }
+  function summarise(steps, a, b) {
+    var pts = steps.filter(function (s) { var t = new Date(s[0]).getTime(); return t > a && t <= b + 1800e3 && typeof s[2] === "number"; });
+    if (pts.length < 2) return null;
+    var x = 0, y = 0, sum = 0, lo = Infinity, hi = 0, gust = 0, rain = 0;
+    pts.forEach(function (s) {
+      var rad = s[1] * Math.PI / 180;
+      x += s[2] * Math.sin(rad); y += s[2] * Math.cos(rad); sum += s[2];
+      lo = Math.min(lo, s[2]); hi = Math.max(hi, s[2]);
+      if (typeof s[3] === "number") gust = Math.max(gust, s[3]);
+      if (typeof s[4] === "number") rain += s[4];
+    });
+    var steady = Math.sqrt(x * x + y * y) / Math.max(sum, 0.1);
+    var dir = steady < 0.3 ? "Variable" : COMPASS[Math.round(((Math.atan2(x, y) * 180 / Math.PI) + 360) % 360 / 45) % 8];
+    var f0 = beaufort(lo), f1 = beaufort(hi), fg = beaufort(gust);
+    var text = dir + " force " + (f0 === f1 ? f1 : f0 + " to " + f1) + (fg > f1 + 1 ? ", gusting force " + fg : "") + ". " +
+      (rain < 0.3 ? "Dry." : "Rain, about " + (rain < 2 ? rain.toFixed(1) : Math.round(rain)) + " mm.");
+    return { text: text, force: f1 };
+  }
+  function renderModel(r, w, body, pill) {
+    var m = state.model;
+    if (!m || !m.lakes || !m.created || Date.now() - new Date(m.created).getTime() > 24 * 3600e3) return false;
+    var periods = modelPeriods(r), top = null, shown = 0;
+    body.textContent = "";
+    r.weather.forEach(function (id) {
+      var lake = m.lakes[id];
+      if (!lake || !Array.isArray(lake.steps)) return;
+      var dl = document.createElement("dl"), rows = 0;
+      periods.forEach(function (p, i) {
+        var s = summarise(lake.steps, p[1], p[2]);
+        if (!s) return;
+        var dt = document.createElement("dt"), dd = document.createElement("dd");
+        dt.textContent = i ? p[0] : "Now to " + hhmm(p[2]); dd.textContent = s.text;
+        dl.appendChild(dt); dl.appendChild(dd); rows++;
+        if (i < 2 && (top == null || s.force > top)) top = s.force;
+      });
+      if (!rows) return;
+      if (r.weather.length > 1) { var h = document.createElement("h3"); h.textContent = LAKE_NAMES[id]; body.appendChild(h); }
+      body.appendChild(dl); shown++;
+    });
+    if (!shown) return false;
+    if (top != null) {
+      pill.hidden = false;
+      pill.className = "pill " + (top >= 6 ? "bad" : top >= 5 ? "warn" : "ok");
+      pill.textContent = "Up to force " + top;
+    } else pill.hidden = true;
+    $("wx-meta").innerHTML = "<b>Model forecast.</b> " + (w && w.issued ? "Met Éireann hasn't issued a lakes forecast since " + fmtTime(w.issued) + ", so" :
+      "No lakes forecast is stored, so") + " this is their automatic model forecast for the lake, worked out at " + fmtTime(m.created) +
+      ". No forecaster has checked it, so use it as a guide. Gusts are shown when they're two forces or more above the wind.";
+    return true;
   }
 
   // Waterways Ireland's published Shannon lock and Portumna Bridge timetables (2026).
@@ -2098,6 +2165,11 @@ a { color: var(--water); }
         var data = snap.data();
         if (data && data.issued && data.lakes) { state.weather = data; render(); }
       }, function () {});
+      db.doc("weather/model").onSnapshot(function (snap) {
+        if (!snap.exists) return;
+        var data = snap.data();
+        if (data && data.created && data.lakes) { state.model = data; render(); }
+      }, function () {});
     }).catch(function () {});
   }
 })();
@@ -2268,7 +2340,6 @@ a { color: var(--water); }
   });
 })();
 </script>
-
 
 </body>
 </html>
