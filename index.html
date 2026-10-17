@@ -65,14 +65,33 @@ h1 { font-family: var(--display); font-weight: 400; font-size: 2rem; line-height
 /* A plain rule between the depth zone and the trip zone */
 .strake { border: 0; border-top: 1px solid var(--line); height: 0; margin: 8px 0; }
 
-/* Stretch selector: a segmented control, ordered south to north as the river runs upstream */
-.reaches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
-.reaches button { border: 0; border-radius: 0; background: transparent; color: var(--ink); padding: 10px 14px 12px; text-align: left; display: grid; gap: 2px; min-width: 0; font-family: var(--body); font-weight: 500; font-size: 0.98rem; line-height: 1.25; }
-.reaches button + button { border-left: 1px solid var(--line); }
-@media (max-width: 520px) { .reaches { grid-template-columns: repeat(2, minmax(0, 1fr)); } .reaches button:nth-child(3) { border-left: 0; } .reaches button:nth-child(n+3) { border-top: 1px solid var(--line); } }
-.reaches button span { font-weight: 400; font-size: 0.78rem; color: var(--muted); }
-.reaches button[aria-pressed="true"] { background: var(--sunk); color: var(--ink); box-shadow: inset 0 -2px 0 var(--ink); }
-.reaches button[aria-pressed="true"] span { color: var(--muted); }
+/* The four stretches side by side, south to north as the river runs upstream: the gauge facts only, tap one for its details */
+.reaches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.reaches button { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); padding: 12px 12px 10px; text-align: left; display: grid; gap: 4px; align-content: start; min-width: 0; font-family: var(--body); font-weight: 500; font-size: 0.98rem; line-height: 1.2; cursor: pointer; }
+.reaches button .st-name { text-wrap: balance; }
+.reaches button .st-gauge { font-weight: 400; font-size: 0.75rem; color: var(--muted); }
+.reaches button .st-level { font-family: var(--display); font-weight: 400; font-size: 1.55rem; line-height: 1; font-variant-numeric: tabular-nums; margin-top: 4px; }
+.reaches button .st-level small { font-family: var(--body); font-size: 0.75rem; color: var(--muted); margin-left: 3px; }
+.reaches button .st-chg { font-weight: 400; font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.reaches button .st-chg.up { color: var(--water); } 
+.reaches button svg { width: 100%; height: 30px; display: block; }
+.reaches button .st-when { font-weight: 400; font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.reaches button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+@media (max-width: 560px) {
+  .reaches { gap: 6px; }
+  .reaches button { padding: 9px 7px 8px; font-size: 0.82rem; }
+  .reaches button .st-gauge { display: none; }
+  .reaches button .st-level { font-size: 1.12rem; }
+  .reaches button .st-level small { display: block; margin: 2px 0 0; }
+  .reaches button .st-chg, .reaches button .st-when { font-size: 0.7rem; }
+}
+/* Published data first, in dashboard-style cards; the depth correction sits apart at the foot of the page */
+.cards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); align-items: start; }
+.panel:has(> #food-box[hidden]) { display: none; }
+.depth-section { display: grid; gap: 16px; border-top: 1px solid var(--line); padding-top: 24px; margin-top: 8px; }
+.depth-head { display: grid; gap: 6px; max-width: 46em; }
+.depth-head h2 { font-family: var(--display); font-weight: 400; font-size: 1.5rem; margin: 0; }
+.depth-head .experiment { text-align: left; margin: 0; }
 
 .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
 @media (min-width: 760px) { .grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: start; } }
@@ -219,14 +238,102 @@ a { color: var(--water); }
 
 <header class="masthead">
   <h1>Shannon Chart Depth</h1>
-  <p class="sub">CSIG charted depths corrected for today's water level</p>
+  <p class="sub">Shannon water levels, locks, forecasts and notices, Killaloe to Lough Key. Depth correction at the foot of the page.</p>
 </header>
 
 <div class="wrap">
   <p class="alert" id="offline" hidden>No signal: showing the last data saved on this phone. Check the reading times before relying on it.</p>
 
-  <nav class="reaches" id="reaches" aria-label="Stretch of river"></nav>
+  <nav class="reaches" id="reaches" aria-label="The four stretches: tap one for its details"></nav>
 
+  <div class="cards info-zone">
+      <section class="panel today" id="today">
+        <div class="wx-head">
+          <h2>Today on the river</h2>
+          <span class="fine" id="today-date"></span>
+        </div>
+        <p class="alert" id="closure-alert" hidden></p>
+        <div class="sun">
+          <div class="today-row">
+            <div>
+              <p class="label" id="sun-label">Daylight</p>
+              <p class="today-main" id="sun-main"></p>
+            </div>
+          </div>
+          <svg id="sun-bar" viewBox="0 0 320 110" role="img" aria-label="A 24-hour dial in leaded glass: night, twilight and daylight, the moon's phase, and the crew's day aboard, with now marked"></svg>
+          <p class="fine" id="sun-note" hidden></p>
+        </div>
+        <div class="today-row">
+          <div>
+            <p class="label">Locks</p>
+            <p class="today-main" id="lock-hours"></p>
+          </div>
+        </div>
+        <div class="today-row" id="bridge-box">
+          <div>
+            <p class="label">Portumna Bridge openings</p>
+            <div class="chips" id="bridge-times"></div>
+          </div>
+          <span class="pill ok" id="bridge-next"></span>
+        </div>
+        <div>
+          <p class="label">Phone</p>
+          <ul class="contacts" id="contacts"></ul>
+        </div>
+        <p class="fine" id="today-note" hidden></p>
+      </section>
+      <section class="panel wx" id="wx">
+        <div class="wx-head">
+          <h2 id="wx-title">Lake forecast</h2>
+          <span class="pill ok" id="wx-wind" hidden></span>
+        </div>
+        <div id="wx-body"><p class="fine">No forecast stored yet.</p></div>
+        <p class="fine" id="wx-meta"></p>
+        <p class="fine" id="wx-hourly" hidden></p>
+      </section>
+      <section class="panel notices">
+        <div class="wx-head">
+          <h2>Marine notices</h2>
+          <span class="fine" id="notices-asof">Live notices as of 13 Oct 2026</span>
+        </div>
+        <ul class="notice-list" id="notices"></ul>
+        <p class="fine"><a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">All live marine notices on waterwaysireland.org</a>. New notices are picked up from Waterways Ireland's email list every two hours.</p>
+        <div id="events-box" hidden>
+          <h3 class="ev-head">Events on the water</h3>
+          <ul class="notice-list" id="events"></ul>
+          <p class="fine" id="events-note"></p>
+        </div>
+      </section>
+      <section class="panel calc" id="trip">
+        <div class="wx-head">
+          <h2>Time to travel</h2>
+          <button type="button" class="linkish" id="trip-swap">Swap ⇅</button>
+        </div>
+        <div class="fields">
+          <label class="f">From <select id="trip-from"></select></label>
+          <label class="f">To <select id="trip-to"></select></label>
+          <label class="f">Leaving at <input type="time" id="trip-dep" step="300"></label>
+        </div>
+        <div class="result">
+          <div class="res" id="trip-hrs-box"><div class="label">Cruising</div><div class="v" id="trip-hrs">–</div><div class="ft" id="trip-hrs-ft"></div></div>
+          <div class="res" id="trip-eta-box"><div class="label">Arrive about</div><div class="v" id="trip-eta">–</div><div class="ft" id="trip-eta-ft"></div></div>
+        </div>
+        <p class="fine">Cruising hours from the shannon-river.com distance chart, counted only between sunrise and 30 minutes before sunset, plus 20 minutes per lock, Waterways Ireland lock hours and lunch breaks, Portumna Bridge openings and announced closures. Allow extra for the weather.</p>
+      </section>
+      <section class="panel" id="food-panel">
+        <div id="food-box" hidden>
+          <div class="food" id="food"></div>
+          <p class="fine" id="food-asof" hidden>Hours, phones and menus from each venue's own website, checked 13 Oct 2026. Star ratings and reviews are on each venue's Google listing.</p>
+        </div>
+      </section>
+  </div>
+
+  <section class="depth-section" id="depth-correction" aria-labelledby="depth-title">
+    <div class="depth-head">
+      <h2 id="depth-title">Depth correction</h2>
+      <p class="experiment" role="note">Untested experiment, not an aid to navigation</p>
+      <p class="fine">Everything above is published data: gauge readings, timetables, forecasts and notices. Everything below is this page's own arithmetic on top of a chart datum that nobody has confirmed against the water. Treat it as a guide to check with your lead line and the markers, never as permission to go somewhere.</p>
+    </div>
   <div class="grid depth-zone">
     <div class="col">
       <section class="panel hero" aria-live="polite">
@@ -385,95 +492,7 @@ a { color: var(--water); }
       </section>
     </div>
   </div>
-  <p class="experiment" role="note">Untested experiment, not an aid to navigation</p>
-  <hr class="strake">
-
-  <div class="grid">
-    <div class="col">
-      <section class="panel wx" id="wx">
-        <div class="wx-head">
-          <h2 id="wx-title">Lake forecast</h2>
-          <span class="pill ok" id="wx-wind" hidden></span>
-        </div>
-        <div id="wx-body"><p class="fine">No forecast stored yet.</p></div>
-        <p class="fine" id="wx-meta"></p>
-        <p class="fine" id="wx-hourly" hidden></p>
-      </section>
-
-      <section class="panel calc" id="trip">
-        <div class="wx-head">
-          <h2>Time to travel</h2>
-          <button type="button" class="linkish" id="trip-swap">Swap ⇅</button>
-        </div>
-        <div class="fields">
-          <label class="f">From <select id="trip-from"></select></label>
-          <label class="f">To <select id="trip-to"></select></label>
-          <label class="f">Leaving at <input type="time" id="trip-dep" step="300"></label>
-        </div>
-        <div class="result">
-          <div class="res" id="trip-hrs-box"><div class="label">Cruising</div><div class="v" id="trip-hrs">–</div><div class="ft" id="trip-hrs-ft"></div></div>
-          <div class="res" id="trip-eta-box"><div class="label">Arrive about</div><div class="v" id="trip-eta">–</div><div class="ft" id="trip-eta-ft"></div></div>
-        </div>
-        <p class="fine">Cruising hours from the shannon-river.com distance chart, counted only between sunrise and 30 minutes before sunset, plus 20 minutes per lock, Waterways Ireland lock hours and lunch breaks, Portumna Bridge openings and announced closures. Allow extra for the weather.</p>
-      </section>
-
-      <section class="panel today" id="today">
-        <div class="wx-head">
-          <h2>Today on the river</h2>
-          <span class="fine" id="today-date"></span>
-        </div>
-        <p class="alert" id="closure-alert" hidden></p>
-        <div class="sun">
-          <div class="today-row">
-            <div>
-              <p class="label" id="sun-label">Daylight</p>
-              <p class="today-main" id="sun-main"></p>
-            </div>
-          </div>
-          <svg id="sun-bar" viewBox="0 0 320 110" role="img" aria-label="A 24-hour dial in leaded glass: night, twilight and daylight, the moon's phase, and the crew's day aboard, with now marked"></svg>
-          <p class="fine" id="sun-note" hidden></p>
-        </div>
-        <div class="today-row">
-          <div>
-            <p class="label">Locks</p>
-            <p class="today-main" id="lock-hours"></p>
-          </div>
-        </div>
-        <div class="today-row" id="bridge-box">
-          <div>
-            <p class="label">Portumna Bridge openings</p>
-            <div class="chips" id="bridge-times"></div>
-          </div>
-          <span class="pill ok" id="bridge-next"></span>
-        </div>
-        <div>
-          <p class="label">Phone</p>
-          <ul class="contacts" id="contacts"></ul>
-        </div>
-        <div id="food-box" hidden>
-          <div class="food" id="food"></div>
-          <p class="fine" id="food-asof" hidden>Hours, phones and menus from each venue's own website, checked 13 Oct 2026. Star ratings and reviews are on each venue's Google listing.</p>
-        </div>
-        <p class="fine" id="today-note" hidden></p>
-        <div id="events-box" hidden>
-          <h3 class="ev-head">Events on the water</h3>
-          <ul class="notice-list" id="events"></ul>
-          <p class="fine" id="events-note"></p>
-        </div>
-      </section>
-    </div>
-
-    <div class="col">
-      <section class="panel notices">
-        <div class="wx-head">
-          <h2>Marine notices</h2>
-          <span class="fine" id="notices-asof">Live notices as of 13 Oct 2026</span>
-        </div>
-        <ul class="notice-list" id="notices"></ul>
-        <p class="fine"><a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">All live marine notices on waterwaysireland.org</a>. New notices are picked up from Waterways Ireland's email list every two hours.</p>
-      </section>
-    </div>
-  </div>
+  </section>
 
   <section class="vinny" id="vinny" aria-label="Emergency button">
     <button type="button" class="vinny-glass" id="vinny-btn">
@@ -869,15 +888,44 @@ a { color: var(--water); }
     return (m < 0 ? "−" : "") + Math.floor(totalIn / 12) + " ft " + (totalIn % 12) + " in";
   }
 
+  // The four stretches as cards: gauge reading, change over 24 hours and a 7-day line. No corrections here.
+  function dayChange(doc) {
+    var f = state.feeds[doc], h = state.histories[doc] || [];
+    if (!f || !h.length) return null;
+    var t = new Date(f.time).getTime() - 24 * 3600e3, best = null;
+    h.forEach(function (p) { var d = Math.abs(new Date(p.t).getTime() - t); if (d <= 3 * 3600e3 && (!best || d < best.d)) best = { d: d, v: p.v }; });
+    return best ? Math.round((f.level - best.v) * 100) : null;
+  }
+  function miniSpark(doc) {
+    var h = (state.histories[doc] || []).filter(function (p) { return Date.now() - new Date(p.t).getTime() < 7 * 864e5; });
+    var svg = document.createElementNS(NS, "svg"); svg.setAttribute("viewBox", "0 0 100 30"); svg.setAttribute("preserveAspectRatio", "none"); svg.setAttribute("aria-hidden", "true");
+    if (h.length < 2) return svg;
+    var ts = h.map(function (p) { return new Date(p.t).getTime(); }), vs = h.map(function (p) { return p.v; });
+    var t0 = Math.min.apply(null, ts), t1 = Math.max.apply(null, ts), v0 = Math.min.apply(null, vs), v1 = Math.max.apply(null, vs);
+    var span = Math.max(v1 - v0, 0.06), mid = (v0 + v1) / 2; v0 = mid - span / 2; v1 = mid + span / 2;
+    var pts = h.map(function (p, i) { return ((ts[i] - t0) / Math.max(1, t1 - t0) * 98 + 1).toFixed(1) + "," + (28 - (vs[i] - v0) / (v1 - v0) * 26).toFixed(1); });
+    svg.appendChild(el("polyline", { points: pts.join(" "), fill: "none", stroke: "var(--water)", "stroke-width": 1.6, "vector-effect": "non-scaling-stroke" }));
+    return svg;
+  }
   function buildSelector() {
     var nav = $("reaches"); nav.textContent = "";
     REACHES.forEach(function (r) {
       var b = document.createElement("button");
       b.type = "button";
       b.setAttribute("aria-pressed", r.id === state.reach ? "true" : "false");
-      b.textContent = r.name;
-      var s = document.createElement("span"); s.textContent = r.span; b.appendChild(s);
-      b.addEventListener("click", function () { state.reach = r.id; state.chkMsg = ""; save("shannon.reach", r.id); buildSelector(); buildReachPanels(); render(); });
+      var add = function (cls, txt) { var x = document.createElement("span"); x.className = cls; if (txt != null) x.textContent = txt; b.appendChild(x); return x; };
+      add("st-name", r.name);
+      add("st-gauge", r.gauge.name + " gauge");
+      var f = state.feeds[r.gauge.doc];
+      var lv = add("st-level", f ? f.level.toFixed(2) : "–");
+      var u = document.createElement("small"); u.textContent = "m OD"; lv.appendChild(u);
+      var c = dayChange(r.gauge.doc);
+      var cg = add("st-chg", c == null ? "24 h: –" : (c === 0 ? "Steady" : (c > 0 ? "↑ " : "↓ ") + Math.abs(c) + " cm") + " in 24 h");
+      if (c != null && c > 0) cg.className += " up";
+      b.appendChild(miniSpark(r.gauge.doc));
+      if (f) add("st-when", hhmm(new Date(f.time).getTime()));
+      b.setAttribute("aria-label", r.name + ": " + (f ? f.level.toFixed(2) + " m" : "no reading") + ". Show details below.");
+      b.addEventListener("click", function () { state.reach = r.id; state.chkMsg = ""; save("shannon.reach", r.id); buildReachPanels(); render(); });
       nav.appendChild(b);
     });
   }
@@ -1875,6 +1923,7 @@ a { color: var(--water); }
       "±10 cm: one check, so this allows for misreading the line, the charted spot and the wind. More checks narrow it." :
       "±" + Math.round(cd.unc * 100) + " cm: the spread of your " + cd.n + " checks, plus a few centimetres for reading the line and the chart.") :
       (r.uncWhy || "");
+    buildSelector();
     showOnline();
     renderWeather();
     renderTrip();
