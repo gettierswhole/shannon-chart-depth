@@ -9,7 +9,7 @@
 # - Marine notices are kept only when they link to waterwaysireland.org.
 import json, os, sys, datetime
 root, out = sys.argv[1], sys.argv[2]
-keep = {"gauge": ["portumna", "banagher", "hodsons", "carrick"], "food": ["derg", "mid", "ree", "key"],
+keep = {"gauge": ["portumna", "banagher", "hodsons", "carrick", "athlone", "shannonbridge"], "food": ["derg", "mid", "ree", "key"],
         "notices": ["live"], "weather": ["lakes", "model"], "events": ["live"]}
 try:
     old = json.load(open(out))

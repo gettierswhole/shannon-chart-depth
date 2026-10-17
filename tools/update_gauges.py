@@ -10,6 +10,9 @@ GAUGES = {  # doc id: (station_ref, gauge zero m OD Malin)
     "banagher": ("0000025017", 30.330),
     "hodsons": ("0000026088", 32.549),
     "carrick": ("0000026324", 38.888),
+    # Extra gauges on the Meelick-Athlone pool, so it can be read at both ends, not just at Banagher.
+    "athlone": ("0000026027", 30.471),        # Athlone, below the weir
+    "shannonbridge": ("0000026028", 30.406),
 }
 HISTORY_KEEP = 168          # one point an hour at most: a week
 HISTORY_STEP = timedelta(minutes=55)
