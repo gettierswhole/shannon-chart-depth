@@ -10,83 +10,79 @@
 <title>Shannon Chart Depth</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: a wheelhouse instrument — pick the stretch, read the correction, then the staff gauge, calculator and settings. One column on a phone, two on wider screens. */
-/* Livery: Shannon Star Livery — a 1974 airliner's roof green, royal pinstripe and pine cheatline over a white Shannon cruiser hull. */
+/* Look: the Shannon Dashboard's — quiet river-grey ground, white cards with hairline borders, serif figures, plain sans text; colour kept for state. */
 :root {
-  --bg: #e2e8e4;
-  --surface: #fbfcf9;
-  --sunk: #eef2ef;
-  --ink: #15201b;
-  --muted: #4c5f57;
-  --line: #c6d1cb;
-  --line-strong: #7e8f87;
-  --water: #22408f;
+  --bg: #eef1f1;
+  --surface: #ffffff;
+  --sunk: #f4f6f6;
+  --ink: #1b2326;
+  --muted: #5b6a6e;
+  --line: #d9e0e1;
+  --line-strong: #9aa8ab;
+  --water: #2d5b8a;
   --on-water: #ffffff;
-  --water-soft: #dce3f4;
-  --ok: #23703a;
-  --warn: #8a5414;
-  --bad: #b12f24;
-  --ok-soft: #dbeedf;
-  --warn-soft: #f4e6cf;
-  --bad-soft: #f7ddd9;
-  --roof: #2a7a3b;
+  --water-soft: #e2ebf4;
+  --ok: #26703f;
+  --warn: #8f5b12;
+  --bad: #b3332a;
+  --ok-soft: #e1f0e5;
+  --warn-soft: #f6ead6;
+  --bad-soft: #f8e1de;
+  --roof: #1b2326;
   --on-roof: #ffffff;
-  --royal: #22408f;
-  --cheat: #123b2a;
+  --royal: #2d5b8a;
+  --cheat: #1b2326;
   --on-cheat: #ffffff;
-  --strake: #1c2621;
-  --display: "Jost", "Futura", "Century Gothic", "Avenir Next", sans-serif;
-  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --strake: #d9e0e1;
+  --display: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0b1612; --surface: #13231c; --sunk: #0f1d17; --ink: #e5ede8; --muted: #9aaea4; --line: #2c4237; --line-strong: #62786d;
-    --water: #9db4f2; --on-water: #0b1612; --water-soft: #1b2a52; --ok: #6fcb8a; --warn: #d9a15a; --bad: #f28474;
-    --ok-soft: #14301f; --warn-soft: #38270f; --bad-soft: #3f1a16;
-    --roof: #1a5a2b; --on-roof: #ffffff; --royal: #7c9bef; --cheat: #2e7a50; --on-cheat: #ffffff; --strake: #7d9389; color-scheme: dark;
+    --bg: #111618; --surface: #182024; --sunk: #141b1e; --ink: #e6ecec; --muted: #9aabae; --line: #2a3539; --line-strong: #5d6d71;
+    --water: #8fb6e0; --on-water: #111618; --water-soft: #1c2c3c; --ok: #74c98d; --warn: #dca95f; --bad: #f08a7c;
+    --ok-soft: #16301f; --warn-soft: #35290f; --bad-soft: #3d1c18;
+    --roof: #e6ecec; --on-roof: #111618; --royal: #8fb6e0; --cheat: #e6ecec; --on-cheat: #111618; --strake: #2a3539; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0b1612; --surface: #13231c; --sunk: #0f1d17; --ink: #e5ede8; --muted: #9aaea4; --line: #2c4237; --line-strong: #62786d;
-  --water: #9db4f2; --on-water: #0b1612; --water-soft: #1b2a52; --ok: #6fcb8a; --warn: #d9a15a; --bad: #f28474;
-  --ok-soft: #14301f; --warn-soft: #38270f; --bad-soft: #3f1a16;
-  --roof: #1a5a2b; --on-roof: #ffffff; --royal: #7c9bef; --cheat: #2e7a50; --on-cheat: #ffffff; --strake: #7d9389; color-scheme: dark;
+  --bg: #111618; --surface: #182024; --sunk: #141b1e; --ink: #e6ecec; --muted: #9aabae; --line: #2a3539; --line-strong: #5d6d71;
+  --water: #8fb6e0; --on-water: #111618; --water-soft: #1c2c3c; --ok: #74c98d; --warn: #dca95f; --bad: #f08a7c;
+  --ok-soft: #16301f; --warn-soft: #35290f; --bad-soft: #3d1c18;
+  --roof: #e6ecec; --on-roof: #111618; --royal: #8fb6e0; --cheat: #e6ecec; --on-cheat: #111618; --strake: #2a3539; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; padding-inline: 16px; padding-block: 0 40px; }
-.wrap { max-width: 900px; margin: 8px auto 0; display: grid; gap: 16px; }
-/* Masthead: the roof green, a royal pinstripe and the pine cheatline, level and then rising to the right like a cruiser's sheer */
-.masthead { margin-inline: -16px; color: var(--on-roof); }
-.roof { background: var(--roof); padding: 22px 16px 8px; }
-.roof > * { max-width: 900px; margin-inline: auto; }
-h1 { font-family: var(--display); font-weight: 600; font-size: 1.9rem; line-height: 1.05; letter-spacing: 0.005em; margin: 0 auto; text-wrap: balance; color: var(--on-roof); }
-.sub { color: var(--on-roof); font-size: 0.9rem; margin: 4px auto 0; }
-.cheatline { display: block; width: 100%; height: 24px; }
-.cheatline .c-roof { fill: var(--roof); } .cheatline .c-royal { fill: var(--royal); } .cheatline .c-cheat { fill: var(--cheat); }
-/* Strake: the double rubbing-strake rule between the depth zone and the trip zone */
-.strake { border: 0; border-top: 2px solid var(--strake); border-bottom: 2px solid var(--strake); height: 7px; margin: 0; }
+.wrap { max-width: 960px; margin: 0 auto; display: grid; gap: 16px; }
+/* Header: a plain title line, as on the dashboard */
+.masthead { max-width: 960px; margin: 0 auto; padding-block: 28px 4px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: 2rem; line-height: 1.1; margin: 0; text-wrap: balance; color: var(--ink); }
+.sub { color: var(--muted); font-size: 0.95rem; margin: 6px 0 0; }
+/* A plain rule between the depth zone and the trip zone */
+.strake { border: 0; border-top: 1px solid var(--line); height: 0; margin: 8px 0; }
 
-/* Stretch selector: ordered south to north, as the river runs upstream */
-.reaches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); }
-.reaches button { border: 0; border-radius: 0; background: transparent; color: var(--ink); padding: 10px 12px 14px; text-align: left; display: grid; gap: 2px; min-width: 0; font-family: var(--display); font-weight: 500; font-size: 1rem; line-height: 1.25; }
+/* Stretch selector: a segmented control, ordered south to north as the river runs upstream */
+.reaches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.reaches button { border: 0; border-radius: 0; background: transparent; color: var(--ink); padding: 10px 14px 12px; text-align: left; display: grid; gap: 2px; min-width: 0; font-family: var(--body); font-weight: 500; font-size: 0.98rem; line-height: 1.25; }
 .reaches button + button { border-left: 1px solid var(--line); }
 @media (max-width: 520px) { .reaches { grid-template-columns: repeat(2, minmax(0, 1fr)); } .reaches button:nth-child(3) { border-left: 0; } .reaches button:nth-child(n+3) { border-top: 1px solid var(--line); } }
-.reaches button span { font-family: var(--body); font-weight: 400; font-size: 0.78rem; color: var(--muted); }
-.reaches button[aria-pressed="true"] { background: var(--roof); color: var(--on-roof); box-shadow: inset 0 -4px 0 var(--cheat), inset 0 -7px 0 var(--royal); }
-.reaches button[aria-pressed="true"] span { color: var(--on-roof); }
+.reaches button span { font-weight: 400; font-size: 0.78rem; color: var(--muted); }
+.reaches button[aria-pressed="true"] { background: var(--sunk); color: var(--ink); box-shadow: inset 0 -2px 0 var(--ink); }
+.reaches button[aria-pressed="true"] span { color: var(--muted); }
 
 .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
 @media (min-width: 760px) { .grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: start; } }
 .col { display: grid; gap: 16px; min-width: 0; }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; min-width: 0; }
-.label { font-family: var(--display); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); font-weight: 600; margin: 0 0 6px; }
-h2 { font-family: var(--display); font-weight: 500; font-size: 1.3rem; line-height: 1.2; margin: 0 0 10px; text-wrap: balance; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; min-width: 0; }
+.label { font-family: var(--body); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; margin: 0 0 6px; }
+h2 { font-family: var(--body); font-weight: 500; font-size: 1.12rem; line-height: 1.2; margin: 0 0 10px; text-wrap: balance; }
 
 .hero { display: grid; gap: 10px; }
-.big { font-family: var(--display); font-weight: 500; font-size: clamp(3.6rem, 16vw, 5.4rem); line-height: 0.95; font-variant-numeric: tabular-nums; color: var(--water); letter-spacing: -0.01em; }
+.big { font-family: var(--display); font-weight: 400; font-size: clamp(3.6rem, 16vw, 5.4rem); line-height: 0.95; font-variant-numeric: tabular-nums; color: var(--water); letter-spacing: -0.01em; }
 .big .unit { font-size: 0.42em; color: var(--muted); margin-left: 6px; font-weight: 400; letter-spacing: 0; }
 .big.pending { font-size: clamp(2.4rem, 10vw, 3.2rem); color: var(--muted); }
 /* Lead-line checks */
@@ -113,7 +109,7 @@ h2 { font-family: var(--display); font-weight: 500; font-size: 1.3rem; line-heig
 .wx-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
 .wx-head h2 { margin: 0; }
 .wx dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: 0.95rem; }
-.wx dt { color: var(--muted); font-family: var(--display); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; padding-top: 3px; }
+.wx dt { color: var(--muted); font-family: var(--body); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; padding-top: 3px; }
 .wx dd { margin: 0; }
 .wx h3 { font-size: 0.95rem; margin: 6px 0 2px; }
 .today { display: grid; gap: 14px; }
@@ -136,10 +132,10 @@ h2 { font-family: var(--display); font-weight: 500; font-size: 1.3rem; line-heig
 .food-menu { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
 .food-menu + .food-menu { margin-top: 10px; }
 .food-menu > summary { cursor: pointer; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-weight: 600; }
-.food-menu > summary .food-title { font-family: var(--display); font-size: 1.15rem; }
+.food-menu > summary .food-title { font-family: var(--body); font-weight: 500; font-size: 1.05rem; }
 .food-menu > summary .food-count { font-size: 0.82rem; color: var(--muted); font-weight: 400; margin-left: auto; }
 .food-menu[open] > summary { margin-bottom: 10px; }
-.food h3 { font-family: var(--display); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 4px 0 0; }
+.food h3 { font-family: var(--body); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 4px 0 0; }
 .venue { display: grid; gap: 3px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--sunk); }
 .venue-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 10px; }
 .venue-name { font-weight: 600; }
@@ -166,19 +162,19 @@ h2 { font-family: var(--display); font-weight: 500; font-size: 1.3rem; line-heig
 .notice-list a { font-weight: 600; text-decoration: none; }
 .notice-list a:hover { text-decoration: underline; }
 .notice-list span { font-size: 0.9rem; color: var(--muted); }
-.ev-head { font-family: var(--display); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 6px 0 8px; }
+.ev-head { font-family: var(--body); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 6px 0 8px; }
 .venue .news { font-size: 0.88rem; padding: 4px 8px; border-radius: 6px; background: var(--warn-soft); }
 .alert { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--bad-soft); color: var(--bad); font-weight: 600; font-size: 0.92rem; }
 .calc { display: grid; gap: 14px; }
 .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 label.f { display: grid; gap: 4px; font-size: 0.9rem; font-weight: 600; }
 label.f small { font-weight: 400; color: var(--muted); }
-input[type=number], input[type=time], input[type=text], input[type=datetime-local], select { font-family: var(--mono); font-size: 1.15rem; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--sunk); color: var(--ink); width: 100%; min-width: 0; }
+input[type=number], input[type=time], input[type=text], input[type=datetime-local], select { font-family: var(--mono); font-size: 1.15rem; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); color: var(--ink); width: 100%; min-width: 0; }
 select { font-family: var(--body); font-size: 1rem; }
 input:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px solid var(--water); outline-offset: 2px; }
 .result { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.res { border-top: 2px solid var(--strake); padding-top: 8px; }
-.res .v { font-family: var(--display); font-weight: 500; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.res { border-top: 1px solid var(--line); padding-top: 10px; }
+.res .v { font-family: var(--display); font-weight: 400; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
 .res .ft { color: var(--muted); font-size: 0.85rem; }
 .res.state-ok .v { color: var(--ok); } .res.state-warn .v { color: var(--warn); } .res.state-bad .v { color: var(--bad); }
 
@@ -187,6 +183,11 @@ input:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visibl
 .gauge-notes { font-size: 0.88rem; color: var(--muted); display: grid; gap: 8px; min-width: 0; }
 .gauge-notes b { color: var(--ink); font-weight: 500; }
 .spark { margin-top: 14px; }
+.along { margin-top: 14px; display: grid; gap: 6px; }
+.along-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 0.92rem; }
+.along-list li { display: flex; justify-content: space-between; gap: 12px; }
+.along-list li.here { font-weight: 600; }
+.along-list .v { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .spark svg { width: 100%; height: auto; display: block; }
 
 details { border-top: 1px solid var(--line); padding-top: 12px; }
@@ -195,7 +196,7 @@ summary { cursor: pointer; font-weight: 600; }
 .stack { display: grid; gap: 10px; margin-top: 12px; font-size: 0.92rem; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
 .row label.f { flex: 1 1 160px; }
-button { font: inherit; font-size: 0.9rem; font-weight: 600; padding: 9px 14px; border-radius: 10px; border: 1px solid var(--cheat); background: var(--cheat); color: var(--on-cheat); cursor: pointer; }
+button { font: inherit; font-size: 0.9rem; font-weight: 500; padding: 9px 14px; border-radius: 8px; border: 1px solid var(--cheat); background: var(--cheat); color: var(--on-cheat); cursor: pointer; }
 button.ghost { background: transparent; border-color: var(--water); color: var(--water); }
 button:disabled { background: var(--sunk); border-color: var(--line); color: var(--muted); cursor: default; }
 a { color: var(--water); }
@@ -217,15 +218,8 @@ a { color: var(--water); }
 </style>
 
 <header class="masthead">
-  <div class="roof">
-    <h1>Shannon Chart Depth</h1>
-    <p class="sub">CSIG charted depths corrected for today's water level</p>
-  </div>
-  <svg class="cheatline" viewBox="0 0 1000 24" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-    <path class="c-roof" d="M0 0H1000V2C930 8 800 12 600 12H0Z"/>
-    <path class="c-royal" d="M0 12H600C800 12 930 8 1000 2V5C930 11 800 15 600 15H0Z"/>
-    <path class="c-cheat" d="M0 15H600C800 15 930 11 1000 5V12C930 18 800 22 600 22H0Z"/>
-  </svg>
+  <h1>Shannon Chart Depth</h1>
+  <p class="sub">CSIG charted depths corrected for today's water level</p>
 </header>
 
 <div class="wrap">
@@ -327,6 +321,11 @@ a { color: var(--water); }
         <div class="spark" id="spark" hidden>
           <p class="label">Recent readings</p>
           <svg id="spark-svg" viewBox="0 0 320 90" role="img" aria-label="Recent water level readings"></svg>
+        </div>
+        <div class="along" id="along" hidden>
+          <p class="label">Along the pool, against summer level</p>
+          <ul class="along-list" id="along-list"></ul>
+          <p class="fine" id="along-note"></p>
         </div>
       </section>
 
@@ -568,6 +567,8 @@ a { color: var(--water); }
       ],
       feet: null,
       osl: { name: "Banagher ordinary summer level", poolbeg: 35.36 },
+      // The same pool read at both ends as well as Banagher: OPW gauges, all against Malin Head.
+      along: [["athlone", "Athlone, below the weir"], ["shannonbridge", "Shannonbridge"], ["banagher", "Banagher"]],
       unc: 0.15, uncWhy: "There is no chart datum here, so ±15 cm is a rough allowance, not a measured one. The CSIG average their river depths; this compares the river with Waterways Ireland's summer level at Banagher, and OPW and Waterways Ireland readings there have disagreed by about 20 cm.",
       river: true,
       weather: ["derg", "ree"],
@@ -1737,11 +1738,39 @@ a { color: var(--water); }
     return (cm < 0 ? "↓ Falling " : "↑ Rising ") + Math.abs(cm) + " cm in " + hrs + " h";
   }
 
+  // Several gauges on one pool: show each against the pool's summer level, so a running river's slope is visible.
+  function renderAlong(r) {
+    var box = $("along"), list = $("along-list");
+    if (!r.along || !r.osl) { box.hidden = true; return; }
+    var ref = r.osl.malin, rows = [];
+    r.along.forEach(function (g) {
+      var f = state.feeds[g[0]];
+      if (!f || typeof f.level !== "number") return;
+      var age = Date.now() - new Date(f.time).getTime();
+      if (!(age < 24 * 3600e3)) return;
+      rows.push({ key: g[0], name: g[1], cm: Math.round((f.level - ref) * 100), age: age });
+    });
+    if (rows.length < 2) { box.hidden = true; return; }
+    list.textContent = "";
+    rows.forEach(function (x) {
+      var li = document.createElement("li");
+      if (x.key === r.gauge.doc) li.className = "here";
+      var a = document.createElement("span"); a.textContent = x.name + (x.key === r.gauge.doc ? " (used above)" : "");
+      var b = document.createElement("span"); b.className = "v"; b.textContent = (x.cm > 0 ? "+" : x.cm < 0 ? "−" : "±") + Math.abs(x.cm) + " cm";
+      li.appendChild(a); li.appendChild(b); list.appendChild(li);
+    });
+    var hi = Math.max.apply(null, rows.map(function (x) { return x.cm; })), lo = Math.min.apply(null, rows.map(function (x) { return x.cm; }));
+    $("along-note").textContent = hi - lo >= 15
+      ? "The pool isn't level: there's " + (hi - lo) + " cm between its ends, so the river is running. Expect more water towards Athlone than the Banagher figure suggests. Banagher may also read about 20 cm low against Waterways Ireland; not yet confirmed."
+      : "The pool is close to level along its length.";
+    box.hidden = false;
+  }
   function render() {
     var r = reach(), s = settings(r), cill = r.cills[s.cill];
     var rd = reading(r), man = manualOf(r);
     var pub = datumOf(r), cd = checkedOf(r);
     var datum = cd ? cd.datum : pub;
+    renderAlong(r);
 
     // Workings
     var w;
@@ -2091,7 +2120,7 @@ a { color: var(--water); }
     // Every document is also kept on this device, so the page shows the last data straight away and with no signal.
     window.claude.use("db").then(function (d) { return cachedDb(d); }, function () { return cachedDb(null); }).then(function (db) {
       if (!db) return;
-      Object.keys(BAKED).forEach(function (key) {
+      Object.keys(BAKED).concat(["athlone", "shannonbridge"]).forEach(function (key) {
         db.doc("gauge/" + key).onSnapshot(function (snap) {
           if (!snap.exists) return;
           var data = snap.data();
