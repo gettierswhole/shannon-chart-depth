@@ -46,6 +46,11 @@ shim = r'''<script>
 </script>
 <style>.rate-you, .rate-gap, .scorecard { display: none !important; }</style>
 '''
+# The public copy goes by its own name. The source page's name stays in a comment, which the sync task checks for.
+import re
+h = h.replace('<title>Shannon Chart Depth</title>', '<title>Ditchcrawlers Shannon Almanac</title>\n<!-- Public copy of the Shannon Chart Depth page -->', 1)
+h = h.replace('<h1>Shannon Chart Depth</h1>', '<h1>Ditchcrawlers Shannon Almanac</h1>', 1)
+h = re.sub(r'<p class="sub">.*?</p>', '<p class="sub">Marine notices, forecasting, water levels and lock times for the Shannon, Killaloe to Lough Key. Depth correction at the foot of the page.</p>', h, count=1, flags=re.S)
 i = h.index('<script>')
 h = h[:i] + shim + h[i:]
 h = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
