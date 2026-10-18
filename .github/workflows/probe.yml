@@ -14,16 +14,10 @@ jobs:
           exec > probe.txt 2>&1
           set +e
           B=https://waterlevel.ie/hydro-data
-          S=$B/data/internet/stations/0/25017/S
-          for f in "" Waterlevel_complete.zip complete.json year.json week.json month.json Waterlevel_complete_daily.zip complete.zip; do
-            echo "== $f"; curl -sS -o /tmp/x -w "%{http_code} %{size_download} %{content_type}\n" "$S/$f"; head -c 600 /tmp/x | tr -c '[:print:]\n' '.'; echo
-          done
-          curl -sS $B/ -o idx.html; grep -o 'src="[^"]*"\|href="[^"]*"' idx.html
-          for js in $(grep -o 'src="[^"]*\.js"' idx.html | cut -d'"' -f2); do
-            curl -sS "$B/$js" -o b.js; echo "== $js $(wc -c <b.js)"; grep -o '.\{80\}complete.\{80\}' b.js | head -20; grep -o '[A-Za-z_]*\.zip' b.js | sort -u
-          done
-          curl -sS $B/data/internet/stations/stations.json -o st.json; wc -c st.json; head -c 1500 st.json
-          find . -maxdepth 1 -name 'conf*'; curl -sS $B/conf/config.json | head -c 3000
+          curl -sS $B/assets/index.8130a0e1.js -o b.js
+          grep -o '.\{200\}[Qq]uality.\{300\}' b.js | head -30
+          for f in conf/config.json config.json data/internet/layers/conf.json data/internet/qualitycodes.json; do echo "== $f"; curl -sS -w " %{http_code}\n" $B/$f | head -c 1500; done
+          for n in 26027 26085 25056; do echo "== $n"; curl -sS $B/data/internet/stations/0/$n/S/year.json | head -c 400; echo; done
       - name: Save
         if: always()
         run: |
