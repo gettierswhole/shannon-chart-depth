@@ -612,10 +612,12 @@ a { color: var(--water); }
       id: "ree", name: "Lough Ree", span: "Athlone – Tarmonbarry",
       gauge: { doc: "athloneus", station: "26333", name: "Athlone (above the weir)", zero: 32.137 },
       cills: [
-        { name: "Athlone upper cill", poolbeg: 35.35 }
+        // 32.609 m Malin: the IWAI Athlone branch's cill, from their record low of 4 ft 11 in on 2 Nov 2018 (OPW 26333 read 34.108 m).
+        // The lock table gives 35.35 m Poolbeg (32.64 m Malin), 3 cm higher.
+        { name: "Athlone upper cill", poolbeg: 35.319 }
       ],
       feet: 5.5,
-      unc: 0.10, uncWhy: "±10 cm until you check it. The datum, 5.5 ft over the Athlone lock cill, comes from the IWAI Athlone branch and fits the lake's record since 2003; the cill height comes from the lock table, and nobody has checked the result against the water. The gauge is at Athlone, which reads a few centimetres below the open lake.",
+      unc: 0.10, uncWhy: "±10 cm until you check it. The datum, 5.5 ft over the Athlone lock cill, comes from the IWAI Athlone branch and fits the lake's record since 2003; the cill height is the one their figures imply (3 cm below the lock table's), and nobody has checked the result against the water. The gauge is at Athlone, which reads a few centimetres below the open lake.",
       lake: true, alts: [{ label: "7 ft over the Athlone cill (Waterways Ireland's summer level, the old figure)", cill: 0, feet: 7 }, { label: "5 ft over the Athlone cill (the CSIG's 2019 forum figure)", cill: 0, feet: 5 }],
       weather: ["ree"],
       sunAt: [53.55, -7.98],
@@ -662,7 +664,7 @@ a { color: var(--water); }
         ["Thatch, Lough Ree level", "03-Thatch-Lough-Ree.pdf"],
         ["Bellantra Sluices, Lough Allen level", "02-Bellantra-Sluices-Lough-Allen.pdf"]
       ],
-      datumHelp: "The IWAI Athlone branch give the CSIG datum for Lough Ree as 5.5 ft over the cill of Athlone lock: 37.03 m Poolbeg, 34.32 m Malin. It was chosen close to the lake's historical low so that charted depths are almost always there. Since 2003 the lake has gone below it in only four years, and the lowest reading on record was 4 ft 11 in, on 2 November 2018. It sits 1.5 ft under Waterways Ireland's ordinary summer level (7 ft, 37.49 m Poolbeg), which this page used before, and just above the ESB's minimum navigation level (about 5 ft, 36.88 m Poolbeg). The CSIG's lead mapper gave 7 ft in a 2018 forum post and 5 ft in 2019.",
+      datumHelp: "The IWAI Athlone branch give the CSIG datum for Lough Ree as 5 ft 6 in over the cill of Athlone lock: 37.00 m Poolbeg, 34.285 m Malin. The cill height, 32.609 m Malin, is worked back from their record low of 4 ft 11 in on 2 November 2018, when the OPW gauge by Athlone Castle read 34.108 m; it puts this page in step with theirs. The lock table's figure is 3 cm higher. It was chosen close to the lake's historical low so that charted depths are almost always there. Since 2003 the lake has gone below it in only four years, and the lowest reading on record was 4 ft 11 in, on 2 November 2018. It sits 1.5 ft under Waterways Ireland's ordinary summer level (7 ft, 37.49 m Poolbeg), which this page used before, and just above the ESB's minimum navigation level (about 5 ft, 36.88 m Poolbeg). The CSIG's lead mapper gave 7 ft in a 2018 forum post and 5 ft in 2019.",
       manualHelp: "Copy the OD level from the <a href=\"https://waterlevel.ie/0000026333/\" target=\"_blank\" rel=\"noopener\">Athlone Weir U/S page on waterlevel.ie</a> (the gauge on the quay by Athlone Castle). A staff gauge reading under 5 m has the gauge zero of 32.137 m added for you.",
       feetHelp: "A daily reading over the cill is available for Athlone Lock; 5.5 ft is chart datum.",
       caveats: [
