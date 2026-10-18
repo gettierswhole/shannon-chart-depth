@@ -1,0 +1,101 @@
+== 
+403 153 text/html
+<html>.
+<head><title>403 Forbidden</title></head>.
+<body>.
+<center><h1>403 Forbidden</h1></center>.
+<hr><center>nginx/1.24.0</center>.
+</body>.
+</html>.
+
+== Waterlevel_complete.zip
+200 4771314 application/zip
+PK..........R]................tsvalues.csv..K.6.y..9?...E....,......B.d"..a.......}..7v..~.U..H........u.......O......w..._......_..W......?......./.sY..................b}......o..............q....?~.....?......?................../........._.o.........w........._......O...........?.._..._..g?./..O..O........_......................w?..?...~........e...~....._.$........~.._......~.o......~......>..-..-.?/...,?../.e..~..........zN.=..*r.cd].R..R........-.I-....O.t\...l.9...-.+.Z.;.=.,.HhY.....}D.k..+.#.l...._a\...p.Gjy..3.<...Zn&.L-7Z.."r......r.....B..p..q..B..h)Hja...r1.Oj.(.'.\L..Z.& }w.......
+== complete.json
+404 302 text/html
+<h1 style='color:red'>Error 404:Page not found :-(</h1>
+<p>We have updated the Hydro-Data website recently and some urls have changed. Please try <a href ="/hydro-data/">the new site</a>.</p>
+<p>In case of any difficulties please contact <a href="mailto:hydrometric@opw.ie">hydrometric@opw.ie</a>.</p>
+
+== year.json
+200 1849143 application/json
+[{"stationparameter_name":"S","ts_shortname":"WEB.Day.Mean","ts_unitsymbol":"m","ts_precision":"DECI,2,1","rows": "13803","columns":"Timestamp,Value,Quality Code,Aggregation Accuracy %", "data": [["1989-01-02T00:00:00.000Z",33.28,31,62.5],["1989-01-03T00:00:00.000Z",33.17,31,100.0],["1989-01-04T00:00:00.000Z",33.09,31,100.0],["1989-01-05T00:00:00.000Z",33.14,31,100.0],["1989-01-06T00:00:00.000Z",33.30,31,100.0],["1989-01-07T00:00:00.000Z",33.37,31,100.0],["1989-01-08T00:00:00.000Z",33.36,31,100.0],["1989-01-09T00:00:00.000Z",33.35,31,100.0],["1989-01-10T00:00:00.000Z",33.31,31,100.0],["1989-01
+== week.json
+200 23443 application/json
+[{"stationparameter_name":"S","ts_shortname":"WEB.Cmd.P-Continuous.Absolute","ts_unitsymbol":"m","ts_precision":"Deci,3,0,0","rows": "572","columns":"Timestamp,Value,Quality Code", "data": [["2026-10-13T00:00:00.000Z",32.379,254],["2026-10-13T00:15:00.000Z",32.379,254],["2026-10-13T00:30:00.000Z",32.381,254],["2026-10-13T00:45:00.000Z",32.383,254],["2026-10-13T01:00:00.000Z",32.388,254],["2026-10-13T01:15:00.000Z",32.390,254],["2026-10-13T01:30:00.000Z",32.388,254],["2026-10-13T01:45:00.000Z",32.389,254],["2026-10-13T02:00:00.000Z",32.389,254],["2026-10-13T02:15:00.000Z",32.387,254],["2026-10-
+== month.json
+200 111393 application/json
+[{"stationparameter_name":"S","ts_shortname":"WEB.Cmd.P-Continuous.Absolute","ts_unitsymbol":"m","ts_precision":"Deci,3,0,0","rows": "2780","columns":"Timestamp,Value,Quality Code", "data": [["2026-09-20T00:00:00.000Z",32.470,254],["2026-09-20T00:15:00.000Z",32.469,254],["2026-09-20T00:30:00.000Z",32.469,254],["2026-09-20T00:45:00.000Z",32.471,254],["2026-09-20T01:00:00.000Z",32.471,254],["2026-09-20T01:15:00.000Z",32.470,254],["2026-09-20T01:30:00.000Z",32.469,254],["2026-09-20T01:45:00.000Z",32.470,254],["2026-09-20T02:00:00.000Z",32.471,254],["2026-09-20T02:15:00.000Z",32.471,254],["2026-09
+== Waterlevel_complete_daily.zip
+404 302 text/html
+<h1 style='color:red'>Error 404:Page not found :-(</h1>
+<p>We have updated the Hydro-Data website recently and some urls have changed. Please try <a href ="/hydro-data/">the new site</a>.</p>
+<p>In case of any difficulties please contact <a href="mailto:hydrometric@opw.ie">hydrometric@opw.ie</a>.</p>
+
+== complete.zip
+404 302 text/html
+<h1 style='color:red'>Error 404:Page not found :-(</h1>
+<p>We have updated the Hydro-Data website recently and some urls have changed. Please try <a href ="/hydro-data/">the new site</a>.</p>
+<p>In case of any difficulties please contact <a href="mailto:hydrometric@opw.ie">hydrometric@opw.ie</a>.</p>
+
+href="./images/favicon.png"
+href="./icons/ki/css/Kisterswater.woff2"
+href="./icons/kim/css/external-min.css"
+href="icon-192x192.png"
+href="./icons/ki/css/external-min.css"
+src="https://www.googletagmanager.com/gtag/js?id=G-W6K5KD6EPQ"
+href="."
+src="./assets/highcharts.ab10c1a7.js"
+src="./assets/vendor.ae406a10.js"
+src="./assets/index.8130a0e1.js"
+href="./assets/index.ef89eb65.css"
+== ./assets/highcharts.ab10c1a7.js 1803831
+.prop=this.prop,u()&&L.timers.push(u)===1&&x(M)):(delete m.curAnim[this.prop],m.complete&&Object.keys(m.curAnim).length===0&&m.complete.call(this.elem))},L.prototype.st
+on(m,u,x){var M,v="",S,w;if(!T(x)){var P=arguments;x={duration:P[2],easing:P[3],complete:P[4]}}L(x.duration)||(x.duration=400),x.easing=typeof x.easing=="function"?x.ea
+,s(T.hidden,T.msHidden,T.webkitHidden,!1)&&(R.duration=0),R.duration!==0?(c&&(R.complete=c),e(function(){j.element&&F(j,i,R)},h)):(this.attr(i,void 0,c||R.complete),l(i
+ototype.fadeOut=function(i){var h=this;h.animate({opacity:0},{duration:s(i,150),complete:function(){h.hide()}})},r.prototype.fillSetter=function(i,h,c){typeof i=="strin
+AAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="),E=new w.Image,P(E,"load",A),E.src=p,E.complete&&A({})):C(D.element,p),D},n.prototype.symbol=function(p,A,E,_,N,b){var I=this,C
+-hidden",this.styledMode||M(q,{opacity:0},{duration:W.loading.hideDuration||100,complete:function(){c(q,{display:"none"})}})),this.loadingShown=!1},tt.prototype.update=
+.prop=this.prop,u()&&L.timers.push(u)===1&&x(M)):(delete m.curAnim[this.prop],m.complete&&Object.keys(m.curAnim).length===0&&m.complete.call(this.elem))},L.prototype.st
+on(m,u,x){var M,v="",S,w;if(!T(x)){var P=arguments;x={duration:P[2],easing:P[3],complete:P[4]}}L(x.duration)||(x.duration=400),x.easing=typeof x.easing=="function"?x.ea
+,s(T.hidden,T.msHidden,T.webkitHidden,!1)&&(R.duration=0),R.duration!==0?(c&&(R.complete=c),e(function(){j.element&&F(j,i,R)},h)):(this.attr(i,void 0,c||R.complete),l(i
+ototype.fadeOut=function(i){var h=this;h.animate({opacity:0},{duration:s(i,150),complete:function(){h.hide()}})},r.prototype.fillSetter=function(i,h,c){typeof i=="strin
+AAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="),E=new w.Image,P(E,"load",A),E.src=p,E.complete&&A({})):C(D.element,p),D},n.prototype.symbol=function(p,A,E,_,N,b){var I=this,C
+-hidden",this.styledMode||M(q,{opacity:0},{duration:W.loading.hideDuration||100,complete:function(){c(q,{display:"none"})}})),this.loadingShown=!1},tt.prototype.update=
+.prop=this.prop,u()&&L.timers.push(u)===1&&x(M)):(delete m.curAnim[this.prop],m.complete&&Object.keys(m.curAnim).length===0&&m.complete.call(this.elem))},L.prototype.st
+on(m,u,x){var M,v="",S,w;if(!T(x)){var P=arguments;x={duration:P[2],easing:P[3],complete:P[4]}}L(x.duration)||(x.duration=400),x.easing=typeof x.easing=="function"?x.ea
+,s(T.hidden,T.msHidden,T.webkitHidden,!1)&&(R.duration=0),R.duration!==0?(c&&(R.complete=c),e(function(){j.element&&F(j,i,R)},h)):(this.attr(i,void 0,c||R.complete),l(i
+ototype.fadeOut=function(i){var h=this;h.animate({opacity:0},{duration:s(i,150),complete:function(){h.hide()}})},r.prototype.fillSetter=function(i,h,c){typeof i=="strin
+AAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="),E=new w.Image,P(E,"load",A),E.src=p,E.complete&&A({})):C(D.element,p),D},n.prototype.symbol=function(p,A,E,_,N,b){var I=this,C
+-hidden",this.styledMode||M(q,{opacity:0},{duration:W.loading.hideDuration||100,complete:function(){c(q,{display:"none"})}})),this.loadingShown=!1},tt.prototype.update=
+.prop=this.prop,u()&&L.timers.push(u)===1&&x(M)):(delete m.curAnim[this.prop],m.complete&&Object.keys(m.curAnim).length===0&&m.complete.call(this.elem))},L.prototype.st
+on(m,u,x){var M,v="",S,w;if(!T(x)){var P=arguments;x={duration:P[2],easing:P[3],complete:P[4]}}L(x.duration)||(x.duration=400),x.easing=typeof x.easing=="function"?x.ea
+== ./assets/vendor.ae406a10.js 3377480
+ror=function(t){this.isStopped||(this.isStopped=!0,this._error(t))},e.prototype.complete=function(){this.isStopped||(this.isStopped=!0,this._complete())},e.prototype.un
+tion(t){try{this.destination.error(t)}finally{this.unsubscribe()}},e.prototype._complete=function(){try{this.destination.complete()}finally{this.unsubscribe()}},e}(Hw),
+artialObserver;if(t.error)try{t.error(e)}catch(n){aB(n)}else aB(e)},i.prototype.complete=function(){var e=this.partialObserver;if(e.complete)try{e.complete()}catch(t){a
+call(this)||this,a;if(il(t)||!t)a={next:t!=null?t:void 0,error:n!=null?n:void 0,complete:r!=null?r:void 0};else{var s;o&&lT.useDeprecatedNextContext?(s=Object.create(t)
+turn o.unsubscribe()},a={next:t.next&&pb(t.next,s),error:t.error&&pb(t.error,s),complete:t.complete&&pb(t.complete,s)}):a=t}return o.destination=new Ape(a),o}return e}(
+ction aB(i){ape(i)}function lpe(i){throw i}var upe={closed:!0,next:U8,error:lpe,complete:U8},hpe=function(){return typeof Symbol=="function"&&Symbol.observable||"@@obse
+var a=new sR({next:function(s){try{e(s)}catch(A){o(A),a.unsubscribe()}},error:o,complete:r});n.subscribe(a)})},i.prototype._subscribe=function(e){var t;return(t=this.so
+l&&e!==void 0?e:Promise}function dpe(i){return i&&il(i.next)&&il(i.error)&&il(i.complete)}function fpe(i){return i&&i instanceof ZK||dpe(i)&&jK(i)}var Ipe=VK(function(i
+hrownError=t;for(var r=n.observers;r.length;)r.shift().error(t)}})},e.prototype.complete=function(){var t=this;im(function(){if(t._throwIfClosed(),!t.isStopped){t.isSto
+tion(t){var n=this,r=n.hasError,o=n.thrownError,a=n.isStopped;r?t.error(o):a&&t.complete()},e.prototype.asObservable=function(){var t=new H8;return t.source=this,t},e.c
+==null||n===void 0?void 0:n.error)===null||r===void 0||r.call(n,t)},e.prototype.complete=function(){var t,n;(n=(t=this.destination)===null||t===void 0?void 0:t.complete
+}" aria-roledescription="${y(this.accInfo.input.ariaRoledescription)}" aria-autocomplete="${y(this.accInfo.input.ariaAutoComplete)}" aria-expanded="${y(this.accInfo.inp
+c();if(!o||!r)return;const a=o.selectionEnd-o.selectionStart;if(this._shouldAutocomplete&&!TT()&&!a&&!this._isKeyNavigation){const s=this._getFirstMatchingItem(r);s&&th
+rformTextSelection=!1}_onkeydown(e){if(this._isKeyNavigation=!0,this._shouldAutocomplete=!this.noTypeahead&&!(Zw(e)||WI(e)||Qg(e)),Oo(e))return this._handleUp(e);if(zr(
+deleteContentBackward","deleteContentForward","historyUndo"];if(this._shouldAutocomplete=!o.includes(r)&&!this.noTypeahead,this.suggestionSelectionCanceled=!1,e instanc
+";this._innerValue=t,this.value=t,this._performTextSelection=!0,this._shouldAutocomplete=!1}_handleResize(){this._inputWidth=this.offsetWidth}_updateAssociatedLabelsTex
+.size;else{const h=this.getImage(1);if(h instanceof HTMLCanvasElement||h.src&&h.complete)l=h.width,u=h.height;else{this.initialOptions_=e;const c=()=>{if(this.unlistenI
+ole="combobox" aria-haspopup="listbox" aria-expanded="${y(this.open)}" aria-autocomplete="both" aria-describedby="${y(this.ariaDescribedByText)}" aria-required="${y(thi
+ole="combobox" aria-haspopup="listbox" aria-expanded="${y(this.open)}" aria-autocomplete="both" aria-describedby="${y(this.ariaDescribedByText)}" aria-required="${y(thi
+tLiveChange}" @change=${this._inputChange} @keydown=${this._onkeydown} aria-autocomplete="both" /></div><${O("ui5-toggle-button",e,t)} slot="header" class="ui5-multi-co
+grep: write error: Broken pipe
+== ./assets/index.8130a0e1.js 776688
+.zip
+station.zip
+936673 st.json
+[{"station_id":"11508","station_no":"18113","station_name":"Ahane Br","site_no":"0","site_name":"---","station_latitude":"52.09607583","station_longitude":"-9.132805278","station_carteasting":"122416.0","station_cartnorthing":"94344.0","object_type":"Surface water (level only);Surface water;General","station_local_x":"","station_local_y":"","catchment_name":"BLACKWATER [MUNSTER]","FFWS":"Yes","station_status":"","station_gauge_datum_unit":"Malin Head OSGM15","station_gauge_datum_postfix":"","station_gauge_datum_from":"1114992000000","station_diary_status":"","region_district":"---","RBD":"SOUTH WESTERN RBD","SW_RBD":"SOUTH WESTERN RBD","CATCHMENT":"BLACKWATER [MUNSTER]","BODY_RESPONSIBLE":"","station_gauge_datum":"108.98","station_elevation":"","CATCHMENT_SIZE":"76.82 km²","WTO_OBJECT":"OWENTARAGLIN","GAUGE_DATUM":"108.98","GWREF_DATUM":"","DIST_TO_CONFL":"","ObjectDescription":"","Stn_Class":"Level & Historic Flow","Stn_Des":"Discontinued as a flow measurement station October 2023. Backwatered at high levels from the River Blackwater, therefore cease taking flow measurements at this station as it is not possible to develop an accurate stage-discharge relationship for high flows. 46 historic gaguings available (2004-2020) for indicative purposes. Please contact OPW Hydrometric Section for further information.","stationpicturecomment1":"Station Overview","stationpicturecomment2":"Staff Gauge","stationpicturecomment3":"View Downstream","HYD_DIS_DES":"","FEMI_INDICATIVE_SUITABI<h1 style='color:red'>Error 404:Page not found :-(</h1>
+<p>We have updated the Hydro-Data website recently and some urls have changed. Please try <a href ="/hydro-data/">the new site</a>.</p>
+<p>In case of any difficulties please contact <a href="mailto:hydrometric@opw.ie">hydrometric@opw.ie</a>.</p>
