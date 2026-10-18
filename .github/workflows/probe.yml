@@ -1,0 +1,21 @@
+name: probe-archive
+on:
+  push:
+    branches: [probe-archive]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe
+        run: |
+          B=https://waterlevel.ie/hydro-data
+          S=$B/data/internet/stations/0/25017/S
+          for f in "" Waterlevel_complete.zip complete.json year.json week.json month.json Waterlevel_complete_daily.zip complete.zip; do
+            echo "== $f"; curl -sS -o /tmp/x -w "%{http_code} %{size_download} %{content_type}\n" "$S/$f"; head -c 600 /tmp/x | tr -c '[:print:]\n' '.'; echo
+          done
+          curl -sS $B/ -o idx.html; grep -o 'src="[^"]*"\|href="[^"]*"' idx.html
+          for js in $(grep -o 'src="[^"]*\.js"' idx.html | cut -d'"' -f2); do
+            curl -sS "$B/$js" -o b.js; echo "== $js $(wc -c <b.js)"; grep -o '.\{80\}complete.\{80\}' b.js | head -20; grep -o '[A-Za-z_]*\.zip' b.js | sort -u
+          done
+          curl -sS $B/data/internet/stations/stations.json -o st.json; wc -c st.json; head -c 1500 st.json
+          find . -maxdepth 1 -name 'conf*'; curl -sS $B/conf/config.json | head -c 3000
