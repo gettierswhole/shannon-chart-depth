@@ -22,4 +22,7 @@ jobs:
         if: always()
         run: |
           git config user.name probe; git config user.email probe@users.noreply.github.com
-          cp /tmp/x lastfile.bin 2>/dev/null; git add -f probe.txt st.json; git commit -m "probe output [skip ci]"; git push
+          git add -f probe.txt || true
+          git commit -m "probe output [skip ci]" || true
+          git pull --rebase -q || true
+          git push
