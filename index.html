@@ -556,7 +556,7 @@ a { color: var(--water); }
         { name: "Killaloe cill (upper?)", poolbeg: 30.52 }
       ],
       feet: 8,
-      unc: 0.10, uncWhy: "±10 cm until you check it. The published datum and Waterways Ireland's summer level at Portumna agree to 3 cm, but the CSIG name different cills in different places and nobody has checked either against the water. The gauge is also at Portumna, not where you are.",
+      unc: 0.10, uncWhy: "±10 cm until you check it, and possibly more. This datum sits within 3 cm of Waterways Ireland's summer level at Portumna, but on Lough Ree the CSIG turned out to chart to a level well below the summer level, so that match proves little here. The CSIG also name different cills in different places, nobody has checked either against the water, and the gauge is at Portumna, not where you are.",
       lake: true, alts: [{ label: "8 ft over the other Killaloe cill", cill: 1, feet: 8 }],
       weather: ["derg"],
       sunAt: [52.95, -8.29],
@@ -570,7 +570,7 @@ a { color: var(--water); }
         ["Pier Head, Killaloe level", "06-Pier-Head-Killaloe.pdf"],
         ["Portumna Bridge level", "05-Portumna-Bridge.pdf"]
       ],
-      datumHelp: "The CSIG reduce their depths to ordinary summer level. For Lough Derg their lead mapper put it at 8 ft on the gauge at the entrance to the old canal in Killaloe. His 2018 forum post says 8 ft over the lower cill; the CSIG's own 2020 article names the sill at the upper gate. The lock table lists the 'lower' cill higher than the 'upper' one, which is odd. Its 30.97 m Poolbeg figure gives 30.70 m Malin, within 3 cm of Waterways Ireland's summer level at Portumna (30.67 m); the other gives 30.25 m. Your own lead-line checks settle it, and replace this figure once you have them.",
+      datumHelp: "For Lough Derg the CSIG's lead mapper put chart datum at 8 ft on the gauge at the entrance to the old canal in Killaloe. His 2018 forum post says 8 ft over the lower cill; the CSIG's own 2020 article names the sill at the upper gate. The lock table lists the 'lower' cill higher than the 'upper' one, which is odd. Its 30.97 m Poolbeg figure gives 30.70 m Malin, within 3 cm of Waterways Ireland's summer level at Portumna (30.67 m); the other gives 30.25 m. Don't read the summer-level match as proof: on Lough Ree the CSIG chart to a level 1.5 ft under the summer level, close to the historical low, and if Lough Derg is charted the same way the true datum is lower and you have more water than shown. Your own lead-line checks settle it, and replace this figure once you have them.",
       manualHelp: "Copy the OD level from the <a href=\"https://waterlevel.ie/0000025341/\" target=\"_blank\" rel=\"noopener\">Portumna Bridge page on waterlevel.ie</a>. A staff gauge reading under 5 m has the gauge zero of 29.169 m added for you.",
       feetHelp: "At Killaloe, read the gauge at the canal entrance. It is marked in feet over the cill, so 8 ft is chart datum.",
       caveats: [
@@ -610,13 +610,13 @@ a { color: var(--water); }
     },
     {
       id: "ree", name: "Lough Ree", span: "Athlone – Tarmonbarry",
-      gauge: { doc: "hodsons", station: "26088", name: "Hodson's Bay", zero: 32.549 },
+      gauge: { doc: "athloneus", station: "26333", name: "Athlone (above the weir)", zero: 32.137 },
       cills: [
         { name: "Athlone upper cill", poolbeg: 35.35 }
       ],
-      feet: 7,
-      unc: 0.10, uncWhy: "±10 cm until you check it, plus one bigger doubt. The CSIG's lead mapper gave 7 ft over the Athlone cill in 2018 and 5 ft in 2019. This uses 7 ft, which is Waterways Ireland's summer level and shows less water. If 5 ft is right there's about 60 cm more. A lead-line check tells them apart.",
-      lake: true, alts: [{ label: "5 ft over the Athlone cill (the 2019 figure)", cill: 0, feet: 5, hero: true }],
+      feet: 5.5,
+      unc: 0.10, uncWhy: "±10 cm until you check it. The datum, 5.5 ft over the Athlone lock cill, comes from the IWAI Athlone branch and fits the lake's record since 2003; the cill height comes from the lock table, and nobody has checked the result against the water. The gauge is at Athlone, which reads a few centimetres below the open lake.",
+      lake: true, alts: [{ label: "7 ft over the Athlone cill (Waterways Ireland's summer level, the old figure)", cill: 0, feet: 7 }, { label: "5 ft over the Athlone cill (the CSIG's 2019 forum figure)", cill: 0, feet: 5 }],
       weather: ["ree"],
       sunAt: [53.55, -7.98],
       bridge: false,
@@ -662,11 +662,12 @@ a { color: var(--water); }
         ["Thatch, Lough Ree level", "03-Thatch-Lough-Ree.pdf"],
         ["Bellantra Sluices, Lough Allen level", "02-Bellantra-Sluices-Lough-Allen.pdf"]
       ],
-      datumHelp: "CSIG depths are reduced to ordinary summer level. Waterways Ireland give Lough Ree's as 37.49 m Poolbeg (34.78 m Malin), which is 7 ft over the Athlone upper cill, the figure the CSIG's lead mapper gave in 2018. His 2019 post said 5 ft, which instead matches the ESB's minimum navigation level of 36.88 m Poolbeg; set 5 ft here if you prefer that.",
-      manualHelp: "Copy the OD level from the <a href=\"https://waterlevel.ie/0000026088/\" target=\"_blank\" rel=\"noopener\">Hodson's Bay page on waterlevel.ie</a>. A staff gauge reading under 5 m has the gauge zero of 32.549 m added for you.",
-      feetHelp: "A daily reading over the cill is available for Athlone Lock; 7 ft is chart datum.",
+      datumHelp: "The IWAI Athlone branch give the CSIG datum for Lough Ree as 5.5 ft over the cill of Athlone lock: 37.03 m Poolbeg, 34.32 m Malin. It was chosen close to the lake's historical low so that charted depths are almost always there. Since 2003 the lake has gone below it in only four years, and the lowest reading on record was 4 ft 11 in, on 2 November 2018. It sits 1.5 ft under Waterways Ireland's ordinary summer level (7 ft, 37.49 m Poolbeg), which this page used before, and just above the ESB's minimum navigation level (about 5 ft, 36.88 m Poolbeg). The CSIG's lead mapper gave 7 ft in a 2018 forum post and 5 ft in 2019.",
+      manualHelp: "Copy the OD level from the <a href=\"https://waterlevel.ie/0000026333/\" target=\"_blank\" rel=\"noopener\">Athlone Weir U/S page on waterlevel.ie</a> (the gauge on the quay by Athlone Castle). A staff gauge reading under 5 m has the gauge zero of 32.137 m added for you.",
+      feetHelp: "A daily reading over the cill is available for Athlone Lock; 5.5 ft is chart datum.",
       caveats: [
-        "ESB draw Lough Ree down in autumn to make room for winter rain, so expect it below datum from late summer.",
+        "The gauge is on the quay by Athlone Castle, just above the lock. The channel narrows there, so out on the lake the water usually sits a few centimetres higher than shown, about 9 cm higher at Hodson's Bay in mid-October.",
+        "ESB draw Lough Ree down in autumn to make room for winter rain, but the datum is close to the historical low, so the lake rarely goes below it.",
         "A strong wind along the lake piles water up at the downwind end."
       ]
     },
@@ -710,7 +711,8 @@ a { color: var(--water); }
   var BAKED = {
     portumna: { level: 30.627, time: "2026-10-12T22:00:00Z" },
     banagher: { level: 32.376, time: "2026-10-12T22:15:00Z" },
-    hodsons: { level: 34.689, time: "2026-10-12T22:15:00Z" },
+    hodsons: { level: 34.777, time: "2026-10-17T22:45:00Z" },
+    athloneus: { level: 34.691, time: "2026-10-17T22:45:00Z" },
     carrick: { level: 40.316, time: "2026-10-13T17:15:00Z" }
   };
 
