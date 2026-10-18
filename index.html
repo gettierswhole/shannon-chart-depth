@@ -63,16 +63,14 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--b
 .masthead { max-width: 960px; margin: 0 auto; padding-block: 28px 16px; }
 h1 { font-family: var(--display); font-weight: 400; font-size: 2rem; line-height: 1.1; margin: 0; text-wrap: balance; color: var(--ink); }
 .sub { color: var(--muted); font-size: 0.95rem; margin: 6px 0 0; }
-/* The backdrop: a photo from the helm, behind the top of the page. It fades into the page colour, so the cards stay on plain ground. */
+/* The backdrop: the harbour photo as it was taken, full width at its own proportions, behind the top of the page. */
 body { position: relative; isolation: isolate; }
-.backdrop { position: absolute; z-index: -1; top: 0; left: 0; right: 0; height: 75vh; min-height: 420px; overflow: hidden; pointer-events: none; }
-.backdrop img { width: 100%; height: 100%; object-fit: cover; object-position: 46% 32%; display: block; }
-.backdrop::after { content: ""; position: absolute; inset: 0;
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 30%, transparent) 0%, color-mix(in srgb, var(--bg) 8%, transparent) 30%, transparent 50%, color-mix(in srgb, var(--bg) 55%, transparent) 78%, var(--bg) 100%); }
-.masthead h1, .masthead .sub { text-shadow: 0 1px 12px color-mix(in srgb, var(--bg) 85%, transparent); }
-.masthead .sub { color: var(--ink); }
-.masthead { padding-block: 10vh 16px; min-height: 60vh; }
-@media (max-width: 560px) { .masthead { padding-block: 8vh 12px; min-height: 46vh; } .backdrop { height: 62vh; } }
+.backdrop { position: absolute; z-index: -1; top: 0; left: 0; right: 0; pointer-events: none; }
+.backdrop img { display: block; width: 100%; height: auto; }
+/* The title sits in the sky, so it keeps sky-friendly dark ink in either theme; the cards start below the bridge. */
+.masthead { padding-block: 7vw 16px; min-height: 41vw; box-sizing: border-box; }
+.masthead h1, .masthead .sub { color: #12212c; }
+@media (max-width: 560px) { .masthead { padding-block: 6vw 10px; min-height: 42vw; } .masthead .sub { font-size: 0.85rem; } }
 
 /* A plain rule between the depth zone and the trip zone */
 .strake { border: 0; border-top: 1px solid var(--line); height: 0; margin: 8px 0; }
