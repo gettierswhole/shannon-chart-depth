@@ -285,6 +285,14 @@ a { color: var(--water); }
           </div>
           <span class="pill ok" id="bridge-next"></span>
         </div>
+        <div class="today-row" id="airdraft-box" hidden>
+          <div>
+            <p class="label">Athlone M6 bridge: air draft</p>
+            <p class="today-main" id="airdraft-main"></p>
+            <p class="fine" id="airdraft-note"></p>
+          </div>
+          <span class="pill" id="airdraft-age"></span>
+        </div>
         <div>
           <p class="label">Phone</p>
           <ul class="contacts" id="contacts"></ul>
@@ -523,7 +531,7 @@ a { color: var(--water); }
       <li><strong>Waterways Ireland</strong>: marine notices, lock opening hours, ordinary summer levels, lock cill heights and the daily navigation levels report. The marine notices shown are short summaries written by an AI assistant, with a link to each official notice on <a href="https://www.waterwaysireland.org/" target="_blank" rel="noopener">waterwaysireland.org</a>, which is the authority.</li>
       <li><strong>ESB</strong>: links to its Shannon flow and level reports on <a href="http://www.esbhydro.ie/" target="_blank" rel="noopener">esbhydro.ie</a>.</li>
       <li><strong>CSIG</strong>: the chart datum figures behind the depth correction come from the CSIG's published articles and forum posts. The depth correction is meant for use with CSIG charts. No CSIG chart data is shown or shared on this page.</li>
-      <li><strong>IWAI Athlone branch</strong>: the Lough Ree chart datum and the lake's record low used to set it.</li>
+      <li><strong>IWAI Athlone branch</strong>: the Lough Ree chart datum and the lake's record low used to set it, and the method and bridge height behind the Athlone M6 bridge air draft.</li>
       <li><strong>shannon-river.com</strong>: the distance chart behind the cruising-time estimates.</li>
       <li><strong>Lough Ree Yacht Club</strong> and venue newsletters: events on the water.</li>
       <li><strong>The venues themselves</strong>: menus, opening hours and phone numbers, from their own websites. The star ratings are an experimental estimate written by the AI assistant from public review scores and awards. They don't come from the venues, and no venue has seen or approved them.</li>
@@ -929,6 +937,26 @@ a { color: var(--water); }
   function fmtTime(iso) {
     return new Date(iso).toLocaleString("en-IE", { weekday: "short", hour: "2-digit", minute: "2-digit", day: "numeric", month: "short", timeZone: "Europe/Dublin" });
   }
+  // Athlone M6 motorway bridge, the lowest bridge in Athlone: clear height from the water to the underside.
+  // Underside 39.583 m OD Malin, worked back from the IWAI Athlone branch's published figure
+  // (4.88 m air draft at 34.703 m on the OPW gauge above Athlone lock, 26333, 18 Oct 2026 17:30).
+  var M6_SOFFIT = 39.583;
+  function renderAirDraft() {
+    var box = $("airdraft-box"), f = state.feeds.athloneus;
+    if (!f || typeof f.level !== "number") { box.hidden = true; return; }
+    var age = Date.now() - new Date(f.time).getTime();
+    if (!(age < 48 * 3600e3)) { box.hidden = true; return; }
+    var ad = M6_SOFFIT - f.level;
+    box.hidden = false;
+    $("airdraft-main").textContent = ad.toFixed(2) + " m (" + ftIn(ad) + ")";
+    $("airdraft-note").innerHTML = "Water surface to the underside of the bridge, from the OPW gauge above Athlone lock (" +
+      f.level.toFixed(3) + " m OD, " + fmtTime(f.time) + "). It's the lowest bridge in Athlone, so clearing it should clear the others. " +
+      "Method and bridge height from the <a href=\"https://www.athlonebranchiwai.com/bridge-air-draft\" target=\"_blank\" rel=\"noopener\">IWAI Athlone branch</a>. " +
+      "Not to be relied on alone: check the air-draft boards at the bridge and leave a margin.";
+    var pill = $("airdraft-age");
+    pill.className = "pill " + (age > 6 * 3600e3 ? "warn" : "ok");
+    pill.textContent = age > 6 * 3600e3 ? "Reading " + Math.round(age / 3600e3) + " h old" : "Live";
+  }
   function ftIn(m) {
     var totalIn = Math.round(Math.abs(m) * FT * 12);
     return (m < 0 ? "−" : "") + Math.floor(totalIn / 12) + " ft " + (totalIn % 12) + " in";
@@ -1260,6 +1288,7 @@ a { color: var(--water); }
       }
     }
 
+    renderAirDraft();
     renderFood(r, t);
     var ul = $("contacts"); ul.textContent = "";
     r.contacts.forEach(function (c) {
