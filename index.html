@@ -222,6 +222,13 @@ button:disabled { background: var(--sunk); border-color: var(--line); color: var
 a { color: var(--water); }
 .workings { font-family: var(--mono); font-size: 0.82rem; background: var(--sunk); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; overflow-x: auto; white-space: pre; }
 .fine { font-size: 0.85rem; color: var(--muted); margin: 0; }
+.credits { margin-top: 24px; }
+.credits h2 { margin: 0 0 6px; }
+.credits .label { margin-top: 16px; }
+.credit-list { margin: 6px 0 0; padding-left: 1.1em; font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+.credit-list li { margin: 0 0 6px; }
+.credit-list strong { color: var(--ink, inherit); font-weight: 600; }
+.credits > .fine:last-child { margin-top: 14px; }
 .caveats { font-size: 0.88rem; color: var(--muted); display: grid; gap: 6px; margin: 0; padding-left: 18px; }
 .experiment { margin: -4px 0 4px; text-align: center; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--bad); }
 .vinny { display: grid; justify-items: center; gap: 10px; margin-top: 8px; }
@@ -503,6 +510,35 @@ a { color: var(--water); }
     </button>
     <canvas id="vinny-cv" width="160" height="90" hidden aria-label="16-bit animation: a cruiser makes a getaway at full speed"></canvas>
   </section>
+
+  <footer class="panel credits" id="credits" aria-labelledby="credits-title">
+    <h2 id="credits-title">Credits and sources</h2>
+    <p class="fine">Who provides what on this page. None of the organisations listed runs, checks or endorses this page, and none is affiliated with it.</p>
+
+    <p class="label">Data</p>
+    <ul class="credit-list">
+      <li><strong>Office of Public Works (OPW)</strong>: water levels from the gauges at Portumna, Banagher, Shannonbridge, Athlone, Hodson's Bay and Carrick-on-Shannon, from <a href="https://waterlevel.ie/" target="_blank" rel="noopener">waterlevel.ie</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Readings are provisional, as the OPW publish them. This page compares them with reference levels and works out depth corrections from them; those workings are ours, not the OPW's.</li>
+      <li><strong>Met Éireann</strong>: the inland lakes forecast and the HARMONIE model point forecast. Copyright Met Éireann. Source <a href="https://www.met.ie/" target="_blank" rel="noopener">www.met.ie</a>. This data is published under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Met Éireann does not accept any liability whatsoever for any error or omission in the data, their availability, or for any loss or damage arising from their use. This page has modified the data: it shortens the written forecast, picks out the lakes on this stretch, and converts and summarises the model's wind and rain.</li>
+      <li><strong>Waterways Ireland</strong>: marine notices, lock opening hours, ordinary summer levels, lock cill heights and the daily navigation levels report. The marine notices shown are short summaries written by an AI assistant, with a link to each official notice on <a href="https://www.waterwaysireland.org/" target="_blank" rel="noopener">waterwaysireland.org</a>, which is the authority.</li>
+      <li><strong>ESB</strong>: links to its Shannon flow and level reports on <a href="http://www.esbhydro.ie/" target="_blank" rel="noopener">esbhydro.ie</a>.</li>
+      <li><strong>CSIG</strong>: the chart datum figures behind the depth correction come from the CSIG's published articles and forum posts. The depth correction is meant for use with CSIG charts. No CSIG chart data is shown or shared on this page.</li>
+      <li><strong>IWAI Athlone branch</strong>: the Lough Ree chart datum and the lake's record low used to set it.</li>
+      <li><strong>shannon-river.com</strong>: the distance chart behind the cruising-time estimates.</li>
+      <li><strong>Lough Ree Yacht Club</strong> and venue newsletters: events on the water.</li>
+      <li><strong>The venues themselves</strong>: menus, opening hours and phone numbers, from their own websites. The star ratings are an experimental estimate written by the AI assistant from public review scores and awards. They don't come from the venues, and no venue has seen or approved them.</li>
+      <li>Sunrise and sunset times are worked out by the page itself.</li>
+    </ul>
+
+    <p class="label">Built and run by</p>
+    <ul class="credit-list">
+      <li><strong>Lee Hughes</strong>: the page's owner. He pays for it and is responsible for it. Contact: <a href="mailto:info@leehughes.ie">info@leehughes.ie</a>.</li>
+      <li><strong>Claude</strong>, an AI assistant made by Anthropic: wrote the page and its update scripts, runs the scheduled updates, and writes the notice summaries, venue notes and ratings. Its work is not checked by a person every time, so it can contain mistakes.</li>
+      <li><strong>GitHub</strong>: hosts the public copy and runs the half-hourly data updates.</li>
+      <li><strong>Google Fonts</strong>: the typefaces Source Serif 4 and IBM Plex, both under the SIL Open Font License.</li>
+    </ul>
+
+    <p class="fine">The page sets no cookies and does no tracking. Readings and checks you enter stay on your own device. GitHub and Google receive your IP address when they serve the page and its fonts, as any website host does. If you spot a mistake, or you're one of the sources above and want something changed or removed, email <a href="mailto:info@leehughes.ie">info@leehughes.ie</a>.</p>
+  </footer>
 </div>
 
 <script>
