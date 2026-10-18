@@ -1,0 +1,43 @@
+name: Archive gauges
+# The site's own record of the Shannon gauges (archive/). Every day: log the latest 15-minute readings.
+# On Sundays, or when run by hand: also rebuild the daily-mean history from OPW's full published record.
+on:
+  schedule:
+    - cron: "23 4 * * *"
+  workflow_dispatch:
+    inputs:
+      daily:
+        description: "Rebuild the daily history too"
+        type: boolean
+        default: true
+  push:
+    branches: [main, probe-archive]
+    paths: [".github/workflows/archive.yml", "tools/archive_gauges.py"]
+permissions:
+  contents: write
+concurrency:
+  group: archive
+  cancel-in-progress: false
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log the latest readings
+        run: python3 tools/archive_gauges.py log archive
+      - name: Rebuild the daily history
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$(date -u +%u)" != "7" ]; then echo "Not Sunday"; exit 0; fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.daily }}" != "true" ]; then exit 0; fi
+          python3 tools/archive_gauges.py daily archive
+      - name: Commit if changed
+        run: |
+          git add archive
+          if git diff --cached --quiet; then echo "Nothing new"; exit 0; fi
+          git config user.name "gauge-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Archive gauge readings"
+          B="${GITHUB_REF_NAME}"
+          for i in 1 2 3; do git pull --rebase -q origin "$B" && git push -q origin "HEAD:$B" && exit 0; sleep 5; done
+          exit 1
