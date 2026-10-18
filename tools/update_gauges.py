@@ -9,6 +9,8 @@ GAUGES = {  # doc id: (station_ref, gauge zero m OD Malin)
     "portumna": ("0000025341", 29.169),
     "banagher": ("0000025017", 30.330),
     "hodsons": ("0000026088", 32.549),
+    # Lough Ree is read at Athlone, above the weir (the quay by Athlone Castle): the CSIG datum is 5.5 ft over the Athlone lock cill.
+    "athloneus": ("0000026333", 32.137),
     "carrick": ("0000026324", 38.888),
     # Extra gauges on the Meelick-Athlone pool, so it can be read at both ends, not just at Banagher.
     "athlone": ("0000026027", 30.471),        # Athlone, below the weir
