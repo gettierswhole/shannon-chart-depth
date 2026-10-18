@@ -48,8 +48,8 @@ shim = r'''<script>
 '''
 # The public copy goes by its own name. The source page's name stays in a comment, which the sync task checks for.
 import re
-h = h.replace('<title>Shannon Chart Depth</title>', '<title>Dicky Mountbatten&#8217;s All Knowing Shannon Almanac</title>\n<!-- Public copy of the Shannon Chart Depth page -->', 1)
-h = h.replace('<h1>Shannon Chart Depth</h1>', '<h1>Dicky Mountbatten&#8217;s All Knowing Shannon Almanac</h1>', 1)
+h = h.replace('<title>Shannon Chart Depth</title>', '<title>de Selby&#8217;s All Knowing Shannon Almanac</title>\n<!-- Public copy of the Shannon Chart Depth page -->', 1)
+h = h.replace('<h1>Shannon Chart Depth</h1>', '<h1>de Selby&#8217;s All Knowing Shannon Almanac</h1>', 1)
 h = re.sub(r'<p class="sub">.*?</p>', '<p class="sub">Marine notices, forecasting, water levels and lock times for the Shannon, Killaloe to Lough Key. Depth correction at the foot of the page.</p>', h, count=1, flags=re.S)
 i = h.index('<script>')
 h = h[:i] + shim + h[i:]
