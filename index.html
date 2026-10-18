@@ -393,6 +393,22 @@ a { color: var(--water); }
         <p class="fine" id="chk-intro"></p>
         <div id="chk-form">
           <div class="fields">
+            <label class="f" for="chk-kind">What did you read?
+              <select id="chk-kind"><option value="lead">Lead line at a charted spot</option><option value="board">A gauge board, in feet</option></select>
+            </label>
+          </div>
+          <div class="fields" id="chk-board-fields" hidden>
+            <label class="f" for="chk-board">Gauge
+              <select id="chk-board"></select>
+            </label>
+            <label class="f" for="chk-ft">Feet
+              <input id="chk-ft" type="number" inputmode="numeric" step="1" min="0" max="20">
+            </label>
+            <label class="f" for="chk-in">Inches
+              <input id="chk-in" type="number" inputmode="decimal" step="any" min="0" max="11.99">
+            </label>
+          </div>
+          <div class="fields" id="chk-lead-fields">
             <label class="f" for="chk-spot">Charted spot depth <small>metres, from the CSIG chart</small>
               <input id="chk-spot" type="number" inputmode="decimal" step="0.1" min="0">
             </label>
@@ -407,7 +423,7 @@ a { color: var(--water); }
             <label class="f" for="chk-where">Where <small>optional, e.g. off Dromineer</small>
               <input id="chk-where" type="text" maxlength="60" autocomplete="off">
             </label>
-            <label class="f" for="chk-when">When <small>leave blank for now</small>
+            <label class="f" for="chk-when">When <small>leave blank for now; up to 30 days back</small>
               <input id="chk-when" type="datetime-local">
             </label>
           </div>
@@ -604,6 +620,9 @@ a { color: var(--water); }
       ],
       feet: 8,
       unc: 0.10, uncWhy: "±10 cm until you check it, plus one bigger doubt. This uses 8 ft over the lake-side (upper) Killaloe cill, as the CSIG's 2020 article says. A 2018 forum post said 8 ft over the lower cill, which would give about 45 cm less water. A reading of the Killaloe canal-entrance gauge or a lead-line check settles it: with Portumna at 30.64 m, about 9 ft 4 in on that gauge confirms this datum, about 7 ft 10 in the other. The gauge is also at Portumna, not where you are.",
+      // Gauge boards marked in feet, and the reading that is chart datum on each. A reading with its time gives the datum
+      // directly against the gauge used here, whichever cill the board is set to.
+      boards: [{ id: "killaloe", name: "Killaloe canal-entrance gauge", datumFt: 8 }],
       lake: true, alts: [{ label: "8 ft over the canal-side (lower) Killaloe cill, the 2018 figure", cill: 1, feet: 8, hero: true, heroLess: "the 2018 figure (8 ft over the other Killaloe cill)" }],
       weather: ["derg"],
       sunAt: [52.95, -8.29],
@@ -667,6 +686,7 @@ a { color: var(--water); }
       ],
       feet: 5.5,
       unc: 0.10, uncWhy: "±10 cm until you check it. The datum, 5.5 ft over the Athlone lock cill, comes from the IWAI Athlone branch and fits the lake's record since 2003; the cill height is the one their figures imply (3 cm below the lock table's), and nobody has checked the result against the water. The gauge is at Athlone, which reads a few centimetres below the open lake.",
+      boards: [{ id: "athlonelock", name: "Athlone lock gauge", datumFt: 5.5 }],
       lake: true, alts: [{ label: "7 ft over the Athlone cill (Waterways Ireland's summer level, the old figure)", cill: 0, feet: 7 }, { label: "5 ft over the Athlone cill (the CSIG's 2019 forum figure)", cill: 0, feet: 5 }],
       weather: ["ree"],
       sunAt: [53.55, -7.98],
@@ -1998,7 +2018,7 @@ a { color: var(--water); }
       var say;
       if (cd) {
         basis.className = "pill ok"; basis.textContent = "Checked by you (" + cd.n + ")";
-        say = "From your " + (cd.n === 1 ? "lead-line check" : cd.n + " lead-line checks") + ", the water is " +
+        say = "From your " + (cd.n === 1 ? "check" : cd.n + " checks") + ", the water is " +
           (cm === 0 ? "at" : cm + " cm " + (off > 0 ? "above" : "below")) + " the level the chart is drawn to. " + act + ", give or take " + u + " cm.";
         if (cd.n === 1) say += " One check can mislead, so take two or three more at different spots.";
       } else {
@@ -2031,7 +2051,7 @@ a { color: var(--water); }
     renderToday();
     renderNotices();
     drawGauge(rd.level, datum);
-    drawSpark(state.histories[r.gauge.doc] || [], datum);
+    drawSpark((state.histories[r.gauge.doc] || []).filter(function (p) { return Date.now() - new Date(p.t).getTime() < 7 * 864e5; }), datum);
     calc();
     renderChecks();
 
@@ -2174,20 +2194,34 @@ a { color: var(--water); }
     $("chk-form").hidden = !lake;
     $("chk-how").hidden = !lake;
     $("chk-intro").textContent = lake ?
-      "Measure the depth at a charted spot. The page notes the " + r.gauge.name + " gauge at that moment and carries your correction forward as the lake rises and falls, so it no longer rests on anyone's published datum." :
+      "Measure the depth at a charted spot, or read a gauge board in feet" + (r.boards && r.boards.length ? " (" + r.boards.map(function (b) { return b.name + ", where " + ftIn(b.datumFt * FOOT) + " is chart datum"; }).join("; ") + ")" : "") + ". The page notes the " + r.gauge.name + " gauge at that moment and carries your correction forward as the lake rises and falls, so it no longer rests on anyone's published datum. You can enter a reading up to 30 days later, with the time you took it." :
       "Chart depths on river stretches are averaged, not drawn to one level, so a check here would only hold at the spot you took it. On the river, trust the lead line in front of you.";
     var list = $("chk-list"); list.textContent = "";
     var sum = $("chk-sum"), msg = $("chk-msg");
+    var bsel = $("chk-board"), boards = r.boards || [], bkey = r.id + ":" + boards.map(function (b) { return b.id; }).join(",");
+    if (bsel.dataset.key !== bkey) {
+      bsel.textContent = "";
+      boards.forEach(function (b) { var o = document.createElement("option"); o.value = b.id; o.textContent = b.name; bsel.appendChild(o); });
+      bsel.dataset.key = bkey;
+    }
+    $("chk-kind").querySelector('option[value="board"]').disabled = !boards.length;
+    if (!boards.length) $("chk-kind").value = "lead";
+    var isBoard = $("chk-kind").value === "board";
+    $("chk-board-fields").hidden = !isBoard; $("chk-lead-fields").hidden = isBoard;
     if (!lake) { sum.textContent = ""; msg.textContent = ""; return; }
     var mine = checksFor(r).slice().reverse();
     mine.forEach(function (c) {
       var li = document.createElement("li"), left = document.createElement("div"), right = document.createElement("div");
       var top = document.createElement("b"); top.className = "mono"; top.textContent = cmText(c.lead - c.spot);
       left.appendChild(top);
-      left.appendChild(document.createTextNode(" line against chart"));
+      left.appendChild(document.createTextNode(c.kind === "board" ? " gauge board against datum" : " line against chart"));
       var when = document.createElement("div"); when.className = "when";
-      var line = c.unit === "ft" ? c.raw + " ft (" + c.lead.toFixed(2) + " m)" : c.lead.toFixed(2) + " m";
-      when.textContent = fmtTime(c.time) + (c.where ? " · " + c.where : "") + " · line " + line + ", chart " + c.spot.toFixed(1) + " m";
+      if (c.kind === "board") {
+        when.textContent = fmtTime(c.time) + (c.where ? " · " + c.where : "") + " · " + (c.boardName || "gauge board") + " read " + ftIn(c.feet * FOOT) + ", datum " + ftIn(c.datumFt * FOOT);
+      } else {
+        var line = c.unit === "ft" ? c.raw + " ft (" + c.lead.toFixed(2) + " m)" : c.lead.toFixed(2) + " m";
+        when.textContent = fmtTime(c.time) + (c.where ? " · " + c.where : "") + " · line " + line + ", chart " + c.spot.toFixed(1) + " m";
+      }
       left.appendChild(when);
       var imp = document.createElement("span"); imp.className = "imp";
       var d = checkDatum(c);
@@ -2231,19 +2265,38 @@ a { color: var(--water); }
   }
   $("chk-unit").value = load("shannon.leadunit") === "ft" ? "ft" : "m";
   $("chk-unit").addEventListener("change", function () { save("shannon.leadunit", $("chk-unit").value); });
+  $("chk-kind").addEventListener("change", function () { state.chkMsg = ""; renderChecks(); });
   $("chk-save").addEventListener("click", function () {
     var r = reach();
     if (!r.lake) return;
-    var spot = parseFloat($("chk-spot").value), raw = parseFloat($("chk-lead").value), unit = $("chk-unit").value;
     function say(t) { state.chkMsg = t; renderChecks(); }
+    var when = $("chk-when").value, t = when ? new Date(when) : new Date();
+    if (!isFinite(t.getTime())) return say("That time isn't valid.");
+    if (t.getTime() > Date.now() + 10 * 60e3) return say("That time is in the future.");
+    if (Date.now() - t.getTime() > 30 * 864e5) return say("The gauge history only goes back about a month, so enter readings from the last 30 days. For older ones, send the time and reading to the page's owner.");
+    if ($("chk-kind").value === "board") {
+      var b = (r.boards || []).filter(function (x) { return x.id === $("chk-board").value; })[0];
+      if (!b) return say("Pick the gauge you read.");
+      var fv = parseFloat($("chk-ft").value), iv = parseFloat($("chk-in").value || "0");
+      if (!isFinite(fv) || !isFinite(iv) || fv < 0 || iv < 0 || iv >= 12) return say("Enter the reading in feet and inches.");
+      var feet = fv + iv / 12;
+      if (Math.abs(feet - b.datumFt) > 6) return say("That's more than 6 ft from chart datum on this gauge. Check the reading, and that it's the right gauge.");
+      var bc = { id: "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), reach: r.id, time: t.toISOString(), kind: "board",
+        board: b.id, boardName: b.name, feet: Math.round(feet * 1000) / 1000, datumFt: b.datumFt,
+        // stored so that lead - spot is how far the water stood above chart datum on the board, in metres
+        lead: Math.round((feet - b.datumFt) * FOOT * 1000) / 1000, spot: 0, unit: "ft", raw: feet,
+        where: $("chk-where").value.trim().slice(0, 60), gauge: null };
+      bc.gauge = gaugeAt(r.gauge.doc, t.getTime());
+      state.checks = mergeChecks(state.checks, [bc], state.checksGone);
+      $("chk-ft").value = ""; $("chk-in").value = ""; $("chk-where").value = ""; $("chk-when").value = "";
+      state.chkMsg = bc.gauge ? "Saved." : "Saved. It will count once the page has the " + r.gauge.name + " reading for that time.";
+      storeChecks(); render(); return;
+    }
+    var spot = parseFloat($("chk-spot").value), raw = parseFloat($("chk-lead").value), unit = $("chk-unit").value;
     if (!isFinite(spot) || !isFinite(raw)) return say("Enter both the charted depth and what the line reads.");
     var lead = unit === "ft" ? raw * FOOT : raw;
     if (spot <= 0 || spot > 15 || lead <= 0 || lead > 15) return say("Those depths look out of range. Enter the chart in metres and the line in " + (unit === "ft" ? "feet" : "metres") + ".");
     if (Math.abs(lead - spot) > 1.5) return say("The line and the chart differ by " + Math.abs(lead - spot).toFixed(2) + " m, more than any doubt about the datum explains. Check you're on the charted spot, the line is vertical, you're reading it at the surface, and the unit is right.");
-    var when = $("chk-when").value, t = when ? new Date(when) : new Date();
-    if (!isFinite(t.getTime())) return say("That time isn't valid.");
-    if (t.getTime() > Date.now() + 10 * 60e3) return say("That time is in the future.");
-    if (Date.now() - t.getTime() > 6 * 864e5) return say("The gauge history only goes back a week, so enter checks from the last six days.");
     var c = { id: "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), reach: r.id, time: t.toISOString(),
       lead: Math.round(lead * 1000) / 1000, spot: spot, unit: unit, raw: raw, where: $("chk-where").value.trim().slice(0, 60), gauge: null };
     c.gauge = gaugeAt(r.gauge.doc, t.getTime());
