@@ -1,0 +1,23 @@
+station_no,station,name,waterway,latitude,longitude,gauge_zero_m,gauge_zero_datum,zero_valid_from,first_day,last_day,days_with_data,possible_datum_steps,opw_series
+26074,blackrock_lock,Blackrock Lock,Lough Allen,54.048448,-8.05076799,43.827,Malin Head OSGM15,1994-07-22,1994-07-22,2026-10-17,7860,0,WEB.Day.Mean
+26108,boyle_abbey,Boyle Abbey Bridge,Boyle River (Lough Key),53.97283889,-8.296673056,48.704,Malin Head OSGM15,1990-11-27,1990-11-28,2026-10-17,12674,1,WEB.Day.Mean
+26324,carrick,Carrick-on-Shannon,Upper Shannon,53.94320444,-8.0958,38.888,Malin Head OSGM15,2004-07-29,2004-07-29,2026-10-17,7893,0,WEB.Day.Mean
+26085,jamestown,Jamestown,Upper Shannon,53.92306028,-8.030334444,38.39,Malin Head OSGM15,1976-08-09,2005-06-14,2026-10-17,7366,2,WEB.Day.Mean
+26359,jamestown_weir_us,Jamestown Weir U/S,Upper Shannon,53.928953,-8.030268,38.372,Malin Head OSGM15,2021-07-01,2021-07-05,2026-10-17,1918,0,WEB.Day.Mean
+26401,jamestown_weir_ds,Jamestown Weir D/S,Upper Shannon,53.928884,-8.03074,38.372,Malin Head OSGM15,2021-07-01,2021-07-05,2026-10-17,1919,1,WEB.Day.Mean
+26089,drumsna,Drumsna,Upper Shannon,53.92314444,-8.008172778,37.415,Malin Head OSGM15,1984-10-09,2007-07-05,2026-10-17,6998,0,WEB.Day.Mean
+26093,derry_bay,Derry Bay,Lough Ree,53.55610806,-7.849053333,34.324,Malin Head OSGM15,2001-08-29,2001-10-04,2026-10-17,8712,5,WEB.Day.Mean
+26088,hodsons_bay,Hodson's Bay,Lough Ree,53.46740667,-7.987295,32.549,Malin Head OSGM15,2001-09-11,2002-02-24,2026-10-17,6965,0,WEB.Day.Mean
+26333,athlone_weir_us,Athlone Weir U/S,Lough Ree (Athlone),53.42289111,-7.9417775,32.137,Malin Head OSGM15,2024-11-14,2003-10-20,2026-10-17,8248,1,WEB.Day.Mean
+26027,athlone,Athlone (below the weir),Meelick - Athlone,53.42153389,-7.940756389,30.471,Malin Head OSGM15,1952-10-20,2007-01-01,2026-10-17,7173,1,WEB.Day.Mean
+26353,wops_rail_bridge,W.O.P.S. Rail Bridge,Meelick - Athlone,53.26828507,-8.04051571,30.406,Malin Head OSGM15,2016-02-03,2016-12-02,2026-10-17,3577,0,WEB.Day.Mean
+26028,shannonbridge,Shannonbridge,Meelick - Athlone,53.2798725,-8.049581389,30.406,Malin Head OSGM15,1997-05-22,1983-01-01,2026-10-17,15795,0,WEB.Day.Mean
+26351,derryholmes_us,Derryholmes U/S,Meelick - Athlone,53.24801241,-8.0003645,30.108,Malin Head OSGM15,2016-10-28,2016-11-23,2026-10-17,3580,0,WEB.Day.Mean
+26352,derryholmes_ds,Derryholmes D/S,Meelick - Athlone,53.24395994,-7.99395353,30.108,Malin Head OSGM15,2016-10-28,2016-11-23,2026-10-17,3616,0,WEB.Day.Mean
+25017,banagher,Banagher,Meelick - Athlone,53.19378667,-7.993646667,30.33,Malin Head OSGM15,1989-11-29,1989-01-02,2026-10-17,13679,0,WEB.Day.Mean
+25056,meelick_weir_us,Meelick Weir U/S,Meelick - Athlone,53.17607972,-8.076067778,30.461,Malin Head OSGM15,1985-01-01,2003-12-30,2026-10-17,8175,1,WEB.Day.Mean
+25058,victoria_lock,Victoria Lock,Meelick - Portumna,53.16877194,-8.080450833,30.438,Malin Head OSGM15,2023-10-13,2007-09-20,2026-09-30,6933,0,WEB.Day.Mean
+26356,raherbeg_rail_bridge,Raherbeg Rail Bridge,River Suck,53.273998,-8.086201,30.893,Malin Head OSGM15,2019-07-01,2019-07-05,2026-10-17,2626,0,WEB.Day.Mean
+26354,ballinasloe_town,Ballinasloe Town,River Suck,53.3295,-8.21493,34.377,Malin Head OSGM15,2020-06-07,2020-07-02,2026-10-17,2299,0,WEB.Day.Mean
+26355,ballinasloe_old_channel,Ballinasloe Old Channel,River Suck,53.330403,-8.218688,35.289,Malin Head OSGM15,2024-11-07,2019-06-26,2026-10-17,2664,0,WEB.Day.Mean
+25341,portumna,Portumna Bridge,Lough Derg (Portumna),53.0915,-8.19565599,29.169,Malin Head OSGM15,2023-05-18,2023-05-22,2026-10-17,1239,0,WEB.Day.Mean
