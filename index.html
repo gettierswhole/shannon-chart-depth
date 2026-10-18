@@ -484,7 +484,7 @@ a { color: var(--water); }
       <section class="panel">
         <p class="label">Official reports</p>
         <ul class="caveats" id="esb"></ul>
-        <p class="fine" style="margin-top:8px">Waterways Ireland's report lists each lock's ordinary summer level and the 9:00 reading, published by 9:30 on weekdays (weekend readings appear on Monday). Its levels and the ESB's are in Poolbeg datum: take off 2.71 m to compare them with this page. Ardnacrusha uses about 100 m³/s per turbine, so around 400 means all four are running and Lough Derg is being drawn hard.</p>
+        <p class="fine" style="margin-top:8px">Waterways Ireland's report lists each lock's ordinary summer level and the 9:00 reading, published by 9:30 on weekdays (weekend readings appear on Monday). Its levels and the ESB's are in Poolbeg datum: take off 2.71 m to compare them with this page (at Banagher, take off 2.91 m: Waterways Ireland's Banagher figures run 20 cm above OPW's on the same gauge). Ardnacrusha uses about 100 m³/s per turbine, so around 400 means all four are running and Lough Derg is being drawn hard.</p>
       </section>
 
       <section class="panel">
@@ -586,10 +586,12 @@ a { color: var(--water); }
         { name: "Athlone lower cill", poolbeg: 33.22 }
       ],
       feet: null,
-      osl: { name: "Banagher ordinary summer level", poolbeg: 35.36 },
+      // Waterways Ireland read the OPW Banagher gauge but report it 2.911 m above OPW's Malin figure (46 days, Feb 2025 to Oct 2026,
+      // spread 2.901 to 2.928), not the usual 2.71. So their summer level is converted with their own offset: 32.449 m on OPW's scale.
+      osl: { name: "Banagher ordinary summer level", poolbeg: 35.36, toMalin: -2.911 },
       // The same pool read at both ends as well as Banagher: OPW gauges, all against Malin Head.
       along: [["athlone", "Athlone, below the weir"], ["shannonbridge", "Shannonbridge"], ["banagher", "Banagher"]],
-      unc: 0.15, uncWhy: "There is no chart datum here, so ±15 cm is a rough allowance, not a measured one. The CSIG average their river depths; this compares the river with Waterways Ireland's summer level at Banagher, and OPW and Waterways Ireland readings there have disagreed by about 20 cm.",
+      unc: 0.15, uncWhy: "There is no chart datum here, so ±15 cm is a rough allowance, not a measured one. The CSIG average their river depths; this compares the river at Banagher with Waterways Ireland's summer level there, both on OPW's gauge. Away from Banagher the level differs: the river slopes down from Athlone to Meelick, more so when it is running.",
       river: true,
       weather: ["derg", "ree"],
       sunAt: [53.25, -8.02],
@@ -600,7 +602,7 @@ a { color: var(--water); }
         ["Athlone Weir downstream level", "04-Athlone-Weir-Downstream.pdf"],
         ["Portumna Bridge level", "05-Portumna-Bridge.pdf"]
       ],
-      datumHelp: "The CSIG's lead mapper says river sections between locks have no datum of their own: depths are averaged, and chart values are fine while you stay in the navigation. Until you set a datum here, the page estimates a correction against Waterways Ireland's ordinary summer level at Banagher, 35.36 m Poolbeg (32.65 m Malin), whose target band is 35.31 to 35.41. To use your own figure instead, pick a cill and enter feet over it.",
+      datumHelp: "The CSIG's lead mapper says river sections between locks have no datum of their own: depths are averaged, and chart values are fine while you stay in the navigation. Until you set a datum here, the page estimates a correction against Waterways Ireland's ordinary summer level at Banagher, 35.36 m in their figures, whose target band is 35.31 to 35.41. They read the same OPW gauge but report it 2.911 m above OPW's Malin figure, steadily, rather than the usual 2.71 m, so on OPW's scale the summer level is 32.449 m Malin (not 32.65 m as a plain conversion would give). To use your own figure instead, pick a cill and enter feet over it.",
       manualHelp: "Copy the OD level from the <a href=\"https://waterlevel.ie/0000025017/\" target=\"_blank\" rel=\"noopener\">Banagher page on waterlevel.ie</a>. A staff gauge reading under 5 m has the gauge zero of 30.330 m added for you.",
       feetHelp: "If a lock keeper gives you the depth over the cill, enter it in feet.",
       caveats: [
@@ -706,7 +708,7 @@ a { color: var(--water); }
   ];
   REACHES.forEach(function (r) {
     r.cills.forEach(function (c) { c.malin = Math.round((c.poolbeg + POOLBEG_TO_MALIN) * 1000) / 1000; });
-    if (r.osl) r.osl.malin = Math.round((r.osl.poolbeg + POOLBEG_TO_MALIN) * 1000) / 1000;
+    if (r.osl) r.osl.malin = Math.round((r.osl.poolbeg + (r.osl.toMalin != null ? r.osl.toMalin : POOLBEG_TO_MALIN)) * 1000) / 1000;
   });
 
   // Readings known when this page was published; replaced by the stored feed.
@@ -1814,7 +1816,7 @@ a { color: var(--water); }
     });
     var hi = Math.max.apply(null, rows.map(function (x) { return x.cm; })), lo = Math.min.apply(null, rows.map(function (x) { return x.cm; }));
     $("along-note").textContent = hi - lo >= 15
-      ? "The pool isn't level: there's " + (hi - lo) + " cm between its ends, so the river is running. Expect more water towards Athlone than the Banagher figure suggests. Banagher may also read about 20 cm low against Waterways Ireland; not yet confirmed."
+      ? "The pool isn't level: there's " + (hi - lo) + " cm between its ends, so the river is running. Expect more water towards Athlone than the Banagher figure suggests, and less below Banagher bridge."
       : "The pool is close to level along its length.";
     box.hidden = false;
   }
@@ -1828,8 +1830,8 @@ a { color: var(--water); }
     // Workings
     var w;
     if (isOsl(r)) {
-      w = r.osl.name.replace(" ordinary", "").padEnd(24) + r.osl.poolbeg.toFixed(2) + " m Poolbeg\n" +
-        "Poolbeg → Malin".padEnd(24) + "−2.71 m\n" +
+      w = r.osl.name.replace(" ordinary", "").padEnd(24) + r.osl.poolbeg.toFixed(2) + " m (WI)\n" +
+        (r.osl.toMalin != null ? "WI → OPW Malin".padEnd(24) + "−" + Math.abs(r.osl.toMalin).toFixed(3) + " m\n" : "Poolbeg → Malin".padEnd(24) + "−2.71 m\n") +
         "Datum (estimated)".padEnd(24) + datum.toFixed(3) + " m OD Malin";
     } else {
     w = cill.name.padEnd(22) + cill.poolbeg.toFixed(2) + " m Poolbeg\n" +
