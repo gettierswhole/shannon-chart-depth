@@ -604,7 +604,7 @@ a { color: var(--water); }
       ],
       feet: 8,
       unc: 0.10, uncWhy: "±10 cm until you check it, plus one bigger doubt. This uses 8 ft over the lake-side (upper) Killaloe cill, as the CSIG's 2020 article says. A 2018 forum post said 8 ft over the lower cill, which would give about 45 cm less water. A reading of the Killaloe canal-entrance gauge or a lead-line check settles it: with Portumna at 30.64 m, about 9 ft 4 in on that gauge confirms this datum, about 7 ft 10 in the other. The gauge is also at Portumna, not where you are.",
-      lake: true, alts: [{ label: "8 ft over the canal-side (lower) Killaloe cill, the 2018 figure", cill: 1, feet: 8 }],
+      lake: true, alts: [{ label: "8 ft over the canal-side (lower) Killaloe cill, the 2018 figure", cill: 1, feet: 8, hero: true, heroLess: "the 2018 figure (8 ft over the other Killaloe cill)" }],
       weather: ["derg"],
       sunAt: [52.95, -8.29],
       bridge: true,
@@ -2009,6 +2009,7 @@ a { color: var(--water); }
           if (!a.hero) return;
           var more = Math.round((datum - datumWith(r, a.cill, a.feet)) * 100);
           if (more > 0) say += " If the CSIG's other figure (" + a.feet + " ft) is the right one, there's about " + more + " cm more water than this.";
+          else if (more < 0) say += " If " + (a.heroLess || "the CSIG's other figure") + " is the right one, there's about " + (-more) + " cm less water than this, so don't count on the extra until a gauge reading or lead-line check confirms it.";
         });
         say += " A lead-line check settles it.";
       }
@@ -2212,7 +2213,7 @@ a { color: var(--water); }
     if (!cd) {
       sum.textContent = mine.length ? "Your check will count once the page has the " + r.gauge.name + " reading for that time." :
         "No checks yet on " + r.name + ". Until you take one, the page uses the published datum." +
-        ((r.alts || []).some(function (a) { return a.hero; }) ? " The CSIG have given two figures here, about 60 cm apart, and one good check tells you which is right." : "");
+        ((r.alts || []).some(function (a) { return a.hero; }) ? " The CSIG have given two figures here, about " + Math.round(Math.max.apply(null, (r.alts || []).filter(function (a) { return a.hero; }).map(function (a) { return Math.abs(pubD - datumWith(r, a.cill, a.feet)); })) * 100) + " cm apart, and one good check tells you which is right." : "");
     } else {
       var opts = [{ label: "the published datum, " + r.feet + " ft over the " + r.cills[0].name.replace(/ \(.*\)$/, ""), v: pubD }];
       (r.alts || []).forEach(function (a) { opts.push({ label: a.label, v: datumWith(r, a.cill, a.feet) }); });
