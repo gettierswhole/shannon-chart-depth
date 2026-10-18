@@ -3,15 +3,15 @@
 # Usage: update_gauges.py <data.json>
 #
 # Sources, both OPW, both in m OD Malin:
-# - Hydro-Data (waterlevel.ie/hydro-data): each station's last 7 days of 15-minute readings. Main source;
-#   it also fills any hours missed while a source was down.
+# - Hydro-Data (waterlevel.ie/hydro-data): each station's last 30 days of 15-minute readings. Main source;
+#   it also fills the hourly history back a month, including any hours missed while a source was down.
 # - The older live feed (waterlevel.ie/geojson/latest/): latest reading only. Used if it is newer.
 # A source that fails is skipped; the script only fails if neither gives anything at all.
 import json, sys, urllib.request
 from datetime import datetime, timezone, timedelta
 
 FEED = "https://waterlevel.ie/geojson/latest/"
-HYDRO = "https://waterlevel.ie/hydro-data/data/internet/stations/0/{no}/S/week.json"
+HYDRO = "https://waterlevel.ie/hydro-data/data/internet/stations/0/{no}/S/month.json"
 UA = {"User-Agent": "shannon-chart-depth (github.com/gettierswhole)"}
 GAUGES = {  # doc id: (station_ref, gauge zero m OD Malin)
     "portumna": ("0000025341", 29.169),
@@ -24,7 +24,7 @@ GAUGES = {  # doc id: (station_ref, gauge zero m OD Malin)
     "athlone": ("0000026027", 30.471),        # Athlone, below the weir
     "shannonbridge": ("0000026028", 30.406),
 }
-HISTORY_KEEP = 168          # one point an hour at most: a week
+HISTORY_KEEP = 744          # one point an hour at most: a month, so late readings can still be checked
 HISTORY_STEP = timedelta(minutes=55)
 
 def ts(s): return datetime.fromisoformat(s.replace("Z", "+00:00"))
@@ -57,7 +57,7 @@ def live_feed(log):
     return out
 
 def hydro(doc, ref, log):
-    """The last week of readings from Hydro-Data, oldest first: [(time, level)]."""
+    """The last month of readings from Hydro-Data, oldest first: [(time, level)]."""
     try:
         j = get_json(HYDRO.format(no=int(ref)))
         rows = j[0]["data"]
@@ -88,11 +88,26 @@ def main(path):
         old = data.setdefault("gauge", {}).get(doc) or {}
         ot = ts(old["time"]) if old.get("time") else None
         ol = old.get("level")
+        hist = [h for h in old.get("history", []) if isinstance(h, dict) and "t" in h and "v" in h]
+        # Fill the history back a month from Hydro-Data: one point per clock hour not already held.
+        hours = {ts(h["t"]).replace(minute=0, second=0, microsecond=0) for h in hist}
+        added = 0
+        for t, v in pts:
+            if v <= 20 or (ot is not None and t > ot): continue
+            hr = t.replace(minute=0, second=0, microsecond=0)
+            if hr in hours or t.minute != 0: continue
+            hist.append({"t": iso(t), "v": round(v, 3)}); hours.add(hr); added += 1
+        hist.sort(key=lambda h: h["t"])
         new = [p for p in pts if p[1] > 20 and (ot is None or p[0] > ot)]
         if not new:
-            log.append(f"{doc}: nothing newer than {old.get('time')}"); continue
+            if added:
+                data["gauge"][doc] = {**old, "history": hist[-HISTORY_KEEP:]}
+                changed = True
+                log.append(f"{doc}: history filled with {added} older hourly reading(s)")
+            else:
+                log.append(f"{doc}: nothing newer than {old.get('time')}")
+            continue
         # Sanity checks, step by step from the stored reading: no jump over 1.5 m, nor over 0.30 m within 6 hours.
-        hist = [h for h in old.get("history", []) if isinstance(h, dict) and "t" in h and "v" in h]
         last_t, last_v, kept, rejected = ot, ol, None, 0
         for t, v in new:
             if last_v is not None:
