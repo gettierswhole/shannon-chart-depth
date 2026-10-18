@@ -5,9 +5,14 @@ on:
 jobs:
   probe:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
+      - uses: actions/checkout@v4
       - name: Probe
         run: |
+          exec > probe.txt 2>&1
+          set +e
           B=https://waterlevel.ie/hydro-data
           S=$B/data/internet/stations/0/25017/S
           for f in "" Waterlevel_complete.zip complete.json year.json week.json month.json Waterlevel_complete_daily.zip complete.zip; do
@@ -19,3 +24,8 @@ jobs:
           done
           curl -sS $B/data/internet/stations/stations.json -o st.json; wc -c st.json; head -c 1500 st.json
           find . -maxdepth 1 -name 'conf*'; curl -sS $B/conf/config.json | head -c 3000
+      - name: Save
+        if: always()
+        run: |
+          git config user.name probe; git config user.email probe@users.noreply.github.com
+          cp /tmp/x lastfile.bin 2>/dev/null; git add -f probe.txt st.json; git commit -m "probe output [skip ci]"; git push
