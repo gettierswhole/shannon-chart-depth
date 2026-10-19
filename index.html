@@ -89,6 +89,19 @@ h1 { font-family: var(--display); font-weight: 400; font-size: 2rem; line-height
 /* Published data first, in dashboard-style cards; the depth correction sits apart at the foot of the page */
 .cards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); align-items: start; }
 .panel:has(> #food-box[hidden]) { display: none; }
+.sights-section { display: grid; gap: 14px; border-top: 1px solid var(--line); padding-top: 24px; margin-top: 8px; }
+.sights-head { display: grid; gap: 4px; max-width: 46em; }
+.sights-head h2 { font-family: var(--display); font-weight: 400; font-size: 1.5rem; margin: 0; }
+.sight-area { display: grid; gap: 10px; }
+.sight-area + .sight-area { margin-top: 14px; }
+.sight-area h3 { font-family: var(--body); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; margin: 0; }
+.sight-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); align-items: start; }
+.sight { display: grid; gap: 4px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.sight .sight-name { font-family: var(--display); font-size: 1.15rem; line-height: 1.2; }
+.sight .where { font-size: 0.82rem; color: var(--muted); }
+.sight .links { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.88rem; margin-top: 4px; }
+.sight-text { font-size: 0.92rem; margin: 2px 0 0; }
+.sight-tag { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
 .depth-section { display: grid; gap: 16px; border-top: 1px solid var(--line); padding-top: 24px; margin-top: 8px; }
 .depth-head { display: grid; gap: 6px; max-width: 46em; }
 .depth-head h2 { font-family: var(--display); font-weight: 400; font-size: 1.5rem; margin: 0; }
@@ -345,6 +358,18 @@ a { color: var(--water); }
       </section>
   </div>
 
+  <section class="sights-section" id="sights-section" aria-labelledby="sights-title" hidden>
+    <div class="sights-head">
+      <div class="wx-head">
+        <h2 id="sights-title">Sights</h2>
+        <span class="pill warn">Preview</span>
+      </div>
+      <p class="fine" id="sights-sub"></p>
+    </div>
+    <div id="sights"></div>
+    <p class="fine">Summarised from Brian Goggin's <a href="https://irishwaterwayshistory.com/" target="_blank" rel="noopener">Irish Waterways History</a>; each entry links to its post. Brian died in 2020, so some describe things as they were then. Positions are only given where the post gives them. Check on the ground before going looking.</p>
+  </section>
+
   <section class="depth-section" id="depth-correction" aria-labelledby="depth-title">
     <div class="depth-head">
       <h2 id="depth-title">Depth correction</h2>
@@ -550,6 +575,7 @@ a { color: var(--water); }
       <li><strong>IWAI Athlone branch</strong>: the Lough Ree chart datum and the lake's record low used to set it, and the method and bridge height behind the Athlone M6 bridge air draft.</li>
       <li><strong>shannon-river.com</strong>: the distance chart behind the cruising-time estimates.</li>
       <li><strong>Lough Ree Yacht Club</strong> and venue newsletters: events on the water.</li>
+      <li><strong>Irish Waterways History</strong> (irishwaterwayshistory.com, the late Brian Goggin): the waterways-heritage sights, summarised in our own words with a link to each post.</li>
       <li><strong>The venues themselves</strong>: menus, opening hours and phone numbers, from their own websites. The star ratings are an experimental estimate written by the AI assistant from public review scores and awards. They don't come from the venues, and no venue has seen or approved them.</li>
       <li>Sunrise and sunset times are worked out by the page itself.</li>
     </ul>
@@ -1310,6 +1336,7 @@ a { color: var(--water); }
 
     renderAirDraft();
     renderFood(r, t);
+    renderSights(r);
     var ul = $("contacts"); ul.textContent = "";
     r.contacts.forEach(function (c) {
       var li = document.createElement("li"), n = document.createElement("span"), a = document.createElement("a");
@@ -1751,6 +1778,78 @@ a { color: var(--water); }
   function gmaps(q, id) { return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q) + "&query_place_id=" + id; }
   function link(label, href) {
     var a = document.createElement("a"); a.href = href; a.target = "_blank"; a.rel = "noopener"; a.textContent = label; return a;
+  }
+
+  // Waterways-heritage sights per stretch, summarised from irishwaterwayshistory.com (Brian Goggin). Preview: Lough Derg only.
+  var IWH = "https://irishwaterwayshistory.com/";
+  var CRANES = IWH + "about/irish-waterways-furniture/the-machine-demands-a-sacrifice/";
+  var SIGHTS = {
+    derg: [
+      { area: "Killaloe and below" },
+      { name: "Killaloe quay crane and old dockyard", where: "Killaloe", tag: "Crane",
+        text: "The quay crane has a geared slewing mechanism, unlike the Portumna and Scarriff cranes, and a maker's plate from William Jones of Upper Thames Street, London. The old dockyard keeps two rail cranes and a static crane with no jib.",
+        src: ["Shannon cranes", CRANES] },
+      { name: "Moys Lock, old Killaloe Canal", where: "Just below Killaloe", tag: "Lock remains",
+        text: "The middle of the old canal's three locks; its remains show just above the water at normal levels. Cussane Lock, further down, was drowned by Parteen Villa Weir. The towpath changes banks here. In 1837 there were 25 eel weirs from the tail of the lake down the rapids.",
+        src: ["The Bishop of Killaloe and the bridge at Moys", IWH + "2018/12/18/the-bishop-of-killaloe-and-the-bridge-at-moys/"] },
+      { area: "Clare shore and Scarriff" },
+      { name: "Parker's Point", where: "Clare shore", tag: "Story",
+        text: "Called one of the most exposed spots on the Shannon. In a snowstorm in December 1906 two of the steamer Dublin's barges, carrying Guinness for Limerick, broke their tows here and were caught just short of the rocks. Barrels went into the lake.",
+        src: ["Peril at Parker's Point", IWH + "2018/03/02/peril-at-parkers-point/"] },
+      { name: "Scarriff Harbour", where: "Up the Scarriff River from the west arm", tag: "Quay and crane",
+        text: "An old quay with a Shannon Commission crane, no longer working; the modern finger jetties stand clear of the old stonework. Waterways Ireland's western office is here.",
+        src: ["Scarriff", IWH + "2017/06/19/scarriff/"] },
+      { name: "Reddan's Quay, Tuamgraney", where: "Downriver from Scarriff", tag: "Quay and limekiln",
+        text: "Probably the head of navigation for bigger boats before the 1840s works took it on to Scarriff. A restored limekiln is a short walk up the village road. The quay sits on a tight bend: awkward to turn a big boat, worst coming downstream against the flow.",
+        src: ["Scarriff", IWH + "2017/06/19/scarriff/"] },
+      { name: "Williamstown", where: "Clare shore, opposite Dromineer", tag: "Harbour and crane",
+        text: "Once Cow Island. A Grand Canal Company station rather than a Shannon Navigation harbour, with a crane of a different pattern. Regattas were held off the Williamstown Hotel in the 1830s and 40s, and the crossing to Dromineer was once a cattle ferry.",
+        src: ["The Lough Derg Pinnace Club", IWH + "2019/02/03/the-lough-derg-pinnace-club/"] },
+      { area: "Tipperary shore" },
+      { name: "Kilgarvan Quay", where: "Tipperary shore", tag: "Quay and crane",
+        text: "Opened in October 1891, paid for by the county and the Grand Canal Company to send barley to Dublin by water. The remains of its crane are still there; the plate may read Shotts Iron Works.",
+        src: ["Kilgarvan Quay", IWH + "2012/09/25/kilgarvan-quay/"] },
+      { area: "Portumna to Meelick" },
+      { name: "Crane No 8, Connaught Harbour", where: "Portumna", tag: "Crane",
+        text: "Rated for 1 ton. The maker's plate seems to read Courtney & Stephens, Dublin, a name the firm stopped using in 1865, so it may be original Shannon Navigation equipment.",
+        src: ["Shannon cranes", CRANES] },
+      { name: "ESB embankment and pumping stations", where: "Galway bank, Portumna to Meelick", tag: "Flood works",
+        text: "The west bank is embanked so Lough Derg can be held high without flooding the callows, and three pumping stations drain the land behind it: one above Portumna, one at the north end of Sally Island where a power line crosses, and one below Meelick.",
+        map: [["Lower", 53.098, -8.188], ["Sally Island", 53.136, -8.159], ["Below Meelick", 53.170, -8.086]],
+        src: ["ESB pumping-stations above Portumna", IWH + "about/irish-waterways-furniture/esb-pumping-stations-above-portumna/"] },
+      { name: "Victoria Lock, Hamilton Lock and the Old Cut", where: "Meelick", tag: "Locks",
+        text: "Victoria, 155 by 40 ft, is one of the two biggest Shannon locks. Beside it is the earlier canal, the Old Cut, with Hamilton Lock and its lockhouse. In 1865 Griffith admitted that in big floods boats went back to the Old Cut, because Counsellor's Ford hadn't been dug deep enough to stem the current up to Victoria Lock.",
+        src: ["Hamilton Lock", IWH + "2015/07/09/hamilton-lock/"] }
+    ]
+  };
+  function renderSights(r) {
+    var sec = $("sights-section"), wrap = $("sights"), list = SIGHTS[r.id];
+    sec.hidden = !list;
+    if (!list) return;
+    wrap.textContent = "";
+    var count = list.filter(function (v) { return !v.area; }).length;
+    $("sights-title").textContent = "Sights along " + r.name;
+    $("sights-sub").textContent = count + " places from the waterways' past: locks, quays, cranes and the stories behind them, " + r.span + ".";
+    var area = null, grid = null;
+    list.forEach(function (v) {
+      if (v.area || !grid) {
+        area = document.createElement("div"); area.className = "sight-area";
+        if (v.area) { var h = document.createElement("h3"); h.textContent = v.area; area.appendChild(h); }
+        grid = document.createElement("div"); grid.className = "sight-grid"; area.appendChild(grid);
+        wrap.appendChild(area);
+        if (v.area) return;
+      }
+      var d = document.createElement("article"); d.className = "sight";
+      if (v.tag) { var g = document.createElement("span"); g.className = "sight-tag"; g.textContent = v.tag; d.appendChild(g); }
+      var n = document.createElement("h4"); n.className = "sight-name"; n.style.margin = "0"; n.style.fontWeight = "400"; n.textContent = v.name; d.appendChild(n);
+      if (v.where) { var w = document.createElement("span"); w.className = "where"; w.textContent = v.where; d.appendChild(w); }
+      var p = document.createElement("p"); p.className = "sight-text"; p.textContent = v.text; d.appendChild(p);
+      var links = document.createElement("div"); links.className = "links";
+      if (v.src) links.appendChild(link("Read: " + v.src[0], v.src[1]));
+      (v.map || []).forEach(function (m) { links.appendChild(link("Map: " + m[0], "https://www.google.com/maps/search/?api=1&query=" + m[1] + "," + m[2])); });
+      d.appendChild(links);
+      grid.appendChild(d);
+    });
   }
   function renderFood(r, t) {
     var box = $("food-box"), wrap = $("food");
