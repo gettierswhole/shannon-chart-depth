@@ -1735,7 +1735,7 @@ a { color: var(--water); }
     var a = document.createElement("a"); a.href = href; a.target = "_blank"; a.rel = "noopener"; a.textContent = label; return a;
   }
 
-  // Waterways-heritage sights per stretch, summarised from irishwaterwayshistory.com (Brian Goggin). Preview: Lough Derg only.
+  // Waterways-heritage sights per stretch, summarised from irishwaterwayshistory.com (Brian Goggin). Preview.
   var IWH = "https://irishwaterwayshistory.com/";
   var CRANES = IWH + "about/irish-waterways-furniture/the-machine-demands-a-sacrifice/";
   var SIGHTS = {
@@ -1775,6 +1775,90 @@ a { color: var(--water); }
       { name: "Victoria Lock, Hamilton Lock and the Old Cut", where: "Meelick", tag: "Locks",
         text: "Victoria, 155 by 40 ft, is one of the two biggest Shannon locks. Beside it is the earlier canal, the Old Cut, with Hamilton Lock and its lockhouse. In 1865 Griffith admitted that in big floods boats went back to the Old Cut, because Counsellor's Ford hadn't been dug deep enough to stem the current up to Victoria Lock.",
         src: ["Hamilton Lock", IWH + "2015/07/09/hamilton-lock/"] }
+    ],
+    mid: [
+      { area: "Banagher" },
+      { name: "Omer's canal and lockhouse", where: "Banagher, north bank across the bridge", tag: "Canal remains",
+        text: "A mid-18th-century bypass canal by Thomas Omer, older than the 1840s works, now a community-run park with information boards. The lockhouse survives. The lock had a single set of gates for a three-foot fall and was never a success. A later \"boat drain\" took eels to the railway; nothing of it is left.",
+        src: ["Big it up for Banagher", IWH + "2017/09/01/big-it-up-for-banagher/"] },
+      { name: "Banagher crane", where: "Banagher quay", tag: "Crane",
+        text: "Its plate reads Board of Public Works, \"To lift 3 tons\", Shannon Navigation. The Grand Canal Company complained in 1900 that it was old and patched; it broke that May and killed a man.",
+        src: ["Shannon cranes", CRANES] },
+      { name: "The unwanted gunboats", where: "Banagher", tag: "Story",
+        text: "In 1843 six navy gunboats came by canal to guard the Shannon crossing between Leinster and Connacht. When they arrived nobody would take charge of them, and the matter went to Dublin Castle.",
+        src: ["Gunboats at Banagher", IWH + "2016/06/24/gunboats-at-banagher/"] },
+      { area: "Shannon Harbour" },
+      { name: "Grand Canal dry docks", where: "Shannon Harbour, Grand Canal", tag: "Dry docks",
+        text: "Two docks side by side, one under a shed and one open with a gate raised by cable and winch, now railed off. Locks 34 to 36 of the Grand Canal main line climb away from the harbour, where passage boats from Dublin once met the Shannon steamers.",
+        src: ["Shannon Harbour dry docks", IWH + "about/irish-waterways-furniture/dry-docks/shannon-harbour-dry-docks/"] },
+      { area: "Shannonbridge and Clonmacnoise" },
+      { name: "Shannonbridge crane", where: "Shannonbridge", tag: "Crane",
+        text: "A different design from Banagher's. The power-station chimneys that marked Shannonbridge for decades across the flat bog are gone now.",
+        src: ["Shannon cranes", CRANES] },
+      { name: "The canal that nearly cut Clonmacnoise", where: "Clonmacnoise", tag: "Story",
+        text: "In the 1790s someone proposed cutting off one of the river's bends here to save three-quarters of a mile. Killaly's 1795 survey shows two possible lines, and either would probably have cut through the strip of land the monastery stands on between the esker and the river. It was dropped, nobody knows why. The 1840 map marks a ford with about 4 ft 6 in least depth.",
+        src: ["Who saved Clonmacnoise?", IWH + "2013/09/25/who-saved-clonmacnoise/"] },
+      { area: "River Suck" },
+      { name: "Pollboy Lock", where: "River Suck, below Ballinasloe", tag: "Lock",
+        text: "The Suck's one lock, on the way to Ballinasloe. Waterways Ireland automated it around 2015, ending the post of a lockkeeper well known for looking after visiting boats.",
+        src: ["Pollboy Lock", IWH + "2015/10/27/pollboy-lock/"] },
+      { name: "The Ballinasloe Line", where: "Ballinasloe", tag: "Canal remains",
+        text: "The Grand Canal's branch to Ballinasloe, built 1824 to 1828 and now dry. A twentieth-century footbridge crosses its old bed in the town.",
+        src: ["Ballinasloe footbridge", IWH + "2014/08/12/ballinasloe-footbridge/"] },
+      { area: "Athlone" },
+      { name: "The old Athlone Canal", where: "Athlone, Connacht side", tag: "Canal remains",
+        text: "Omer's canal of 1757, bypassing the falls at Athlone, replaced by the river lock in the 1840s but not abandoned until 1982. It can be walked end to end: the upper end with its lake-boats, the guard lock (the gate recess is under the bridge), Battery Bridge, a filled-in stretch that is now a playground, then the lower lock and lay-by, out to the river near Clonown Road bridge.",
+        src: ["Athlone canal", IWH + "abandoned-or-little-used-irish-waterways/the-middle-and-upper-shannon/athlone-canal/"] }
+    ],
+    ree: [
+      { area: "Athlone" },
+      { name: "Athlone Lock", where: "Athlone, west bank", tag: "Lock",
+        text: "At 155 by 40 ft, one of the two biggest locks on the Shannon, with Victoria at Meelick. The upper gates were replaced in steel in 1969. Look for the big bulbous winches (six for the four gates), the depth gauge, and the caged rain gauge on the lock island, read every day. In floods the river below can stand almost level with the lake above.",
+        src: ["A River Shannon lock: Athlone", IWH + "abandoned-or-little-used-irish-waterways/the-middle-and-upper-shannon/a-river-shannon-lock-athlone/"] },
+      { name: "Turf for the distillery", where: "Athlone", tag: "Story",
+        text: "Boatmen carrying turf to the Robinson family's distillery in Athlone were threatened and attacked, and the distillery changed fuel.",
+        src: ["Fuel for Athlone", IWH + "2019/10/19/fuel-for-athlone/"] },
+      { area: "The lake" },
+      { name: "The 1837 survey drawings", where: "All round the lake", tag: "Then and now",
+        text: "Commander Wolfe and Lieutenant Beechey drew the shore while making the Admiralty's first chart and sailing directions for Lough Ree. Worth comparing with what you see from the boat today.",
+        src: ["Lough Ree 1837", IWH + "2011/11/23/lough-ree-1837/"] },
+      { name: "River Hind at Cruit Bay", where: "West shore, near Portrunny", tag: "Unfinished navigation",
+        text: "Schemes in 1830 and 1847 meant to make the Hind navigable up to Roscommon town; the works stalled and were never finished. The view upstream from Clooncah Bridge shows why: far too narrow for steamers.",
+        src: ["The River Hind Navigation", IWH + "abandoned-or-little-used-irish-waterways/the-middle-and-upper-shannon/the-river-hind-navigation/"] },
+      { area: "Tarmonbarry and Clondra" },
+      { name: "Tarmonbarry weir sluices", where: "Beside Tarmonbarry Lock", tag: "Weir",
+        text: "The sluices on the weir are worked from the weir itself. A small hydro plant here was surveyed and then dropped.",
+        src: ["Operating the sluices at Tarmonbarry", IWH + "2009/07/23/operating-the-sluices-at-tarmonbarry/"] },
+      { name: "Clondra Lock and Richmond Harbour", where: "On the Camlin at Clondra", tag: "Lock",
+        text: "The only lock from the early Omer-era works still in use on the Shannon, kept in the 1840s because the Royal Canal joins the Camlin here. Small (29.67 by 5.66 m, 2.29 m fall), with one lower-gate rack still worked by a wheel and a possible Omer lockhouse. Richmond Harbour is at the canal's western end. Traffic came this way when Tarmonbarry Lock was shut.",
+        src: ["Clondra Lock: the great survivor", IWH + "abandoned-or-little-used-irish-waterways/the-middle-and-upper-shannon/clondra-lock-the-great-survivor/"] }
+    ],
+    key: [
+      { area: "Roosky and Jamestown" },
+      { name: "Roosky dry dock", where: "Roosky", tag: "Dry dock",
+        text: "Waterways Ireland's dry dock, where its old workboats are kept going, among them the maintenance boat Fox, 75 years old in 2012.",
+        src: ["Fox II", IWH + "2012/08/01/fox-ii-113b/"] },
+      { name: "Jamestown", where: "Jamestown, Co Leitrim", tag: "Village and canal",
+        text: "Its heritage festival brings old barges together and remembers the Royal Canal passage-boats.",
+        src: ["Jamestown and the Longford", IWH + "2018/05/10/jamestown-and-the-longford/"] },
+      { area: "Carrick-on-Shannon" },
+      { name: "Carrick crane", where: "Above the bridge", tag: "Crane",
+        text: "Green, no jib, numbered 12. The maker's plate seems to read Mather Dixon & Co, Liverpool, a firm that closed in 1843, so this may be the oldest crane on the river, perhaps moved here from an earlier harbour.",
+        src: ["Shannon cranes", CRANES] },
+      { name: "The stone warehouse", where: "Carrick-on-Shannon", tag: "Building",
+        text: "A solid stone warehouse of the early 1800s. In 1949 barges still brought stout to it, the last cargo still coming by water, and it was carted twenty miles in every direction.",
+        src: ["Carrick-on-Shannon in 1949", IWH + "2014/07/15/carrick-on-shannon-in-1949/"] },
+      { area: "Lough Key" },
+      { name: "Rockingham turf canal", where: "Mainland behind Castle Island", tag: "Canal remains",
+        text: "The mouth of a canal that brought turf by boat to a harbour below the big house, whence an underground incline took it up into the house. The ruins of its lock lie east of the house site; it was out of use by about 1900.",
+        src: ["Rockingham", IWH + "abandoned-or-little-used-irish-waterways/midlands-turf-waterways/rockingham/"] },
+      { area: "Lough Allen" },
+      { name: "Blackrock, Bellantra and Spencer Harbour", where: "Drumshanbo and the lake", tag: "Lake works",
+        text: "A sluice-keeper's house stood at Blackrock from about 1860 to 1920; the Bellantra sluices that control the lake date from about 1893. Spencer Harbour had brickworks served by a steamer and barges.",
+        src: ["The middle and upper Shannon", IWH + "abandoned-or-little-used-irish-waterways/the-middle-and-upper-shannon/"] },
+      { name: "The Slieve Anierin ore canal", where: "East shore, Cornashamsogue", tag: "Story",
+        text: "Folklore tells of a 17th-century canal along the foot of Slieve Anierin that carried iron ore to a furnace. Traces are very faint and the date is doubtful, but a field there is still called the Furnace Meadow.",
+        src: ["The Slieve Anierin Canal", IWH + "2017/03/16/the-slieve-anierin-canal/"] }
     ]
   };
   function renderSights(r) {
