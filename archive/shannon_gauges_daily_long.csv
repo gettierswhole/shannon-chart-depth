@@ -7858,7 +7858,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26074,blackrock_lock,45.95,254,unchecked (provisional),100.0
 2026-10-15,26074,blackrock_lock,46.12,254,unchecked (provisional),100.0
 2026-10-16,26074,blackrock_lock,46.19,254,unchecked (provisional),100.0
-2026-10-17,26074,blackrock_lock,46.17,254,unchecked (provisional),94.8
+2026-10-17,26074,blackrock_lock,46.17,254,unchecked (provisional),100.0
+2026-10-18,26074,blackrock_lock,46.13,254,unchecked (provisional),100.0
+2026-10-19,26074,blackrock_lock,46.09,254,unchecked (provisional),100.0
+2026-10-20,26074,blackrock_lock,46.04,254,unchecked (provisional),100.0
+2026-10-21,26074,blackrock_lock,46.04,254,unchecked (provisional),100.0
+2026-10-22,26074,blackrock_lock,46.04,254,unchecked (provisional),100.0
+2026-10-23,26074,blackrock_lock,46.04,254,unchecked (provisional),100.0
+2026-10-24,26074,blackrock_lock,46.02,254,unchecked (provisional),40.63
 1990-11-28,26108,boyle_abbey,49.51,31,inspected,92.3
 1990-11-29,26108,boyle_abbey,49.48,31,inspected,100.0
 1990-11-30,26108,boyle_abbey,49.45,31,inspected,100.0
@@ -20532,7 +20539,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26108,boyle_abbey,49.04,254,unchecked (provisional),100.0
 2026-10-15,26108,boyle_abbey,49.12,254,unchecked (provisional),100.0
 2026-10-16,26108,boyle_abbey,49.14,254,unchecked (provisional),100.0
-2026-10-17,26108,boyle_abbey,49.19,254,unchecked (provisional),94.8
+2026-10-17,26108,boyle_abbey,49.19,254,unchecked (provisional),100.0
+2026-10-18,26108,boyle_abbey,49.23,254,unchecked (provisional),100.0
+2026-10-19,26108,boyle_abbey,49.24,254,unchecked (provisional),100.0
+2026-10-20,26108,boyle_abbey,49.24,254,unchecked (provisional),100.0
+2026-10-21,26108,boyle_abbey,49.24,254,unchecked (provisional),100.0
+2026-10-22,26108,boyle_abbey,49.24,254,unchecked (provisional),100.0
+2026-10-23,26108,boyle_abbey,49.25,254,unchecked (provisional),100.0
+2026-10-24,26108,boyle_abbey,49.26,254,unchecked (provisional),40.63
 2004-07-29,26324,carrick,40.34,32,corrected,22.92
 2004-07-30,26324,carrick,40.34,32,corrected,100.0
 2004-07-31,26324,carrick,40.31,32,corrected,100.0
@@ -28425,7 +28439,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26324,carrick,40.32,254,unchecked (provisional),100.0
 2026-10-15,26324,carrick,40.42,254,unchecked (provisional),100.0
 2026-10-16,26324,carrick,40.5,254,unchecked (provisional),100.0
-2026-10-17,26324,carrick,40.5,254,unchecked (provisional),94.8
+2026-10-17,26324,carrick,40.5,254,unchecked (provisional),100.0
+2026-10-18,26324,carrick,40.47,254,unchecked (provisional),100.0
+2026-10-19,26324,carrick,40.42,254,unchecked (provisional),100.0
+2026-10-20,26324,carrick,40.38,254,unchecked (provisional),100.0
+2026-10-21,26324,carrick,40.39,254,unchecked (provisional),100.0
+2026-10-22,26324,carrick,40.41,254,unchecked (provisional),100.0
+2026-10-23,26324,carrick,40.44,254,unchecked (provisional),100.0
+2026-10-24,26324,carrick,40.46,254,unchecked (provisional),39.59
 2005-06-14,26085,jamestown,40.16,31,inspected,40.63
 2005-06-15,26085,jamestown,40.16,31,inspected,100.0
 2005-06-16,26085,jamestown,40.16,31,inspected,100.0
@@ -35787,11 +35808,18 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-10,26085,jamestown,40.26,254,unchecked (provisional),100.0
 2026-10-11,26085,jamestown,40.22,254,unchecked (provisional),100.0
 2026-10-12,26085,jamestown,40.23,254,unchecked (provisional),100.0
-2026-10-13,26085,jamestown,40.25,254,unchecked (provisional),100.0
-2026-10-14,26085,jamestown,40.24,254,unchecked (provisional),100.0
-2026-10-15,26085,jamestown,40.33,254,unchecked (provisional),100.0
+2026-10-13,26085,jamestown,40.25,254,unchecked (provisional),98.96
+2026-10-14,26085,jamestown,40.24,254,unchecked (provisional),98.96
+2026-10-15,26085,jamestown,40.33,254,unchecked (provisional),98.96
 2026-10-16,26085,jamestown,40.38,254,unchecked (provisional),100.0
-2026-10-17,26085,jamestown,40.36,254,unchecked (provisional),94.8
+2026-10-17,26085,jamestown,40.36,254,unchecked (provisional),98.96
+2026-10-18,26085,jamestown,40.32,254,unchecked (provisional),98.96
+2026-10-19,26085,jamestown,40.27,254,unchecked (provisional),100.0
+2026-10-20,26085,jamestown,40.24,254,unchecked (provisional),100.0
+2026-10-21,26085,jamestown,40.25,254,unchecked (provisional),100.0
+2026-10-22,26085,jamestown,40.26,254,unchecked (provisional),100.0
+2026-10-23,26085,jamestown,40.29,254,unchecked (provisional),100.0
+2026-10-24,26085,jamestown,40.29,254,unchecked (provisional),40.63
 2021-07-05,26359,jamestown_weir_us,40.23,31,inspected,59.38
 2021-07-06,26359,jamestown_weir_us,40.17,31,inspected,100.0
 2021-07-07,26359,jamestown_weir_us,40.15,31,inspected,100.0
@@ -37709,7 +37737,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26359,jamestown_weir_us,40.11,254,unchecked (provisional),100.0
 2026-10-15,26359,jamestown_weir_us,40.15,254,unchecked (provisional),100.0
 2026-10-16,26359,jamestown_weir_us,40.1,254,unchecked (provisional),100.0
-2026-10-17,26359,jamestown_weir_us,40.0,254,unchecked (provisional),94.8
+2026-10-17,26359,jamestown_weir_us,40.0,254,unchecked (provisional),100.0
+2026-10-18,26359,jamestown_weir_us,39.88,254,unchecked (provisional),100.0
+2026-10-19,26359,jamestown_weir_us,39.78,254,unchecked (provisional),100.0
+2026-10-20,26359,jamestown_weir_us,39.78,254,unchecked (provisional),100.0
+2026-10-21,26359,jamestown_weir_us,39.76,254,unchecked (provisional),100.0
+2026-10-22,26359,jamestown_weir_us,39.75,254,unchecked (provisional),100.0
+2026-10-23,26359,jamestown_weir_us,39.72,254,unchecked (provisional),100.0
+2026-10-24,26359,jamestown_weir_us,39.71,254,unchecked (provisional),38.55
 2021-07-05,26401,jamestown_weir_ds,38.8,254,unchecked (provisional),47.92
 2021-07-06,26401,jamestown_weir_ds,38.88,32,corrected,100.0
 2021-07-07,26401,jamestown_weir_ds,38.81,32,corrected,100.0
@@ -39628,7 +39663,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26401,jamestown_weir_ds,38.94,254,unchecked (provisional),100.0
 2026-10-15,26401,jamestown_weir_ds,39.09,254,unchecked (provisional),100.0
 2026-10-16,26401,jamestown_weir_ds,39.29,254,unchecked (provisional),100.0
-2026-10-17,26401,jamestown_weir_ds,39.36,254,unchecked (provisional),94.8
+2026-10-17,26401,jamestown_weir_ds,39.37,254,unchecked (provisional),100.0
+2026-10-18,26401,jamestown_weir_ds,39.39,254,unchecked (provisional),100.0
+2026-10-19,26401,jamestown_weir_ds,39.37,254,unchecked (provisional),100.0
+2026-10-20,26401,jamestown_weir_ds,39.33,254,unchecked (provisional),100.0
+2026-10-21,26401,jamestown_weir_ds,39.35,254,unchecked (provisional),100.0
+2026-10-22,26401,jamestown_weir_ds,39.37,254,unchecked (provisional),100.0
+2026-10-23,26401,jamestown_weir_ds,39.41,254,unchecked (provisional),100.0
+2026-10-24,26401,jamestown_weir_ds,39.43,254,unchecked (provisional),38.55
 2007-07-05,26089,drumsna,38.44,31,inspected,40.63
 2007-07-06,26089,drumsna,38.46,31,inspected,100.0
 2007-07-07,26089,drumsna,38.47,31,inspected,100.0
@@ -46626,7 +46668,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26089,drumsna,38.42,254,unchecked (provisional),100.0
 2026-10-15,26089,drumsna,38.46,254,unchecked (provisional),78.13
 2026-10-16,26089,drumsna,38.48,254,unchecked (provisional),100.0
-2026-10-17,26089,drumsna,38.48,254,unchecked (provisional),92.71
+2026-10-17,26089,drumsna,38.48,254,unchecked (provisional),97.92
+2026-10-18,26089,drumsna,38.48,254,unchecked (provisional),100.0
+2026-10-19,26089,drumsna,38.46,254,unchecked (provisional),100.0
+2026-10-20,26089,drumsna,38.45,254,unchecked (provisional),100.0
+2026-10-21,26089,drumsna,38.44,254,unchecked (provisional),100.0
+2026-10-22,26089,drumsna,38.44,254,unchecked (provisional),97.92
+2026-10-23,26089,drumsna,38.45,254,unchecked (provisional),100.0
+2026-10-24,26089,drumsna,38.49,254,unchecked (provisional),40.63
 2001-10-04,26093,derry_bay,34.96,31,inspected,58.34
 2001-10-05,26093,derry_bay,34.98,31,inspected,100.0
 2001-10-06,26093,derry_bay,35.01,31,inspected,100.0
@@ -55338,7 +55387,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26093,derry_bay,34.74,254,unchecked (provisional),100.0
 2026-10-15,26093,derry_bay,34.76,254,unchecked (provisional),100.0
 2026-10-16,26093,derry_bay,34.77,254,unchecked (provisional),100.0
-2026-10-17,26093,derry_bay,34.78,254,unchecked (provisional),92.71
+2026-10-17,26093,derry_bay,34.78,254,unchecked (provisional),93.75
+2026-10-18,26093,derry_bay,34.81,254,unchecked (provisional),90.63
+2026-10-19,26093,derry_bay,34.82,254,unchecked (provisional),100.0
+2026-10-20,26093,derry_bay,34.83,254,unchecked (provisional),100.0
+2026-10-21,26093,derry_bay,34.87,254,unchecked (provisional),100.0
+2026-10-22,26093,derry_bay,34.88,254,unchecked (provisional),100.0
+2026-10-23,26093,derry_bay,34.92,254,unchecked (provisional),100.0
+2026-10-24,26093,derry_bay,34.93,254,unchecked (provisional),40.63
 2002-02-24,26088,hodsons_bay,36.07,31,inspected,47.92
 2002-02-25,26088,hodsons_bay,36.07,31,inspected,100.0
 2002-02-26,26088,hodsons_bay,36.1,31,inspected,100.0
@@ -62303,7 +62359,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26088,hodsons_bay,34.7,254,unchecked (provisional),100.0
 2026-10-15,26088,hodsons_bay,34.73,254,unchecked (provisional),100.0
 2026-10-16,26088,hodsons_bay,34.75,254,unchecked (provisional),100.0
-2026-10-17,26088,hodsons_bay,34.77,254,unchecked (provisional),94.8
+2026-10-17,26088,hodsons_bay,34.77,254,unchecked (provisional),100.0
+2026-10-18,26088,hodsons_bay,34.79,254,unchecked (provisional),100.0
+2026-10-19,26088,hodsons_bay,34.8,254,unchecked (provisional),100.0
+2026-10-20,26088,hodsons_bay,34.81,254,unchecked (provisional),100.0
+2026-10-21,26088,hodsons_bay,34.84,254,unchecked (provisional),100.0
+2026-10-22,26088,hodsons_bay,34.86,254,unchecked (provisional),100.0
+2026-10-23,26088,hodsons_bay,34.89,254,unchecked (provisional),100.0
+2026-10-24,26088,hodsons_bay,34.9,254,unchecked (provisional),40.63
 2003-10-20,26333,athlone_weir_us,34.36,31,inspected,48.96
 2003-10-21,26333,athlone_weir_us,34.35,31,inspected,100.0
 2003-10-22,26333,athlone_weir_us,34.36,31,inspected,100.0
@@ -70551,7 +70614,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26333,athlone_weir_us,34.62,254,unchecked (provisional),100.0
 2026-10-15,26333,athlone_weir_us,34.66,254,unchecked (provisional),100.0
 2026-10-16,26333,athlone_weir_us,34.68,254,unchecked (provisional),100.0
-2026-10-17,26333,athlone_weir_us,34.68,254,unchecked (provisional),94.8
+2026-10-17,26333,athlone_weir_us,34.68,254,unchecked (provisional),100.0
+2026-10-18,26333,athlone_weir_us,34.7,254,unchecked (provisional),100.0
+2026-10-19,26333,athlone_weir_us,34.72,254,unchecked (provisional),100.0
+2026-10-20,26333,athlone_weir_us,34.73,254,unchecked (provisional),100.0
+2026-10-21,26333,athlone_weir_us,34.76,254,unchecked (provisional),100.0
+2026-10-22,26333,athlone_weir_us,34.78,254,unchecked (provisional),100.0
+2026-10-23,26333,athlone_weir_us,34.82,254,unchecked (provisional),100.0
+2026-10-24,26333,athlone_weir_us,34.82,254,unchecked (provisional),39.59
 2007-01-01,26027,athlone,35.367,31,inspected,
 2007-01-02,26027,athlone,35.354,31,inspected,
 2007-01-03,26027,athlone,35.381,31,inspected,
@@ -77725,6 +77795,13 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-15,26027,athlone,32.963,254,unchecked (provisional),
 2026-10-16,26027,athlone,32.997,254,unchecked (provisional),
 2026-10-17,26027,athlone,33.1,254,unchecked (provisional),
+2026-10-18,26027,athlone,33.159,254,unchecked (provisional),
+2026-10-19,26027,athlone,33.18,254,unchecked (provisional),
+2026-10-20,26027,athlone,33.166,254,unchecked (provisional),
+2026-10-21,26027,athlone,33.139,254,unchecked (provisional),
+2026-10-22,26027,athlone,33.114,254,unchecked (provisional),
+2026-10-23,26027,athlone,33.225,254,unchecked (provisional),
+2026-10-24,26027,athlone,33.303,254,unchecked (provisional),
 2016-12-02,26353,wops_rail_bridge,33.15,101,unreliable,37.5
 2016-12-03,26353,wops_rail_bridge,33.17,101,unreliable,100.0
 2016-12-04,26353,wops_rail_bridge,33.19,101,unreliable,100.0
@@ -81301,7 +81378,13 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26353,wops_rail_bridge,32.71,254,unchecked (provisional),100.0
 2026-10-15,26353,wops_rail_bridge,32.74,254,unchecked (provisional),100.0
 2026-10-16,26353,wops_rail_bridge,32.78,254,unchecked (provisional),100.0
-2026-10-17,26353,wops_rail_bridge,32.85,254,unchecked (provisional),45.84
+2026-10-17,26353,wops_rail_bridge,32.87,254,unchecked (provisional),100.0
+2026-10-18,26353,wops_rail_bridge,32.93,254,unchecked (provisional),100.0
+2026-10-19,26353,wops_rail_bridge,32.93,254,unchecked (provisional),100.0
+2026-10-20,26353,wops_rail_bridge,32.91,254,unchecked (provisional),100.0
+2026-10-21,26353,wops_rail_bridge,32.86,254,unchecked (provisional),100.0
+2026-10-22,26353,wops_rail_bridge,32.86,254,unchecked (provisional),100.0
+2026-10-23,26353,wops_rail_bridge,32.93,254,unchecked (provisional),62.5
 1983-01-01,26028,shannonbridge,34.78,31,inspected,77.71
 1983-01-02,26028,shannonbridge,34.77,31,inspected,100.0
 1983-01-03,26028,shannonbridge,34.78,31,inspected,100.0
@@ -97096,7 +97179,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26028,shannonbridge,32.8,254,unchecked (provisional),100.0
 2026-10-15,26028,shannonbridge,32.83,254,unchecked (provisional),100.0
 2026-10-16,26028,shannonbridge,32.87,254,unchecked (provisional),100.0
-2026-10-17,26028,shannonbridge,32.96,254,unchecked (provisional),94.8
+2026-10-17,26028,shannonbridge,32.97,254,unchecked (provisional),100.0
+2026-10-18,26028,shannonbridge,33.02,254,unchecked (provisional),100.0
+2026-10-19,26028,shannonbridge,33.03,254,unchecked (provisional),100.0
+2026-10-20,26028,shannonbridge,33.02,254,unchecked (provisional),100.0
+2026-10-21,26028,shannonbridge,32.97,254,unchecked (provisional),100.0
+2026-10-22,26028,shannonbridge,32.96,254,unchecked (provisional),100.0
+2026-10-23,26028,shannonbridge,33.06,254,unchecked (provisional),100.0
+2026-10-24,26028,shannonbridge,33.15,254,unchecked (provisional),40.63
 2016-11-23,26351,derryholmes_us,33.08,31,inspected,94.8
 2016-11-24,26351,derryholmes_us,33.05,31,inspected,100.0
 2016-11-25,26351,derryholmes_us,33.02,31,inspected,100.0
@@ -100676,7 +100766,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26351,derryholmes_us,32.6,254,unchecked (provisional),100.0
 2026-10-15,26351,derryholmes_us,32.63,254,unchecked (provisional),100.0
 2026-10-16,26351,derryholmes_us,32.66,254,unchecked (provisional),100.0
-2026-10-17,26351,derryholmes_us,32.74,254,unchecked (provisional),94.8
+2026-10-17,26351,derryholmes_us,32.74,254,unchecked (provisional),100.0
+2026-10-18,26351,derryholmes_us,32.78,254,unchecked (provisional),100.0
+2026-10-19,26351,derryholmes_us,32.77,254,unchecked (provisional),100.0
+2026-10-20,26351,derryholmes_us,32.74,254,unchecked (provisional),100.0
+2026-10-21,26351,derryholmes_us,32.71,254,unchecked (provisional),100.0
+2026-10-22,26351,derryholmes_us,32.7,254,unchecked (provisional),100.0
+2026-10-23,26351,derryholmes_us,32.8,254,unchecked (provisional),100.0
+2026-10-24,26351,derryholmes_us,32.9,254,unchecked (provisional),39.59
 2016-11-23,26352,derryholmes_ds,32.97,254,unchecked (provisional),36.46
 2016-11-24,26352,derryholmes_ds,32.95,254,unchecked (provisional),96.88
 2016-11-25,26352,derryholmes_ds,32.92,31,inspected,100.0
@@ -104292,7 +104389,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26352,derryholmes_ds,32.56,254,unchecked (provisional),100.0
 2026-10-15,26352,derryholmes_ds,32.58,254,unchecked (provisional),100.0
 2026-10-16,26352,derryholmes_ds,32.61,254,unchecked (provisional),100.0
-2026-10-17,26352,derryholmes_ds,32.68,254,unchecked (provisional),94.8
+2026-10-17,26352,derryholmes_ds,32.68,254,unchecked (provisional),100.0
+2026-10-18,26352,derryholmes_ds,32.71,254,unchecked (provisional),100.0
+2026-10-19,26352,derryholmes_ds,32.71,254,unchecked (provisional),100.0
+2026-10-20,26352,derryholmes_ds,32.68,254,unchecked (provisional),100.0
+2026-10-21,26352,derryholmes_ds,32.64,254,unchecked (provisional),100.0
+2026-10-22,26352,derryholmes_ds,32.63,254,unchecked (provisional),100.0
+2026-10-23,26352,derryholmes_ds,32.73,254,unchecked (provisional),100.0
+2026-10-24,26352,derryholmes_ds,32.83,254,unchecked (provisional),40.63
 1989-01-02,25017,banagher,33.28,31,inspected,62.5
 1989-01-03,25017,banagher,33.17,31,inspected,100.0
 1989-01-04,25017,banagher,33.09,31,inspected,100.0
@@ -117971,7 +118075,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,25017,banagher,32.41,254,unchecked (provisional),100.0
 2026-10-15,25017,banagher,32.44,254,unchecked (provisional),100.0
 2026-10-16,25017,banagher,32.47,254,unchecked (provisional),100.0
-2026-10-17,25017,banagher,32.51,254,unchecked (provisional),94.8
+2026-10-17,25017,banagher,32.51,254,unchecked (provisional),100.0
+2026-10-18,25017,banagher,32.53,254,unchecked (provisional),100.0
+2026-10-19,25017,banagher,32.51,254,unchecked (provisional),100.0
+2026-10-20,25017,banagher,32.47,254,unchecked (provisional),100.0
+2026-10-21,25017,banagher,32.43,254,unchecked (provisional),100.0
+2026-10-22,25017,banagher,32.42,254,unchecked (provisional),100.0
+2026-10-23,25017,banagher,32.5,254,unchecked (provisional),100.0
+2026-10-24,25017,banagher,32.58,254,unchecked (provisional),39.59
 2003-12-30,25056,meelick_weir_us,31.95,31,inspected,85.5
 2003-12-31,25056,meelick_weir_us,31.94,31,inspected,100.0
 2004-01-01,25056,meelick_weir_us,32.01,31,inspected,100.0
@@ -126146,7 +126257,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,25056,meelick_weir_us,31.11,254,unchecked (provisional),100.0
 2026-10-15,25056,meelick_weir_us,31.12,254,unchecked (provisional),100.0
 2026-10-16,25056,meelick_weir_us,31.13,254,unchecked (provisional),100.0
-2026-10-17,25056,meelick_weir_us,31.2,254,unchecked (provisional),94.8
+2026-10-17,25056,meelick_weir_us,31.2,254,unchecked (provisional),100.0
+2026-10-18,25056,meelick_weir_us,31.27,254,unchecked (provisional),100.0
+2026-10-19,25056,meelick_weir_us,31.28,254,unchecked (provisional),100.0
+2026-10-20,25056,meelick_weir_us,31.3,254,unchecked (provisional),100.0
+2026-10-21,25056,meelick_weir_us,31.3,254,unchecked (provisional),100.0
+2026-10-22,25056,meelick_weir_us,31.3,254,unchecked (provisional),100.0
+2026-10-23,25056,meelick_weir_us,31.37,254,unchecked (provisional),100.0
+2026-10-24,25056,meelick_weir_us,31.45,254,unchecked (provisional),39.59
 2007-09-20,25058,victoria_lock,32.39,31,inspected,68.75
 2007-09-21,25058,victoria_lock,32.38,31,inspected,100.0
 2007-09-22,25058,victoria_lock,32.36,31,inspected,100.0
@@ -135705,7 +135823,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26356,raherbeg_rail_bridge,32.78,254,unchecked (provisional),100.0
 2026-10-15,26356,raherbeg_rail_bridge,32.82,254,unchecked (provisional),100.0
 2026-10-16,26356,raherbeg_rail_bridge,32.86,254,unchecked (provisional),100.0
-2026-10-17,26356,raherbeg_rail_bridge,32.95,254,unchecked (provisional),79.17
+2026-10-17,26356,raherbeg_rail_bridge,32.96,254,unchecked (provisional),100.0
+2026-10-18,26356,raherbeg_rail_bridge,33.02,254,unchecked (provisional),100.0
+2026-10-19,26356,raherbeg_rail_bridge,33.03,254,unchecked (provisional),100.0
+2026-10-20,26356,raherbeg_rail_bridge,33.0,254,unchecked (provisional),100.0
+2026-10-21,26356,raherbeg_rail_bridge,32.94,254,unchecked (provisional),100.0
+2026-10-22,26356,raherbeg_rail_bridge,32.95,254,unchecked (provisional),100.0
+2026-10-23,26356,raherbeg_rail_bridge,33.04,254,unchecked (provisional),100.0
+2026-10-24,26356,raherbeg_rail_bridge,33.13,254,unchecked (provisional),12.5
 2020-07-02,26354,ballinasloe_town,35.08,254,unchecked (provisional),50.0
 2020-07-03,26354,ballinasloe_town,35.07,254,unchecked (provisional),98.96
 2020-07-04,26354,ballinasloe_town,35.04,254,unchecked (provisional),97.92
@@ -138004,7 +138129,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26354,ballinasloe_town,35.15,254,unchecked (provisional),100.0
 2026-10-15,26354,ballinasloe_town,35.17,254,unchecked (provisional),100.0
 2026-10-16,26354,ballinasloe_town,35.26,254,unchecked (provisional),100.0
-2026-10-17,26354,ballinasloe_town,35.35,254,unchecked (provisional),94.8
+2026-10-17,26354,ballinasloe_town,35.35,254,unchecked (provisional),100.0
+2026-10-18,26354,ballinasloe_town,35.38,254,unchecked (provisional),100.0
+2026-10-19,26354,ballinasloe_town,35.38,254,unchecked (provisional),100.0
+2026-10-20,26354,ballinasloe_town,35.38,254,unchecked (provisional),100.0
+2026-10-21,26354,ballinasloe_town,35.34,254,unchecked (provisional),100.0
+2026-10-22,26354,ballinasloe_town,35.29,254,unchecked (provisional),100.0
+2026-10-23,26354,ballinasloe_town,35.35,254,unchecked (provisional),100.0
+2026-10-24,26354,ballinasloe_town,35.41,254,unchecked (provisional),38.55
 2019-06-26,26355,ballinasloe_old_channel,35.87,31,inspected,31.25
 2019-06-27,26355,ballinasloe_old_channel,35.87,31,inspected,100.0
 2019-06-28,26355,ballinasloe_old_channel,35.87,31,inspected,100.0
@@ -140668,7 +140800,14 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),100.0
 2026-10-15,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),100.0
 2026-10-16,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),100.0
-2026-10-17,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),94.8
+2026-10-17,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),100.0
+2026-10-18,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),100.0
+2026-10-19,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),100.0
+2026-10-20,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),100.0
+2026-10-21,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),100.0
+2026-10-22,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),100.0
+2026-10-23,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),100.0
+2026-10-24,26355,ballinasloe_old_channel,35.9,254,unchecked (provisional),40.63
 2023-05-22,25341,portumna,30.78,254,unchecked (provisional),35.42
 2023-05-23,25341,portumna,30.79,254,unchecked (provisional),100.0
 2023-05-24,25341,portumna,30.77,31,inspected,100.0
@@ -141907,4 +142046,11 @@ date,station_no,station,level_m,quality,quality_meaning,day_coverage_pct
 2026-10-14,25341,portumna,30.62,254,unchecked (provisional),100.0
 2026-10-15,25341,portumna,30.58,254,unchecked (provisional),100.0
 2026-10-16,25341,portumna,30.59,254,unchecked (provisional),100.0
-2026-10-17,25341,portumna,30.6,254,unchecked (provisional),94.8
+2026-10-17,25341,portumna,30.59,254,unchecked (provisional),100.0
+2026-10-18,25341,portumna,30.62,254,unchecked (provisional),100.0
+2026-10-19,25341,portumna,30.64,254,unchecked (provisional),100.0
+2026-10-20,25341,portumna,30.66,254,unchecked (provisional),100.0
+2026-10-21,25341,portumna,30.7,254,unchecked (provisional),100.0
+2026-10-22,25341,portumna,30.69,254,unchecked (provisional),100.0
+2026-10-23,25341,portumna,30.75,254,unchecked (provisional),100.0
+2026-10-24,25341,portumna,30.78,254,unchecked (provisional),40.63
