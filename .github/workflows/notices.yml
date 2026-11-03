@@ -22,9 +22,10 @@ jobs:
         run: |
           [ -f notices_site.json ] || exit 0
           git add notices_site.json
+          if [ -f tools/wi_intermediate.pem ]; then git add tools/wi_intermediate.pem; fi
           if git diff --cached --quiet; then echo "Nothing to commit"; exit 0; fi
           git config user.name "gauge-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Check marine notices" notices_site.json
+          git commit -m "Check marine notices"
           for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && exit 0; sleep 5; done
           exit 1

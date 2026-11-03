@@ -8,7 +8,7 @@
 # - identifies itself by name, with the page's address, so their web team can recognise or block it,
 # - keeps only each notice's number, official title and link: nothing is republished in full.
 # The page uses it to flag a notice that is on their site but hasn't reached us by email.
-import html, json, re, sys, urllib.request
+import html, json, os, re, ssl, subprocess, sys, tempfile, urllib.error, urllib.request
 from datetime import datetime, timezone, timedelta
 
 LIST = "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices"
@@ -16,10 +16,50 @@ BASE = "https://www.waterwaysireland.org"
 UA = {"User-Agent": "shannon-almanac-notices/1.0 (hourly marine notices check, by permission; +https://leehughes.ie)",
       "Accept": "text/html"}
 MIN_GAP = timedelta(minutes=60)
+HOST = "www.waterwaysireland.org"
+# Their server doesn't send its intermediate certificate, so it is fetched once from the certificate
+# authority (the address named in the site's own certificate) and kept here for later runs.
+CA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "wi_intermediate.pem")
 KEEP = 60
 
 def iso(d): return d.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 def ts(s): return datetime.fromisoformat(s.replace("Z", "+00:00"))
+
+def context():
+    c = ssl.create_default_context()
+    if os.path.exists(CA_FILE):
+        c.load_verify_locations(CA_FILE)
+    return c
+
+def fetch_intermediate():
+    """Get the missing intermediate certificate from the issuer address in the site's certificate."""
+    leaf = ssl.get_server_certificate((HOST, 443))
+    with tempfile.NamedTemporaryFile("w", suffix=".pem", delete=False) as f:
+        f.write(leaf)
+    text = subprocess.run(["openssl", "x509", "-in", f.name, "-noout", "-text"], capture_output=True, text=True).stdout
+    m = re.search(r"CA Issuers - URI:(\S+)", text)
+    if not m:
+        raise ValueError("site certificate names no issuer address")
+    raw = urllib.request.urlopen(urllib.request.Request(m.group(1), headers={"User-Agent": UA["User-Agent"]}), timeout=30).read()
+    if b"BEGIN CERTIFICATE" in raw:
+        pem = raw.decode()
+    else:
+        pem = subprocess.run(["openssl", "x509", "-inform", "DER", "-outform", "PEM"], input=raw, capture_output=True).stdout.decode()
+    if "BEGIN CERTIFICATE" not in pem:
+        raise ValueError("could not read the intermediate certificate")
+    open(CA_FILE, "w").write(pem)
+    print("Saved the intermediate certificate from", m.group(1))
+
+def get_page():
+    req = urllib.request.Request(LIST, headers=UA)
+    try:
+        return urllib.request.urlopen(req, timeout=60, context=context()).read()
+    except urllib.error.URLError as e:
+        # A failed certificate check stops before any request is sent, so one retry still makes one request.
+        if not isinstance(getattr(e, "reason", None), ssl.SSLCertVerificationError):
+            raise
+    fetch_intermediate()
+    return urllib.request.urlopen(req, timeout=60, context=context()).read()
 
 def parse(page):
     """Marine notice links on the list page: [{no, year, update, title, url}], newest first as listed."""
@@ -60,8 +100,7 @@ def main(path):
         return
     data = {"checked": iso(now), "source": LIST, "items": old.get("items", [])}
     try:
-        req = urllib.request.Request(LIST, headers=UA)
-        page = urllib.request.urlopen(req, timeout=60).read().decode("utf-8", "replace")
+        page = get_page().decode("utf-8", "replace")
         found = parse(page)
         print(f"Fetched list page: {len(page)} bytes, {len(found)} marine notice links.")
         if not found:
