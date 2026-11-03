@@ -1,0 +1,30 @@
+name: Check marine notices
+# One request an hour at most to Waterways Ireland's marine notices list, by their written permission.
+# The script also refuses to run within 60 minutes of its last check, so a manual run can't add a second request.
+on:
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: data-json
+  cancel-in-progress: false
+jobs:
+  notices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the marine notices list
+        run: python3 tools/check_notices.py notices_site.json
+      - name: Commit if changed
+        run: |
+          [ -f notices_site.json ] || exit 0
+          git add notices_site.json
+          if git diff --cached --quiet; then echo "Nothing to commit"; exit 0; fi
+          git config user.name "gauge-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Check marine notices" notices_site.json
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && exit 0; sleep 5; done
+          exit 1
