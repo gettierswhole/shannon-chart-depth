@@ -1,0 +1,7 @@
+{
+"checked": "2026-11-03T21:38:37Z",
+"source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
+"items": [],
+"ok": false,
+"error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)>"
+}
