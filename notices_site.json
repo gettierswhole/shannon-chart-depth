@@ -1,7 +1,147 @@
 {
-"checked": "2026-11-03T21:38:37Z",
+"checked": "2026-11-03T23:03:53Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
-"items": [],
-"ok": false,
-"error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)>"
+"items": [
+{
+"no": "120",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No. 120 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-120-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "118",
+"year": "2026",
+"update": true,
+"special": false,
+"title": "Marine Notice No. 118 of 2026",
+"url": "https://www.waterwaysireland.org/news/update-to-marine-notice-no-118-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "114",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Update to Marine Notice No.114 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-114-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "117",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No. 117 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-117-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "104",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No. 104 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-104-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "113",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No. 113 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-113-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "112",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No. 112 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-112-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "107",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No.107 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-107-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "106",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No. 106 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-106-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "88",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No. 88 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-88-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "87",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No. 87 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-87-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "53",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No. 53 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-53-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "35",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No. 35 of 2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-35-of-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+},
+{
+"no": "1",
+"year": "2026",
+"update": false,
+"special": true,
+"title": "Special Marine Notice No1. 2026",
+"url": "https://www.waterwaysireland.org/news/special-marine-notice-no1-2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true
+}
+],
+"ok": true
 }
