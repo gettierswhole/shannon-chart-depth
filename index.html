@@ -1285,11 +1285,11 @@ a { color: var(--water); }
     var known = {}, cutoff = Date.now() - 21 * 864e5, upd = noticesUpdated ? new Date(noticesUpdated).getTime() : 0;
     NOTICES.forEach(function (n) { known[String(n.no)] = true; });
     var rows = SITE.items.filter(function (i) {
-      if (!i || !i.url || i.baseline || !i.firstSeen) return false;
-      var seen = new Date(i.firstSeen).getTime();
+      if (!i || !i.url || !i.firstSeen || (i.baseline && !i.changed)) return false;
+      var seen = new Date(i.changed || i.firstSeen).getTime();
       if (!(seen > cutoff)) return false;
-      if (i.title && !SHANNONISH.test(i.title)) return false;
-      if (i.special) return !upd || seen > upd;
+      if (!SHANNONISH.test((i.title || "") + " " + (i.detail || ""))) return false;
+      if (i.special || i.changed) return !upd || seen > upd;
       return !known[String(i.no)] || (i.update && seen > upd);
     });
     list.textContent = "";
@@ -1297,8 +1297,10 @@ a { color: var(--water); }
       var li = document.createElement("li"), a = document.createElement("a"), s = document.createElement("span");
       li.className = "active";
       a.href = i.url; a.target = "_blank"; a.rel = "noopener";
-      a.textContent = (i.title || ((i.special ? "Special " : "") + "Marine Notice " + i.no + " of " + i.year));
-      s.textContent = "Listed on waterwaysireland.org since " + fmtTime(i.firstSeen) + ", but not in the email we get yet. Open it for the details.";
+      var head = (i.detail || "").replace(/\s*(\d{1,2}\/\d{1,2}\/\d{4}|read more).*$/i, "").slice(0, 110);
+      a.textContent = (i.special ? "Special MN " : "MN ") + i.no + (head ? ": " + head : "");
+      s.textContent = (i.changed ? "Changed on waterwaysireland.org " + fmtTime(i.changed) : "Listed on waterwaysireland.org since " + fmtTime(i.firstSeen)) +
+        ", but not in the email we get yet. Open it for the details.";
       li.appendChild(a); li.appendChild(s); list.appendChild(li);
     });
     box.hidden = !rows.length;

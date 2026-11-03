@@ -64,8 +64,12 @@ def get_page():
 def parse(page):
     """Marine notice links on the list page: [{no, year, update, title, url}], newest first as listed."""
     out, seen = [], set()
-    for m in re.finditer(r'<a\b[^>]*href="([^"#]*marine-notice[^"#]*)"[^>]*>(.*?)</a>', page, re.S | re.I):
+    links = list(re.finditer(r'<a\b[^>]*href="([^"#]*marine-notice[^"#]*)"[^>]*>(.*?)</a>', page, re.S | re.I))
+    for k, m in enumerate(links):
         href, inner = m.group(1), m.group(2)
+        # The card's text after the link, up to the next notice link: usually the notice's heading or first line.
+        nxt = links[k + 1].start() if k + 1 < len(links) else m.end() + 3000
+        after = re.sub(r"\s+", " ", html.unescape(re.sub(r"<(script|style)\b.*?</\1>|<[^>]+>", " ", page[m.end():min(nxt, m.end() + 3000)], flags=re.S | re.I))).strip()
         url = href if href.startswith("http") else BASE + ("" if href.startswith("/") else "/") + href
         if not url.startswith(BASE + "/news/"):
             continue
@@ -82,10 +86,14 @@ def parse(page):
             for o in out:
                 if o["url"] == url and not o["title"] and title:
                     o["title"] = title[:160]
+                if o["url"] == url and not o["detail"] and after:
+                    o["detail"] = after[:240]
             continue
         seen.add(key)
-        out.append({"no": n.group(1).lstrip("0") or "0", "year": n.group(2), "update": slug.startswith(("update", "amend", "cancel", "extension")),
-                    "special": "special" in slug, "title": title[:160], "url": url})
+        upd = ("update", "amend", "cancel", "extension")
+        out.append({"no": n.group(1).lstrip("0") or "0", "year": n.group(2),
+                    "update": slug.startswith(upd) or title.lower().startswith(upd),
+                    "special": "special" in slug, "title": title[:160], "detail": after[:240], "url": url})
     return out
 
 def main(path):
@@ -112,6 +120,12 @@ def main(path):
         for f in found:
             p = prev.get(f["url"])
             f["firstSeen"] = p["firstSeen"] if p else iso(now)
+            # Updates can reuse the same link, so a changed title (or card text) counts as an update too.
+            if p and (p.get("title", "") != f["title"] or (p.get("detail") and f["detail"] and p["detail"] != f["detail"])):
+                f["changed"] = iso(now)
+                print("Changed:", f["no"], f["title"][:60])
+            elif p and p.get("changed"):
+                f["changed"] = p["changed"]
             if baseline or (p and p.get("baseline")):
                 f["baseline"] = True
             if p and not f["title"]:
@@ -123,6 +137,8 @@ def main(path):
         data["items"] = items[:KEEP]
         data["ok"] = True
         new = [f for f in found if f["url"] not in prev]
+        for f in found[:3]:
+            print("Card text sample:", f["no"], "|", f["detail"][:200])
         for f in new[:10]:
             print("New:", f["no"], f["year"], "(update)" if f["update"] else "", f["title"][:80])
     except Exception as e:
