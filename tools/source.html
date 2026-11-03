@@ -318,7 +318,12 @@ a { color: var(--water); }
           <span class="fine" id="notices-asof">Live notices as of 13 Oct 2026</span>
         </div>
         <ul class="notice-list" id="notices"></ul>
-        <p class="fine">These are short summaries written by an AI assistant and not checked by a person each time, so they may contain mistakes. The official text is on Waterways Ireland's website: <a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">all live marine notices on waterwaysireland.org</a>. New notices are picked up from Waterways Ireland's email list every two hours, and some notices are not emailed, so check their website before setting out.</p>
+        <div id="site-new" hidden>
+          <p class="label" style="margin-top:12px">On Waterways Ireland's site, not summarised here yet</p>
+          <ul class="notice-list" id="site-new-list"></ul>
+        </div>
+        <p class="fine" id="site-checked" hidden></p>
+        <p class="fine">These are short summaries written by an AI assistant and not checked by a person each time, so they may contain mistakes. The official text is on Waterways Ireland's website: <a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">all live marine notices on waterwaysireland.org</a>. New notices are picked up from Waterways Ireland's email list every hour from 08:00 to 21:00. Their notices list is also checked once an hour, with their permission, to catch any notice that isn't emailed.</p>
         <div id="events-box" hidden>
           <h3 class="ev-head">Events on the water</h3>
           <ul class="notice-list" id="events"></ul>
@@ -560,7 +565,7 @@ a { color: var(--water); }
     <ul class="credit-list">
       <li><strong>Office of Public Works (OPW)</strong>: water levels from the gauges at Portumna, Banagher, Shannonbridge, Athlone, Hodson's Bay and Carrick-on-Shannon, from <a href="https://waterlevel.ie/" target="_blank" rel="noopener">waterlevel.ie</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Readings are provisional, as the OPW publish them. This page compares them with reference levels and works out depth corrections from them; those workings are ours, not the OPW's.</li>
       <li><strong>Met Éireann</strong>: the inland lakes forecast and the HARMONIE model point forecast. Copyright Met Éireann. Source <a href="https://www.met.ie/" target="_blank" rel="noopener">www.met.ie</a>. This data is published under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Met Éireann does not accept any liability whatsoever for any error or omission in the data, their availability, or for any loss or damage arising from their use. This page has modified the data: it shortens the written forecast, picks out the lakes on this stretch, and converts and summarises the model's wind and rain.</li>
-      <li><strong>Waterways Ireland</strong>: marine notices, lock opening hours, ordinary summer levels, lock cill heights and the daily navigation levels report. The marine notices shown are short summaries written by an AI assistant, with a link to each official notice on <a href="https://www.waterwaysireland.org/" target="_blank" rel="noopener">waterwaysireland.org</a>, which is the authority.</li>
+      <li><strong>Waterways Ireland</strong>: marine notices, lock opening hours, ordinary summer levels, lock cill heights and the daily navigation levels report. With the written permission of their Inspector of Navigation, this page checks their marine notices list no more than once an hour, and keeps only each notice's number, title and link. The marine notices shown are short summaries written by an AI assistant, with a link to each official notice on <a href="https://www.waterwaysireland.org/" target="_blank" rel="noopener">waterwaysireland.org</a>, which is the authority.</li>
       <li><strong>ESB</strong>: links to its Shannon flow and level reports on <a href="http://www.esbhydro.ie/" target="_blank" rel="noopener">esbhydro.ie</a>.</li>
       <li><strong>CSIG</strong>: the chart datum figures behind the depth correction come from the CSIG's published articles and forum posts. The depth correction is meant for use with CSIG charts. No CSIG chart data is shown or shared on this page.</li>
       <li><strong>IWAI Athlone branch</strong>: the Lough Ree chart datum and the lake's record low used to set it, and the method and bridge height behind the Athlone M6 bridge air draft.</li>
@@ -1187,7 +1192,10 @@ a { color: var(--water); }
   ];
   function dublinISO(offsetDays) { return new Date(Date.now() + (offsetDays || 0) * 864e5).toLocaleDateString("en-CA", { timeZone: "Europe/Dublin" }); }
   function closureOn(iso) { for (var i = 0; i < CLOSURES.length; i++) if (CLOSURES[i].date === iso) return CLOSURES[i]; return null; }
-  var noticesAsOf = "13 Oct 2026";
+  var noticesAsOf = "13 Oct 2026", noticesUpdated = null;
+  // Waterways Ireland's marine notices list, checked once an hour at most (by their permission): number, title and link only.
+  var SITE = null;
+  var SHANNONISH = /shannon|all navigations|lough (derg|ree|key|allen|boderg|forbes)|ardnacrusha|killaloe|portumna|banagher|athlone|lanesborough|tarmonbarry|roosk|carrick|boyle|leitrim|meelick|shannonbridge|dromod|jamestown|drumsna|scarriff|dromineer|limerick|clondra|camlin/i;
   function renderEvents() {
     var r = reach(), today = dublinISO(0), horizon = dublinISO(60), ul = $("events"); ul.textContent = "";
     var ev = (state.events && Array.isArray(state.events.events) ? state.events.events : []).filter(function (e) {
@@ -1216,6 +1224,39 @@ a { color: var(--water); }
       s.textContent = n.text;
       li.appendChild(a); li.appendChild(s); ul.appendChild(li);
     });
+    renderSiteNotices();
+  }
+  // Notices that are on Waterways Ireland's list but haven't reached this page by email: new numbers, and updates
+  // that appeared after the page's notices were last updated. Only the official title and a link are shown.
+  function renderSiteNotices() {
+    var box = $("site-new"), list = $("site-new-list"), chk = $("site-checked");
+    if (!SITE || !Array.isArray(SITE.items)) { box.hidden = true; chk.hidden = true; return; }
+    var known = {}, cutoff = Date.now() - 21 * 864e5, upd = noticesUpdated ? new Date(noticesUpdated).getTime() : 0;
+    NOTICES.forEach(function (n) { known[String(n.no)] = true; });
+    var rows = SITE.items.filter(function (i) {
+      if (!i || !i.url || i.baseline || !i.firstSeen) return false;
+      var seen = new Date(i.firstSeen).getTime();
+      if (!(seen > cutoff)) return false;
+      if (i.title && !SHANNONISH.test(i.title)) return false;
+      if (i.special) return !upd || seen > upd;
+      return !known[String(i.no)] || (i.update && seen > upd);
+    });
+    list.textContent = "";
+    rows.forEach(function (i) {
+      var li = document.createElement("li"), a = document.createElement("a"), s = document.createElement("span");
+      li.className = "active";
+      a.href = i.url; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = (i.title || ((i.special ? "Special " : "") + "Marine Notice " + i.no + " of " + i.year));
+      s.textContent = "Listed on waterwaysireland.org since " + fmtTime(i.firstSeen) + ", but not in the email we get yet. Open it for the details.";
+      li.appendChild(a); li.appendChild(s); list.appendChild(li);
+    });
+    box.hidden = !rows.length;
+    if (SITE.checked) {
+      var age = Date.now() - new Date(SITE.checked).getTime();
+      chk.hidden = false;
+      chk.textContent = "Waterways Ireland's notices list last checked " + fmtTime(SITE.checked) +
+        (SITE.ok === false ? " (the check didn't get through)" : "") + (age > 3 * 3600e3 ? ". That's more than 3 hours ago." : ".");
+    } else chk.hidden = true;
   }
   function dublinNow(offsetDays) {
     var d = new Date(Date.now() + (offsetDays || 0) * 864e5), p = {};
@@ -2523,8 +2564,14 @@ a { color: var(--water); }
         if (!data || !Array.isArray(data.notices)) return;
         NOTICES = data.notices.filter(function (n) { return n && n.no && n.title && n.url && n.until; });
         CLOSURES = Array.isArray(data.closures) ? data.closures.filter(function (c) { return c && c.date && c.url; }) : [];
+        if (data.updated) noticesUpdated = data.updated;
         if (data.updated) noticesAsOf = new Date(data.updated).toLocaleDateString("en-IE", { day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Dublin" });
         render();
+      }, function () {});
+      db.doc("notices/site").onSnapshot(function (snap) {
+        if (!snap.exists) return;
+        var data = snap.data();
+        if (data && Array.isArray(data.items)) { SITE = data; render(); }
       }, function () {});
       db.doc("events/live").onSnapshot(function (snap) {
         if (!snap.exists) return;

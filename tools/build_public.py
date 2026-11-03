@@ -10,10 +10,11 @@ if h.lstrip().lower().startswith('<!doctype') and '<body>' in h[:3000]:
     if h.rstrip().endswith('</body></html>'):
         h = h.rstrip()[:-len('</body></html>')]
 shim = r'''<script>
-// Public copy: stand in for the artifact database with data.json, re-read every 10 minutes.
+// Public copy: stand in for the artifact database with data.json (and notices_site.json), re-read every 10 minutes.
 (function () {
-  var subs = [], cache = null;
+  var subs = [], cache = null, site;
   function pick(path) {
+    if (path === "notices/site") return site;
     if (!cache) return undefined;
     var p = path.split("/");
     var col = cache[p[0]];
@@ -29,6 +30,11 @@ shim = r'''<script>
     fetch("data.json?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (j) { if (j) { cache = j; deliver(); } })
+      .catch(function () {});
+    // Waterways Ireland's notices list, as the hourly check last found it (number, title and link only).
+    fetch("notices_site.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && Array.isArray(j.items)) { site = j; if (cache) deliver(); } })
       .catch(function () {});
   }
   var db = {

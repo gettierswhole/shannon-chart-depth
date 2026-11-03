@@ -106,10 +106,14 @@ def main(path):
         if not found:
             raise ValueError("no marine notice links found on the list page")
         prev = {i["url"]: i for i in data["items"]}
+        # The first list read is the baseline: those notices were already out, so the page doesn't flag them as new.
+        baseline = not prev
         items = []
         for f in found:
             p = prev.get(f["url"])
             f["firstSeen"] = p["firstSeen"] if p else iso(now)
+            if baseline or (p and p.get("baseline")):
+                f["baseline"] = True
             if p and not f["title"]:
                 f["title"] = p.get("title", "")
             items.append(f)
