@@ -1,5 +1,5 @@
 {
-"checked": "2026-11-03T23:03:53Z",
+"checked": "2026-11-04T01:27:45Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
 {
@@ -8,6 +8,7 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 120 of 2026",
+"detail": "Erne System Tullyinishmore Jetty Closure Posted: 03/11/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-120-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -18,6 +19,7 @@
 "update": true,
 "special": false,
 "title": "Marine Notice No. 118 of 2026",
+"detail": "Shannon Navigation Roosky Bridge Closure Posted: 27/10/2026",
 "url": "https://www.waterwaysireland.org/news/update-to-marine-notice-no-118-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -25,9 +27,10 @@
 {
 "no": "114",
 "year": "2026",
-"update": false,
+"update": true,
 "special": false,
 "title": "Update to Marine Notice No.114 of 2026",
+"detail": "Shannon Navigation Tarmonbarry Bridge Reopening Posted: 27/10/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-114-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -38,6 +41,7 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 117 of 2026",
+"detail": "Lower Bann – Carnroe Lock Closure Posted: 26/10/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-117-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -48,6 +52,7 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 104 of 2026",
+"detail": "Grand Canal Temporary Closure of 7th Lock Posted: 19/10/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-104-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -58,6 +63,7 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 113 of 2026",
+"detail": "Lough Erne Pump-Out Facilities Posted: 13/10/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-113-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -68,6 +74,7 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 112 of 2026",
+"detail": "Shannon–Erne Waterway Winter Closure for Essential Maintenance Posted: 09/10/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-112-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -78,6 +85,7 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No.107 of 2026",
+"detail": "Winter Mooring 2026–2027 Shannon & Shannon-Erne Waterway Posted: 25/09/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-107-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -88,6 +96,7 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 106 of 2026",
+"detail": "Shannon Navigation Ardnacrusha Locks – Temporary Closure Posted: 14/09/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-106-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -98,6 +107,7 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 88 of 2026",
+"detail": "Canal Navigations: Water Levels & Lock Gates Posted: 30/07/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-88-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -108,6 +118,7 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 87 of 2026",
+"detail": "All Navigations: Boater's Guide to Fire Safety Posted: 29/07/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-87-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -118,6 +129,7 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 53 of 2026",
+"detail": "Shannon Navigation Restrictions for Construction of New Hartley Bridge Posted: 03/05/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-53-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -128,6 +140,7 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 35 of 2026",
+"detail": "All Navigations: Mandatory Wearing of Personal Flotation Devices at Navigation Locks Posted: 20/03/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-35-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
@@ -138,6 +151,7 @@
 "update": false,
 "special": true,
 "title": "Special Marine Notice No1. 2026",
+"detail": "Notice to all Waterway Users Posted: 03/03/2026 Page 1 (first page) Page 2 (last page) Next page Last page No results to display here yet, please check back soon. <div id=\"tab-panel-tabbedsection-3\" class=\"js-wi-tabs-panel\" role=\"tabpanel\" ",
 "url": "https://www.waterwaysireland.org/news/special-marine-notice-no1-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
