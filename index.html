@@ -192,6 +192,10 @@ h2 { font-family: var(--body); font-weight: 500; font-size: 1.12rem; line-height
 .notice-list li::before { content: ""; position: absolute; left: 0; top: 5px; width: 10px; height: 14px; border-radius: 4px; background: var(--line-strong); }
 .notice-list li.urgent::before { background: var(--bad); }
 .notice-list li.active::before { background: var(--warn); }
+.notice-list li.ended::before { background: var(--ok); }
+.notice-list .ended-tag { justify-self: start; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--ok); border: 1px solid var(--ok); border-radius: 4px; padding: 1px 6px; margin: 2px 0; }
+.notice-list .ended-note { font-size: 0.85rem; color: var(--muted); }
 .notice-list a { font-weight: 600; text-decoration: none; }
 .notice-list a:hover { text-decoration: underline; }
 .notice-list span { font-size: 0.9rem; color: var(--muted); }
@@ -1268,12 +1272,34 @@ a { color: var(--water); }
     renderEvents();
     var today = dublinISO(0), ul = $("notices"); ul.textContent = "";
     $("notices-asof").textContent = "Live notices as of " + noticesAsOf;
-    NOTICES.filter(function (n) { return n.until >= today; }).forEach(function (n) {
-      var li = document.createElement("li"), a = document.createElement("a"), s = document.createElement("span");
-      li.className = n.level;
+    // A notice that has ended, whether lifted by an update (n.ended) or run past its last day (n.until), stays for
+    // 72 hours at the top of the list with a green tag, so the change sinks in before it disappears.
+    var HOLD = 72 * 3600e3, now = Date.now();
+    var rows = NOTICES.map(function (n) {
+      var end = n.ended ? new Date(n.ended).getTime() : (n.until < today ? endOfIrishDay(n.until) : null);
+      if (end != null && end > now) end = null;
+      return { n: n, end: end };
+    }).filter(function (x) { return x.end == null || now - x.end < HOLD; });
+    rows.sort(function (x, y) { return (x.end != null ? 0 : 1) - (y.end != null ? 0 : 1) || (y.end || 0) - (x.end || 0); });
+    rows.forEach(function (x) {
+      var n = x.n, li = document.createElement("li"), a = document.createElement("a"), s = document.createElement("span");
+      li.className = x.end != null ? "ended" : n.level;
       a.href = n.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "MN " + n.no + ": " + n.title;
-      s.textContent = n.text;
-      li.appendChild(a); li.appendChild(s); ul.appendChild(li);
+      li.appendChild(a);
+      if (x.end != null) {
+        var tag = document.createElement("span"), note = document.createElement("span");
+        tag.className = "ended-tag";
+        tag.textContent = (n.endedHow || "ended") + " · " + fmtTime(new Date(x.end).toISOString());
+        s.textContent = n.endedText || (n.ended ? "This notice has been lifted." : "Its last day, " +
+          new Date(n.until + "T12:00:00Z").toLocaleDateString("en-IE", { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Dublin" }) + ", has passed.");
+        note.className = "ended-note";
+        note.textContent = "Leaves this list " + fmtTime(new Date(x.end + HOLD).toISOString()) + ".";
+        li.appendChild(tag); li.appendChild(s); li.appendChild(note);
+      } else {
+        s.textContent = n.text;
+        li.appendChild(s);
+      }
+      ul.appendChild(li);
     });
     renderSiteNotices();
   }
@@ -1310,6 +1336,12 @@ a { color: var(--water); }
       chk.textContent = "Waterways Ireland's notices list last checked " + fmtTime(SITE.checked) +
         (SITE.ok === false ? " (the check didn't get through)" : "") + (age > 3 * 3600e3 ? ". That's more than 3 hours ago." : ".");
     } else chk.hidden = true;
+  }
+  // Midnight at the end of an Irish calendar day (YYYY-MM-DD), as a UTC time.
+  function endOfIrishDay(iso) {
+    var d = Date.parse(iso + "T00:00:00Z") + 864e5;
+    var off = new Date(d).toLocaleString("en-GB", { timeZone: "Europe/Dublin", hour: "2-digit", hourCycle: "h23" });
+    return d - (+off) * 3600e3;
   }
   function dublinNow(offsetDays) {
     var d = new Date(Date.now() + (offsetDays || 0) * 864e5), p = {};
