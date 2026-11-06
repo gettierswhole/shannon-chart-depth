@@ -1229,7 +1229,16 @@ a { color: var(--water); }
       if (end != null && end > now) end = null;
       return { n: n, end: end };
     }).filter(function (x) { return x.end == null || now - x.end < HOLD; });
-    rows.sort(function (x, y) { return (x.end != null ? 0 : 1) - (y.end != null ? 0 : 1) || (y.end || 0) - (x.end || 0); });
+    // Newest first, by when the latest word on each notice was sent: an update or reopening counts from when it was
+    // sent, a new notice from when it was issued. Notices with no recorded time go below, highest number first.
+    function sentAt(x) { var t = x.n.ended ? x.n.ended : x.n.sent; var v = t ? Date.parse(t) : NaN; return isNaN(v) ? null : v; }
+    rows.sort(function (x, y) {
+      var a = sentAt(x), b = sentAt(y);
+      if (a != null && b != null) return b - a;
+      if (a != null) return -1;
+      if (b != null) return 1;
+      return (parseInt(y.n.no, 10) || 0) - (parseInt(x.n.no, 10) || 0);
+    });
     rows.forEach(function (x) {
       var n = x.n, li = document.createElement("li"), a = document.createElement("a"), s = document.createElement("span");
       li.className = x.end != null ? "ended" : n.level;
