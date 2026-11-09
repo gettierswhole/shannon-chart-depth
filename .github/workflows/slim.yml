@@ -1,0 +1,34 @@
+name: Make page files
+# The public pages load small files made from data.json (tools/slim_data.py). This remakes them whenever
+# data.json is pushed by the scheduled tasks (notices, public sync). The gauge job makes them itself,
+# because a push by a workflow doesn't start another workflow.
+on:
+  push:
+    branches: [main]
+    paths: ["data.json", "tools/slim_data.py", ".github/workflows/slim.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: data-json
+  cancel-in-progress: false
+jobs:
+  slim:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make and commit the page files
+        run: |
+          git config user.name "gauge-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            python3 tools/slim_data.py data.json .
+            git add live.json food-*.json history-*.json
+            if git diff --cached --quiet; then echo "Page files up to date"; exit 0; fi
+            git commit -q -m "Update page files"
+            git push -q origin HEAD:main && exit 0
+            sleep 5
+          done
+          exit 1

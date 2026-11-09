@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Live Shannon water levels against CSIG chart datum, with lake forecasts, lock times, marine notices and places to eat ashore.">
 </head>
 <body>
 
 <title>Test: Trim · Shannon Almanac</title>
-<!-- Test layout of the public Shannon Almanac page -->
+<!-- Public copy of the Shannon Chart Depth page -->
 <style>
 /* Layout: a wheelhouse instrument — pick the stretch, read the correction, then the staff gauge, calculator and settings. One column on a phone, two on wider screens. */
 /* Look: the Shannon Dashboard's — quiet river-grey ground, white cards with hairline borders, serif figures, plain sans text; colour kept for state. */
@@ -582,29 +583,94 @@ a { color: var(--water); }
   </footer>
 </div>
 
+<script>window.SHANNON_BASE = "../../";</script>
 <script>
+// Public copy: stand in for the artifact database with the small files beside the page, re-read every 10 minutes.
+// live.json holds the gauges (a week of history), notices, forecasts and events. Venues come one stretch at a time
+// (food-<stretch>.json, for the stretch on screen), and a gauge's full month (history-<gauge>.json) only when a
+// lead-line check is entered over a week late. If live.json can't be had, the full data.json?t= is used instead.
+// The page keeps every document on the phone and shows it at once, so these only bring it up to date.
 (function () {
-  var subs = [], cache = null, site;
+  var BASE = window.SHANNON_BASE || "";
+  var subs = [], cache = null, site, food = {}, full = {}, foodWanted = {}, fullWanted = {};
+  function get(name) {
+    return fetch(BASE + name + "?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+  }
+  function merged(key) {
+    var g = cache && cache.gauge && cache.gauge[key];
+    if (!g || !full[key]) return g;
+    var seen = {}, h = [];
+    full[key].concat(g.history || []).forEach(function (p) { if (p && p.t && !seen[p.t]) { seen[p.t] = 1; h.push(p); } });
+    h.sort(function (x, y) { return x.t < y.t ? -1 : 1; });
+    var o = {}; for (var k in g) o[k] = g[k]; o.history = h; return o;
+  }
   function pick(path) {
     if (path === "notices/site") return site;
+    var p = path.split("/");
+    if (p[0] === "food") return food[p[1]] || (cache && cache.food ? cache.food[p[1]] : undefined);
     if (!cache) return undefined;
-    var p = path.split("/"); var col = cache[p[0]];
+    if (p[0] === "gauge") return merged(p[1]);
+    var col = cache[p[0]];
     return col ? col[p[1]] : undefined;
   }
-  function deliver() {
-    subs.forEach(function (s) { var d = pick(s.path); try { s.cb({ exists: d !== undefined, data: function () { return d; } }); } catch (e) {} });
+  function deliver(only) {
+    subs.forEach(function (s) {
+      if (only && s.path.indexOf(only) !== 0) return;
+      var d = pick(s.path);
+      if (d === undefined) return;
+      try { s.cb({ exists: true, data: function () { return d; } }); } catch (e) {}
+    });
   }
+  function loadFood(rid) {
+    if (!rid || foodWanted[rid]) return;
+    foodWanted[rid] = 1;
+    get("food-" + rid + ".json").then(function (j) { if (j) { food[rid] = j; deliver("food/" + rid); } else foodWanted[rid] = 0; });
+  }
+  function shownReach() { try { return localStorage.getItem("shannon.reach") || "derg"; } catch (e) { return "derg"; } }
   function load() {
-    fetch("../../data.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { if (j) { cache = j; deliver(); } }).catch(function () {});
-    fetch("../../notices_site.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { if (j && Array.isArray(j.items)) { site = j; if (cache) deliver(); } }).catch(function () {});
+    get("live.json").then(function (j) {
+      if (j && j.gauge) return j;
+      return fetch(BASE + "data.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+    }).then(function (j) { if (j) { cache = j; deliver(); } });
+    // Waterways Ireland's notices list, as the hourly check last found it (number, title and link only).
+    get("notices_site.json").then(function (j) { if (j && Array.isArray(j.items)) { site = j; deliver("notices/site"); } });
+    foodWanted = {}; loadFood(shownReach());
   }
-  var db = { doc: function (path) { return {
-    onSnapshot: function (cb) { subs.push({ path: path, cb: cb }); if (cache) deliver(); return function () {}; },
-    set: function () { return Promise.reject(new Error("read-only")); } }; } };
+  // A lead-line check over a week old needs the gauge's month of readings: fetch it as the time is entered.
+  function wantFull() {
+    var el = document.getElementById("chk-when"), t = el && el.value ? new Date(el.value).getTime() : NaN;
+    if (!isFinite(t) || Date.now() - t < 6.5 * 864e5) return;
+    ["portumna", "athloneus"].forEach(function (key) {
+      if (fullWanted[key]) return;
+      fullWanted[key] = 1;
+      get("history-" + key + ".json").then(function (j) {
+        if (j && Array.isArray(j.history)) { full[key] = j.history; deliver("gauge/" + key); } else fullWanted[key] = 0;
+      });
+    });
+  }
+  document.addEventListener("change", function (e) { if (e.target && e.target.id === "chk-when") wantFull(); }, true);
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t && t.closest && t.closest("#chk-save")) wantFull();
+    if (t && t.closest && t.closest("#reaches")) setTimeout(function () { loadFood(shownReach()); }, 0);
+  }, true);
+  var db = {
+    doc: function (path) {
+      return {
+        onSnapshot: function (cb) {
+          subs.push({ path: path, cb: cb });
+          var d = pick(path);
+          if (d !== undefined) { try { cb({ exists: true, data: function () { return d; } }); } catch (e) {} }
+          return function () {};
+        },
+        set: function () { return Promise.reject(new Error("read-only")); }
+      };
+    }
+  };
   window.claude = { use: function (name) { return name === "db" ? Promise.resolve(db) : Promise.reject(new Error("unavailable")); } };
   load(); setInterval(load, 10 * 60 * 1000);
+  if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register(BASE + "sw.js"); } catch (e) {} }
 })();
 </script>
 <style>.rate-you, .rate-gap, .scorecard { display: none !important; }</style>

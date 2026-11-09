@@ -30,3 +30,19 @@ jobs:
           git commit -m "Update gauges and forecast" data.json
           for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && exit 0; sleep 5; done
           exit 1
+      - name: Make the page files
+        # The small files the public pages load (tools/slim_data.py). Made here because this job's push
+        # doesn't start the "Make page files" workflow.
+        run: |
+          git config user.name "gauge-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            python3 tools/slim_data.py data.json .
+            git add live.json food-*.json history-*.json
+            if git diff --cached --quiet; then echo "Page files up to date"; exit 0; fi
+            git commit -q -m "Update page files"
+            git push -q origin HEAD:main && exit 0
+            sleep 5
+          done
+          exit 1
