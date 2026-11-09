@@ -1041,13 +1041,13 @@ a { color: var(--water); }
     return h + (tail ? '<span class="unit tol">' + tail + '</span>' : "");
   }
 
-  // The four stretches as cards: gauge reading, change over 7 days (in inches) and a 7-day line. No corrections here.
+  // The four stretches as cards: change over 7 days (cm, with inches beneath), a 7-day line, and the gauge reading. No corrections here.
   function weekChange(doc) {
     var f = state.feeds[doc], h = state.histories[doc] || [];
     if (!f || !h.length) return null;
     var t = new Date(f.time).getTime() - 7 * 864e5, best = null;
     h.forEach(function (p) { var d = Math.abs(new Date(p.t).getTime() - t); if (d <= 6 * 3600e3 && (!best || d < best.d)) best = { d: d, v: p.v }; });
-    return best ? inNear(f.level - best.v) : null;
+    return best ? f.level - best.v : null;
   }
   function miniSpark(doc) {
     var h = (state.histories[doc] || []).filter(function (p) { return Date.now() - new Date(p.t).getTime() < 7 * 864e5; });
@@ -1070,14 +1070,14 @@ a { color: var(--water); }
       add("st-name", r.name);
       add("st-gauge", r.gauge.name + " gauge");
       var f = state.feeds[r.gauge.doc];
-      var lv = add("st-level", f ? f.level.toFixed(2) : "–");
-      var u = document.createElement("small"); u.textContent = "m OD"; lv.appendChild(u);
-      var c = weekChange(r.gauge.doc);
-      var cg = add("st-chg", c == null ? "7 days: –" : c === 0 ? "Steady over 7 days" : (c > 0 ? "↑ " : "↓ ") + ftInText(c) + " in 7 days");
-      if (c != null && c > 0) cg.className += " up";
+      var c = weekChange(r.gauge.doc), ccm = c == null ? null : Math.round(c * 100), cin = c == null ? null : inNear(c);
+      var lv = add("st-level", ccm == null ? "–" : ccm === 0 ? "0" : (ccm > 0 ? "+" : "−") + Math.abs(ccm));
+      var u = document.createElement("small"); u.textContent = "cm in 7 days"; lv.appendChild(u);
+      var cg = add("st-chg", cin == null ? "No 7-day record yet" : cin === 0 ? "Steady (under ½ in)" : (cin > 0 ? "↑ " : "↓ ") + ftInText(cin) + (cin > 0 ? " higher" : " lower"));
+      if (ccm != null && ccm > 0) cg.className += " up";
       b.appendChild(miniSpark(r.gauge.doc));
-      if (f) add("st-when", hhmm(new Date(f.time).getTime()));
-      b.setAttribute("aria-label", r.name + ": " + (f ? f.level.toFixed(2) + " m" : "no reading") + ". Show details below.");
+      if (f) add("st-when", f.level.toFixed(2) + " m OD · " + hhmm(new Date(f.time).getTime()));
+      b.setAttribute("aria-label", r.name + ": " + (ccm == null ? "no 7-day change yet" : (ccm === 0 ? "steady" : (ccm > 0 ? "up " : "down ") + Math.abs(ccm) + " centimetres, " + ftInText(cin)) + " over 7 days") + (f ? ", gauge " + f.level.toFixed(2) + " metres" : "") + ". Show details below.");
       b.addEventListener("click", function () { state.reach = r.id; state.chkMsg = ""; save("shannon.reach", r.id); buildReachPanels(); render(); });
       nav.appendChild(b);
     });
