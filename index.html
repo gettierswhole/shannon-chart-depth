@@ -372,7 +372,6 @@ a { color: var(--water); }
     <div class="depth-head">
       <h2 id="depth-title">Depth correction</h2>
       <p class="experiment" role="note">Untested experiment, not an aid to navigation</p>
-      <p class="fine">Everything above is published data: gauge readings, timetables, forecasts and notices. Everything below is this page's own arithmetic on top of a chart datum that nobody has confirmed against the water. Treat it as a guide to check with your lead line and the markers, never as permission to go somewhere.</p>
     </div>
   <div class="grid depth-zone">
     <div class="col">
@@ -558,7 +557,7 @@ a { color: var(--water); }
     <ul class="credit-list">
       <li><strong>Office of Public Works (OPW)</strong>: water levels from the gauges at Portumna, Banagher, Shannonbridge, Athlone, Hodson's Bay and Carrick-on-Shannon, from <a href="https://waterlevel.ie/" target="_blank" rel="noopener">waterlevel.ie</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Readings are provisional, as the OPW publish them. This page compares them with reference levels and works out depth corrections from them; those workings are ours, not the OPW's.</li>
       <li><strong>Met Éireann</strong>: the inland lakes forecast and the HARMONIE model point forecast. Copyright Met Éireann. Source <a href="https://www.met.ie/" target="_blank" rel="noopener">www.met.ie</a>. This data is published under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Met Éireann does not accept any liability whatsoever for any error or omission in the data, their availability, or for any loss or damage arising from their use. This page has modified the data: it shortens the written forecast, picks out the lakes on this stretch, and converts and summarises the model's wind and rain.</li>
-      <li><strong>Waterways Ireland</strong>: marine notices, lock opening hours, ordinary summer levels, lock cill heights and the daily navigation levels report. With the written permission of their Inspector of Navigation, this page checks their marine notices list no more than once an hour, and keeps only each notice's number, title and link. The marine notices shown are short summaries written by an AI assistant, with a link to each official notice on <a href="https://www.waterwaysireland.org/" target="_blank" rel="noopener">waterwaysireland.org</a>, which is the authority.</li>
+      <li><strong>Waterways Ireland</strong>: marine notices, lock opening hours, ordinary summer levels, lock cill heights and the daily navigation levels report. With the written permission of their Inspector of Navigation, this page checks their marine notices list no more than once an hour, and keeps only each notice's number, title and link.</li>
       <li><strong>ESB</strong>: links to its Shannon flow and level reports on <a href="http://www.esbhydro.ie/" target="_blank" rel="noopener">esbhydro.ie</a>.</li>
       <li><strong>CSIG</strong>: the chart datum figures behind the depth correction come from the CSIG's published articles and forum posts. The depth correction is meant for use with CSIG charts. No CSIG chart data is shown or shared on this page.</li>
       <li><strong>IWAI Athlone branch</strong>: the Lough Ree chart datum and the lake's record low used to set it, and the method and bridge height behind the Athlone M6 bridge air draft.</li>
@@ -572,7 +571,7 @@ a { color: var(--water); }
     <p class="label">Built and run by</p>
     <ul class="credit-list">
       <li><strong>Lee Hughes</strong>: the page's owner. He pays for it and is responsible for it. Contact: <a href="mailto:info@leehughes.ie">info@leehughes.ie</a>.</li>
-      <li><strong>Claude</strong>, an AI assistant made by Anthropic: wrote the page and its update scripts, runs the scheduled updates, and writes the notice summaries, venue notes and ratings. Its work is not checked by a person every time, so it can contain mistakes.</li>
+      <li><strong>Claude</strong>, an AI assistant made by Anthropic: wrote the page and its update scripts, runs the scheduled updates, and writes the notice summaries, venue notes and ratings.</li>
       <li><strong>GitHub</strong>: hosts the public copy and runs the half-hourly data updates.</li>
       <li><strong>Typefaces</strong>: the page uses the fonts already built into your phone or computer, so none are downloaded.</li>
     </ul>
@@ -1084,8 +1083,7 @@ a { color: var(--water); }
     $("datum-ft").value = s.feet == null ? "" : s.feet;
     var ul = $("caveats"); ul.textContent = "";
     var poolLines = r.pools ? ["Waterways Ireland's ordinary summer levels on this stretch, in m Malin: " + r.pools.map(function (x) { return x[0] + " " + (x[1] + POOLBEG_TO_MALIN).toFixed(2); }).join("; ") + "."] : [];
-    r.caveats.concat(poolLines).concat(["OPW data is raw and unchecked. A sudden jump is more likely a sensor fault than the river.",
-      "Charts age. Silt, weed and boulders move, so navigate by your chart, your lead line and the markers, not this page."]).forEach(function (t) {
+    r.caveats.concat(poolLines).concat(["OPW data is raw and unchecked. A sudden jump is more likely a sensor fault than the river."]).forEach(function (t) {
       var li = document.createElement("li"); li.textContent = t; ul.appendChild(li);
     });
     var esb = $("esb"); esb.textContent = "";
@@ -2300,8 +2298,8 @@ a { color: var(--water); }
         if (cd.n === 1) say += " One check can mislead, so take two or three more at different spots.";
       } else {
         basis.className = "pill warn"; basis.textContent = "Unconfirmed datum";
-        say = "Unconfirmed: this uses the published datum, which nobody has checked against the water. The water is " +
-          (oin === 0 ? "at it" : ftInText(oin) + " " + (oin > 0 ? "above" : "below") + " it") + ". " + act + ", give or take " + ut + ".";
+        say = "The water is " +
+          (oin === 0 ? "at the published datum" : ftInText(oin) + " " + (oin > 0 ? "above" : "below") + " the published datum") + ". " + act + ", give or take " + ut + ".";
         (r.alts || []).forEach(function (a) {
           if (!a.hero) return;
           var more = inNear(datum - datumWith(r, a.cill, a.feet));
