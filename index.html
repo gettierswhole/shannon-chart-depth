@@ -73,6 +73,7 @@ h1 { font-family: var(--display); font-weight: 400; font-size: 2rem; line-height
 .reaches button .st-gauge { font-weight: 400; font-size: 0.75rem; color: var(--muted); }
 .reaches button .st-level { font-family: var(--display); font-weight: 400; font-size: 1.55rem; line-height: 1; font-variant-numeric: tabular-nums; margin-top: 4px; }
 .reaches button .st-level small { font-family: var(--body); font-size: 0.75rem; color: var(--muted); margin-left: 3px; }
+.reaches button .st-level .u { font-family: var(--body); font-size: 0.75rem; color: var(--muted); margin: 0 4px 0 2px; }
 .reaches button .st-chg { font-weight: 400; font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .reaches button .st-chg.up { color: var(--water); } 
 .reaches button svg { width: 100%; height: 30px; display: block; }
@@ -1041,7 +1042,7 @@ a { color: var(--water); }
     return h + (tail ? '<span class="unit tol">' + tail + '</span>' : "");
   }
 
-  // The four stretches as cards: change over 7 days (cm, with inches beneath), a 7-day line, and the gauge reading. No corrections here.
+  // The four stretches as cards: change over 7 days (inches, with cm beneath), a 7-day line, and the gauge reading. No corrections here.
   function weekChange(doc) {
     var f = state.feeds[doc], h = state.histories[doc] || [];
     if (!f || !h.length) return null;
@@ -1071,10 +1072,17 @@ a { color: var(--water); }
       add("st-gauge", r.gauge.name + " gauge");
       var f = state.feeds[r.gauge.doc];
       var c = weekChange(r.gauge.doc), ccm = c == null ? null : Math.round(c * 100), cin = c == null ? null : inNear(c);
-      var lv = add("st-level", ccm == null ? "–" : ccm === 0 ? "0" : (ccm > 0 ? "+" : "−") + Math.abs(ccm));
-      var u = document.createElement("small"); u.textContent = "cm in 7 days"; lv.appendChild(u);
-      var cg = add("st-chg", cin == null ? "No 7-day record yet" : cin === 0 ? "Steady (under ½ in)" : (cin > 0 ? "↑ " : "↓ ") + ftInText(cin) + (cin > 0 ? " higher" : " lower"));
-      if (ccm != null && ccm > 0) cg.className += " up";
+      var lv = add("st-level");
+      if (cin == null) lv.appendChild(document.createTextNode("–"));
+      else {
+        var a = Math.abs(cin), ft = Math.floor(a / 12), inch = a % 12, sg = cin > 0 ? "+" : cin < 0 ? "−" : "";
+        var unit = function (t) { var x = document.createElement("span"); x.className = "u"; x.textContent = t; lv.appendChild(x); };
+        if (ft) { lv.appendChild(document.createTextNode(sg + ft)); unit("ft"); if (inch) { lv.appendChild(document.createTextNode(String(inch))); unit("in"); } }
+        else { lv.appendChild(document.createTextNode(sg + inch)); unit("in"); }
+      }
+      var u = document.createElement("small"); u.textContent = "over 7 days"; lv.appendChild(u);
+      var cg = add("st-chg", ccm == null ? "No 7-day record yet" : ccm === 0 ? "Steady (under 1 cm)" : (ccm > 0 ? "↑ " : "↓ ") + Math.abs(ccm) + " cm " + (ccm > 0 ? "higher" : "lower"));
+      if (cin != null && cin > 0) cg.className += " up";
       b.appendChild(miniSpark(r.gauge.doc));
       if (f) add("st-when", f.level.toFixed(2) + " m OD · " + hhmm(new Date(f.time).getTime()));
       b.setAttribute("aria-label", r.name + ": " + (ccm == null ? "no 7-day change yet" : (ccm === 0 ? "steady" : (ccm > 0 ? "up " : "down ") + Math.abs(ccm) + " centimetres, " + ftInText(cin)) + " over 7 days") + (f ? ", gauge " + f.level.toFixed(2) + " metres" : "") + ". Show details below.");
