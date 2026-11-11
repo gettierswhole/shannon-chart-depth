@@ -50,7 +50,7 @@ const stretches = box.REACHES.map((r) => {
     name: r.name,
     span: r.span,
     gauge: { doc: r.gauge.doc, station: r.gauge.station, name: r.gauge.name },
-    datum: datum == null ? null : { level: datum, basis, how, confirmed: false },
+    datum: datum == null ? null : { level: datum, basis, how, confirmed: !!r.confirmed },
     alternatives,
     band: r.unc,
     bandWhy: r.uncWhy || "",

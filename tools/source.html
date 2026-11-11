@@ -1,8 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Shannon Chart Depth</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: a wheelhouse instrument — pick the stretch, read the correction, then the staff gauge, calculator and settings. One column on a phone, two on wider screens. */
 /* Look: the Shannon Dashboard's — quiet river-grey ground, white cards with hairline borders, serif figures, plain sans text; colour kept for state. */
@@ -29,9 +25,9 @@
   --cheat: #1b2326;
   --on-cheat: #ffffff;
   --strake: #d9e0e1;
-  --display: "Source Serif 4", "Iowan Old Style", Georgia, serif;
-  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Roboto Mono", monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -64,6 +60,7 @@ h1 { font-family: var(--display); font-weight: 400; font-size: 2rem; line-height
 .reaches button .st-gauge { font-weight: 400; font-size: 0.75rem; color: var(--muted); }
 .reaches button .st-level { font-family: var(--display); font-weight: 400; font-size: 1.55rem; line-height: 1; font-variant-numeric: tabular-nums; margin-top: 4px; }
 .reaches button .st-level small { font-family: var(--body); font-size: 0.75rem; color: var(--muted); margin-left: 3px; }
+.reaches button .st-level .u { font-family: var(--body); font-size: 0.75rem; color: var(--muted); margin: 0 4px 0 2px; }
 .reaches button .st-chg { font-weight: 400; font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .reaches button .st-chg.up { color: var(--water); } 
 .reaches button svg { width: 100%; height: 30px; display: block; }
@@ -108,6 +105,7 @@ h2 { font-family: var(--body); font-weight: 500; font-size: 1.12rem; line-height
 .hero { display: grid; gap: 10px; }
 .big { font-family: var(--display); font-weight: 400; font-size: clamp(3.6rem, 16vw, 5.4rem); line-height: 0.95; font-variant-numeric: tabular-nums; color: var(--water); letter-spacing: -0.01em; }
 .big .unit { font-size: 0.42em; color: var(--muted); margin-left: 6px; font-weight: 400; letter-spacing: 0; }
+.big .unit.tol { margin-left: 0.6em; white-space: nowrap; }
 .big.pending { font-size: clamp(2.4rem, 10vw, 3.2rem); color: var(--muted); }
 /* Lead-line checks */
 .checks { display: grid; gap: 12px; }
@@ -240,16 +238,6 @@ a { color: var(--water); }
 .credits .footnote { margin-top: 10px; font-style: italic; }
 .caveats { font-size: 0.88rem; color: var(--muted); display: grid; gap: 6px; margin: 0; padding-left: 18px; }
 .experiment { margin: -4px 0 4px; text-align: center; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--bad); }
-.vinny { display: grid; justify-items: center; gap: 10px; margin-top: 8px; }
-.vinny-glass { display: grid; gap: 4px; justify-items: center; width: min(100%, 320px); padding: 14px 16px; border-radius: 6px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15)), var(--bad-soft);
-  border: 3px solid var(--bad); outline: 2px dashed var(--bad); outline-offset: 5px; color: var(--bad); cursor: pointer; }
-.vinny-glass .vinny-big { font-family: var(--display); font-size: 1.4rem; text-transform: uppercase; letter-spacing: 0.06em; }
-.vinny-glass .vinny-small { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; }
-.vinny-glass.broken { background: repeating-linear-gradient(115deg, transparent 0 14px, rgba(0,0,0,0.25) 14px 15px), repeating-linear-gradient(35deg, transparent 0 22px, rgba(0,0,0,0.2) 22px 23px), var(--bad-soft); }
-#vinny-cv { width: min(100%, 480px); height: auto; aspect-ratio: 16 / 9; image-rendering: pixelated; image-rendering: crisp-edges; border: 3px solid var(--ink); border-radius: 4px; background: #000; }
-@media (prefers-reduced-motion: no-preference) { .vinny-glass.shake { animation: vshake 0.3s linear; } }
-@keyframes vshake { 25% { transform: translateX(-4px) rotate(-1deg); } 75% { transform: translateX(4px) rotate(1deg); } }
 @media (prefers-reduced-motion: no-preference) { .waterfill { transition: y 0.6s ease, height 0.6s ease; } }
 </style>
 
@@ -374,7 +362,6 @@ a { color: var(--water); }
     <div class="depth-head">
       <h2 id="depth-title">Depth correction</h2>
       <p class="experiment" role="note">Untested experiment, not an aid to navigation</p>
-      <p class="fine">Everything above is published data: gauge readings, timetables, forecasts and notices. Everything below is this page's own arithmetic on top of a chart datum that nobody has confirmed against the water. Treat it as a guide to check with your lead line and the markers, never as permission to go somewhere.</p>
     </div>
   <div class="grid depth-zone">
     <div class="col">
@@ -552,15 +539,6 @@ a { color: var(--water); }
   </div>
   </section>
 
-  <section class="vinny" id="vinny" aria-label="Emergency button">
-    <button type="button" class="vinny-glass" id="vinny-btn">
-      <span class="vinny-small">In case of emergency</span>
-      <span class="vinny-big">Break in case of Vinny</span>
-      <span class="vinny-small">Tap glass · sound on</span>
-    </button>
-    <canvas id="vinny-cv" width="160" height="90" hidden aria-label="16-bit animation: a cruiser makes a getaway at full speed"></canvas>
-  </section>
-
   <footer class="panel credits" id="credits" aria-labelledby="credits-title">
     <h2 id="credits-title">Credits and sources</h2>
     <p class="fine">Who provides what on this page. None of the organisations listed runs, checks or endorses this page, and none is affiliated with it.</p>
@@ -569,7 +547,7 @@ a { color: var(--water); }
     <ul class="credit-list">
       <li><strong>Office of Public Works (OPW)</strong>: water levels from the gauges at Portumna, Banagher, Shannonbridge, Athlone, Hodson's Bay and Carrick-on-Shannon, from <a href="https://waterlevel.ie/" target="_blank" rel="noopener">waterlevel.ie</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Readings are provisional, as the OPW publish them. This page compares them with reference levels and works out depth corrections from them; those workings are ours, not the OPW's.</li>
       <li><strong>Met Éireann</strong>: the inland lakes forecast and the HARMONIE model point forecast. Copyright Met Éireann. Source <a href="https://www.met.ie/" target="_blank" rel="noopener">www.met.ie</a>. This data is published under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Met Éireann does not accept any liability whatsoever for any error or omission in the data, their availability, or for any loss or damage arising from their use. This page has modified the data: it shortens the written forecast, picks out the lakes on this stretch, and converts and summarises the model's wind and rain.</li>
-      <li><strong>Waterways Ireland</strong>: marine notices, lock opening hours, ordinary summer levels, lock cill heights and the daily navigation levels report. With the written permission of their Inspector of Navigation, this page checks their marine notices list no more than once an hour, and keeps only each notice's number, title and link. The marine notices shown are short summaries written by an AI assistant, with a link to each official notice on <a href="https://www.waterwaysireland.org/" target="_blank" rel="noopener">waterwaysireland.org</a>, which is the authority.</li>
+      <li><strong>Waterways Ireland</strong>: marine notices, lock opening hours, ordinary summer levels, lock cill heights and the daily navigation levels report. With the written permission of their Inspector of Navigation, this page checks their marine notices list no more than once an hour, and keeps only each notice's number, title and link.</li>
       <li><strong>ESB</strong>: links to its Shannon flow and level reports on <a href="http://www.esbhydro.ie/" target="_blank" rel="noopener">esbhydro.ie</a>.</li>
       <li><strong>CSIG</strong>: the chart datum figures behind the depth correction come from the CSIG's published articles and forum posts. The depth correction is meant for use with CSIG charts. No CSIG chart data is shown or shared on this page.</li>
       <li><strong>IWAI Athlone branch</strong>: the Lough Ree chart datum and the lake's record low used to set it, and the method and bridge height behind the Athlone M6 bridge air draft.</li>
@@ -583,12 +561,12 @@ a { color: var(--water); }
     <p class="label">Built and run by</p>
     <ul class="credit-list">
       <li><strong>Lee Hughes</strong>: the page's owner. He pays for it and is responsible for it. Contact: <a href="mailto:info@leehughes.ie">info@leehughes.ie</a>.</li>
-      <li><strong>Claude</strong>, an AI assistant made by Anthropic: wrote the page and its update scripts, runs the scheduled updates, and writes the notice summaries, venue notes and ratings. Its work is not checked by a person every time, so it can contain mistakes.</li>
+      <li><strong>Claude</strong>, an AI assistant made by Anthropic: wrote the page and its update scripts, runs the scheduled updates, and writes the notice summaries, venue notes and ratings.</li>
       <li><strong>GitHub</strong>: hosts the public copy and runs the half-hourly data updates.</li>
-      <li><strong>Google Fonts</strong>: the typefaces Source Serif 4 and IBM Plex, both under the SIL Open Font License.</li>
+      <li><strong>Typefaces</strong>: the page uses the fonts already built into your phone or computer, so none are downloaded.</li>
     </ul>
 
-    <p class="fine">The page sets no cookies and does no tracking. Readings and checks you enter stay on your own device. GitHub and Google receive your IP address when they serve the page and its fonts, as any website host does. If you spot a mistake, or you're one of the sources above and want something changed or removed, email <a href="mailto:info@leehughes.ie">info@leehughes.ie</a>.</p>
+    <p class="fine">The page sets no cookies and does no tracking. Readings and checks you enter stay on your own device. GitHub receives your IP address when it serves the page, as any website host does. If you spot a mistake, or you're one of the sources above and want something changed or removed, email <a href="mailto:info@leehughes.ie">info@leehughes.ie</a>.</p>
     <p class="fine footnote">* Ballistics tables to follow.</p>
   </footer>
 </div>
@@ -596,7 +574,7 @@ a { color: var(--water); }
 <script>
 (function () {
   "use strict";
-  var FT = 3.28084, FOOT = 0.3048, POOLBEG_TO_MALIN = -2.71;
+  var FT = 3.28084, FOOT = 0.3048, INCH = 0.0254, POOLBEG_TO_MALIN = -2.71;
 
   // Lock cill heights from the Shannon and Limerick Navigation lock tables (Poolbeg OD), converted to Malin.
   var REACHES = [
@@ -604,16 +582,15 @@ a { color: var(--water); }
       id: "derg", name: "Lough Derg", span: "Killaloe – Meelick",
       gauge: { doc: "portumna", station: "25341", name: "Portumna Bridge", zero: 29.169 },
       cills: [
-        // Killaloe was a double-acting lock: the upper (lake-side) sill sits deeper so it worked at any lake level.
-        { name: "Killaloe upper cill", poolbeg: 30.52 },
-        { name: "Killaloe lower cill", poolbeg: 30.97 }
+        // Chart datum is 8 ft over the upper (lake-side) sill of the old Killaloe lock: confirmed.
+        { name: "Killaloe upper cill", poolbeg: 30.52 }
       ],
       feet: 8,
-      unc: 0.10, uncWhy: "±10 cm until you check it, plus one bigger doubt. This uses 8 ft over the lake-side (upper) Killaloe cill, as the CSIG's 2020 article says. A 2018 forum post said 8 ft over the lower cill, which would give about 45 cm less water. A reading of the Killaloe canal-entrance gauge or a lead-line check settles it: with Portumna at 30.64 m, about 9 ft 4 in on that gauge confirms this datum, about 7 ft 10 in the other. The gauge is also at Portumna, not where you are.",
+      unc: 0.10, uncWhy: "±4 in until you check it with a lead line. The datum is confirmed as 8 ft over the lake-side (upper) Killaloe cill. The band allows for the gauge being at Portumna, not where you are.",
       // Gauge boards marked in feet, and the reading that is chart datum on each. A reading with its time gives the datum
       // directly against the gauge used here, whichever cill the board is set to.
       boards: [{ id: "killaloe", name: "Killaloe canal-entrance gauge", datumFt: 8 }],
-      lake: true, alts: [{ label: "8 ft over the canal-side (lower) Killaloe cill, the 2018 figure", cill: 1, feet: 8, hero: true, heroLess: "the 2018 figure (8 ft over the other Killaloe cill)" }],
+      lake: true, confirmed: true,
       weather: ["derg"],
       sunAt: [52.95, -8.29],
       bridge: true,
@@ -626,7 +603,7 @@ a { color: var(--water); }
         ["Pier Head, Killaloe level", "06-Pier-Head-Killaloe.pdf"],
         ["Portumna Bridge level", "05-Portumna-Bridge.pdf"]
       ],
-      datumHelp: "For Lough Derg the CSIG's lead mapper put chart datum at 8 ft on the gauge at the entrance to the old canal in Killaloe. The CSIG's own 2020 article names the sill at the upper gate. Killaloe was a double-acting lock, built to work whether the lake stood above or below the canal, so its upper (lake-side) sill sits deeper than the lower one: 30.52 m Poolbeg against 30.97 m in the lock table. 8 ft over the upper sill gives 30.25 m Malin. His 2018 forum post said 8 ft over the lower cill instead, which gives 30.70 m, about 45 cm higher; nothing else explains that difference, so this datum is not confirmed. The lead mapper also put the lake's average at about 9 ft 6 in on the gauge, 18 in above datum; Portumna's readings since 2023 sit about 22 in above this datum and 5 in above the other, which leans this way without settling it. Pick the lower cill below if you prefer the 2018 figure. Your own lead-line checks settle it, and replace this figure once you have them.",
+      datumHelp: "For Lough Derg the CSIG's chart datum is 8 ft over the upper (lake-side) sill of the old Killaloe lock, at the entrance to the old canal. This is confirmed. Killaloe was a double-acting lock, built to work whether the lake stood above or below the canal, so its lake-side sill sits deep: 30.52 m Poolbeg in the lock table. 8 ft over it gives 30.25 m Malin. Your own lead-line checks refine it, and replace this figure once you have them.",
       manualHelp: "Copy the OD level from the <a href=\"https://waterlevel.ie/0000025341/\" target=\"_blank\" rel=\"noopener\">Portumna Bridge page on waterlevel.ie</a>. A staff gauge reading under 5 m has the gauge zero of 29.169 m added for you.",
       feetHelp: "At Killaloe, read the gauge at the canal entrance. It is marked in feet over the cill, so 8 ft is chart datum.",
       caveats: [
@@ -647,7 +624,7 @@ a { color: var(--water); }
       osl: { name: "Banagher ordinary summer level", poolbeg: 35.36, toMalin: -2.911 },
       // The same pool read at both ends as well as Banagher: OPW gauges, all against Malin Head.
       along: [["athlone", "Athlone, below the weir"], ["shannonbridge", "Shannonbridge"], ["banagher", "Banagher"]],
-      unc: 0.15, uncWhy: "There is no chart datum here, so ±15 cm is a rough allowance, not a measured one. The CSIG average their river depths; this compares the river at Banagher with Waterways Ireland's summer level there, both on OPW's gauge. Away from Banagher the level differs: the river slopes down from Athlone to Meelick, more so when it is running.",
+      unc: 0.15, uncWhy: "There is no chart datum here, so ±6 in is a rough allowance, not a measured one. The CSIG average their river depths; this compares the river at Banagher with Waterways Ireland's summer level there, both on OPW's gauge. Away from Banagher the level differs: the river slopes down from Athlone to Meelick, more so when it is running.",
       river: true,
       weather: ["derg", "ree"],
       sunAt: [53.25, -8.02],
@@ -675,7 +652,7 @@ a { color: var(--water); }
         { name: "Athlone upper cill", poolbeg: 35.319 }
       ],
       feet: 5.5,
-      unc: 0.10, uncWhy: "±10 cm until you check it. The datum, 5.5 ft over the Athlone lock cill, comes from the IWAI Athlone branch and fits the lake's record since 2003; the cill height is the one their figures imply (3 cm below the lock table's), and nobody has checked the result against the water. The gauge is at Athlone, which reads a few centimetres below the open lake.",
+      unc: 0.10, uncWhy: "±4 in until you check it. The datum, 5.5 ft over the Athlone lock cill, comes from the IWAI Athlone branch and fits the lake's record since 2003; the cill height is the one their figures imply (3 cm below the lock table's), and nobody has checked the result against the water. The gauge is at Athlone, which reads a few centimetres below the open lake.",
       boards: [{ id: "athlonelock", name: "Athlone lock gauge", datumFt: 5.5 }],
       lake: true, alts: [{ label: "7 ft over the Athlone cill (Waterways Ireland's summer level, the old figure)", cill: 0, feet: 7 }, { label: "5 ft over the Athlone cill (the CSIG's 2019 forum figure)", cill: 0, feet: 5 }],
       weather: ["ree"],
@@ -738,7 +715,7 @@ a { color: var(--water); }
       cills: [],
       feet: null,
       osl: { name: "Carrick ordinary summer level", poolbeg: 42.98 },
-      unc: 0.15, uncWhy: "There is no chart datum here, so ±15 cm is a rough allowance, not a measured one. This compares the river with Waterways Ireland's summer level at Carrick, which only covers the pool between Clarendon and Albert locks.",
+      unc: 0.15, uncWhy: "There is no chart datum here, so ±6 in is a rough allowance, not a measured one. This compares the river with Waterways Ireland's summer level at Carrick, which only covers the pool between Clarendon and Albert locks.",
       river: true,
       pools: [
         ["Lough Key (above Clarendon Lock)", 44.20],
@@ -971,14 +948,31 @@ a { color: var(--water); }
     var totalIn = Math.round(Math.abs(m) * FT * 12);
     return (m < 0 ? "−" : "") + Math.floor(totalIn / 12) + " ft " + (totalIn % 12) + " in";
   }
+  // Water over chart datum in whole inches, rounded toward less water: +0.41 m gives 16 in, −0.10 m gives −4 in.
+  function inSafe(m) { return Math.floor(m / INCH + 1e-6); }
+  function inNear(m) { return Math.round(m / INCH); }
+  function inUp(m) { return Math.ceil(Math.abs(m) / INCH - 1e-6); }
+  // "1 ft 4 in", "4 in", "0 in" from a whole number of inches (sign dropped).
+  function ftInText(n) {
+    n = Math.abs(n);
+    var f = Math.floor(n / 12), i = n % 12;
+    return f ? f + " ft" + (i ? " " + i + " in" : "") : i + " in";
+  }
+  function signedIn(n) { return (n < 0 ? "−" : "+") + ftInText(n); }
+  // The headline figure, with the units set small.
+  function bigIn(n, tail) {
+    var a = Math.abs(n), f = Math.floor(a / 12), i = a % 12, s = n < 0 ? "−" : "+";
+    var h = f ? s + f + '<span class="unit">ft</span> ' + i + '<span class="unit">in</span>' : s + i + '<span class="unit">in</span>';
+    return h + (tail ? '<span class="unit tol">' + tail + '</span>' : "");
+  }
 
-  // The four stretches as cards: gauge reading, change over 24 hours and a 7-day line. No corrections here.
-  function dayChange(doc) {
+  // The four stretches as cards: change over 7 days (inches, with cm beneath), a 7-day line, and the gauge reading. No corrections here.
+  function weekChange(doc) {
     var f = state.feeds[doc], h = state.histories[doc] || [];
     if (!f || !h.length) return null;
-    var t = new Date(f.time).getTime() - 24 * 3600e3, best = null;
-    h.forEach(function (p) { var d = Math.abs(new Date(p.t).getTime() - t); if (d <= 3 * 3600e3 && (!best || d < best.d)) best = { d: d, v: p.v }; });
-    return best ? Math.round((f.level - best.v) * 100) : null;
+    var t = new Date(f.time).getTime() - 7 * 864e5, best = null;
+    h.forEach(function (p) { var d = Math.abs(new Date(p.t).getTime() - t); if (d <= 6 * 3600e3 && (!best || d < best.d)) best = { d: d, v: p.v }; });
+    return best ? f.level - best.v : null;
   }
   function miniSpark(doc) {
     var h = (state.histories[doc] || []).filter(function (p) { return Date.now() - new Date(p.t).getTime() < 7 * 864e5; });
@@ -1001,14 +995,21 @@ a { color: var(--water); }
       add("st-name", r.name);
       add("st-gauge", r.gauge.name + " gauge");
       var f = state.feeds[r.gauge.doc];
-      var lv = add("st-level", f ? f.level.toFixed(2) : "–");
-      var u = document.createElement("small"); u.textContent = "m OD"; lv.appendChild(u);
-      var c = dayChange(r.gauge.doc);
-      var cg = add("st-chg", c == null ? "24 h: –" : (c === 0 ? "Steady" : (c > 0 ? "↑ " : "↓ ") + Math.abs(c) + " cm") + " in 24 h");
-      if (c != null && c > 0) cg.className += " up";
+      var c = weekChange(r.gauge.doc), ccm = c == null ? null : Math.round(c * 100), cin = c == null ? null : inNear(c);
+      var lv = add("st-level");
+      if (cin == null) lv.appendChild(document.createTextNode("–"));
+      else {
+        var a = Math.abs(cin), ft = Math.floor(a / 12), inch = a % 12, sg = cin > 0 ? "+" : cin < 0 ? "−" : "";
+        var unit = function (t) { var x = document.createElement("span"); x.className = "u"; x.textContent = t; lv.appendChild(x); };
+        if (ft) { lv.appendChild(document.createTextNode(sg + ft)); unit("ft"); if (inch) { lv.appendChild(document.createTextNode(String(inch))); unit("in"); } }
+        else { lv.appendChild(document.createTextNode(sg + inch)); unit("in"); }
+      }
+      var u = document.createElement("small"); u.textContent = "over 7 days"; lv.appendChild(u);
+      var cg = add("st-chg", ccm == null ? "No 7-day record yet" : ccm === 0 ? "Steady (under 1 cm)" : (ccm > 0 ? "↑ " : "↓ ") + Math.abs(ccm) + " cm " + (ccm > 0 ? "higher" : "lower"));
+      if (cin != null && cin > 0) cg.className += " up";
       b.appendChild(miniSpark(r.gauge.doc));
-      if (f) add("st-when", hhmm(new Date(f.time).getTime()));
-      b.setAttribute("aria-label", r.name + ": " + (f ? f.level.toFixed(2) + " m" : "no reading") + ". Show details below.");
+      if (f) add("st-when", f.level.toFixed(2) + " m OD · " + hhmm(new Date(f.time).getTime()));
+      b.setAttribute("aria-label", r.name + ": " + (ccm == null ? "no 7-day change yet" : (ccm === 0 ? "steady" : (ccm > 0 ? "up " : "down ") + Math.abs(ccm) + " centimetres, " + ftInText(cin)) + " over 7 days") + (f ? ", gauge " + f.level.toFixed(2) + " metres" : "") + ". Show details below.");
       b.addEventListener("click", function () { state.reach = r.id; state.chkMsg = ""; save("shannon.reach", r.id); buildReachPanels(); render(); });
       nav.appendChild(b);
     });
@@ -1029,8 +1030,7 @@ a { color: var(--water); }
     $("datum-ft").value = s.feet == null ? "" : s.feet;
     var ul = $("caveats"); ul.textContent = "";
     var poolLines = r.pools ? ["Waterways Ireland's ordinary summer levels on this stretch, in m Malin: " + r.pools.map(function (x) { return x[0] + " " + (x[1] + POOLBEG_TO_MALIN).toFixed(2); }).join("; ") + "."] : [];
-    r.caveats.concat(poolLines).concat(["OPW data is raw and unchecked. A sudden jump is more likely a sensor fault than the river.",
-      "Charts age. Silt, weed and boulders move, so navigate by your chart, your lead line and the markers, not this page."]).forEach(function (t) {
+    r.caveats.concat(poolLines).concat(["OPW data is raw and unchecked. A sudden jump is more likely a sensor fault than the river."]).forEach(function (t) {
       var li = document.createElement("li"); li.textContent = t; ul.appendChild(li);
     });
     var esb = $("esb"); esb.textContent = "";
@@ -2211,12 +2211,12 @@ a { color: var(--water); }
     basis.hidden = false;
     $("hero-label").textContent = isOsl(r) ? "River against summer level" : "Correction to charted depths";
     if (isOsl(r)) {
-      var eoff = rd.level - datum, ecm = Math.round(Math.abs(eoff) * 100);
+      var eoff = rd.level - datum, ein = inSafe(eoff);
       basis.className = "pill warn"; basis.textContent = "Not a chart datum";
       $("offset").className = "big";
-      $("offset").innerHTML = signed(eoff, 2) + '<span class="unit">m</span>';
+      $("offset").innerHTML = bigIn(ein);
       $("say").textContent = "Not a chart correction. CSIG depths on river stretches are averaged, not drawn to one level. " +
-        r.gauge.name + " is " + (ecm === 0 ? "at" : ecm + " cm " + (eoff > 0 ? "above" : "below")) + " Waterways Ireland's summer level" +
+        r.gauge.name + " is " + (ein === 0 ? "at" : ftInText(ein) + " " + (ein > 0 ? "above" : "below")) + " Waterways Ireland's summer level" +
         (eoff < -0.005 ? ", so expect less water than charted, perhaps by about that much. The calculator takes it off charted depths." :
           eoff > 0.005 ? ". The calculator doesn't add it to charted depths, because on a river the extra water isn't spread evenly." : ".") +
         " Where it's tight, trust your lead line.";
@@ -2232,39 +2232,39 @@ a { color: var(--water); }
       $("g-datum").textContent = "not set";
     } else {
       var off = rd.level - datum;
-      var cm = Math.round(Math.abs(off) * 100), u = Math.round(uncOf(r) * 100);
+      var oin = inSafe(off), u = inUp(uncOf(r)), ut = ftInText(u);
       $("offset").className = "big";
-      $("offset").innerHTML = signed(off, 2) + '<span class="unit">m ±' + uncOf(r).toFixed(2) + '</span>';
-      var act = cm === 0 ? "Charted depths are what you have" :
-        (off > 0 ? "Add " + cm + " cm to" : "Take " + cm + " cm off") + " charted depths";
+      $("offset").innerHTML = bigIn(oin, "±" + ut);
+      var act = oin === 0 ? "Charted depths are what you have" :
+        (oin > 0 ? "Add " + ftInText(oin) + " to" : "Take " + ftInText(oin) + " off") + " charted depths";
       var say;
       if (cd) {
         basis.className = "pill ok"; basis.textContent = "Checked by you (" + cd.n + ")";
         say = "From your " + (cd.n === 1 ? "check" : cd.n + " checks") + ", the water is " +
-          (cm === 0 ? "at" : cm + " cm " + (off > 0 ? "above" : "below")) + " the level the chart is drawn to. " + act + ", give or take " + u + " cm.";
+          (oin === 0 ? "at" : ftInText(oin) + " " + (oin > 0 ? "above" : "below")) + " the level the chart is drawn to. " + act + ", give or take " + ut + ".";
         if (cd.n === 1) say += " One check can mislead, so take two or three more at different spots.";
       } else {
-        basis.className = "pill warn"; basis.textContent = "Unconfirmed datum";
-        say = "Unconfirmed: this uses the published datum, which nobody has checked against the water. The water is " +
-          (cm === 0 ? "at it" : cm + " cm " + (off > 0 ? "above" : "below") + " it") + ". " + act + ", give or take " + u + " cm.";
+        basis.className = r.confirmed ? "pill ok" : "pill warn"; basis.textContent = r.confirmed ? "Confirmed datum" : "Unconfirmed datum";
+        say = "The water is " +
+          (oin === 0 ? "at the published datum" : ftInText(oin) + " " + (oin > 0 ? "above" : "below") + " the published datum") + ". " + act + ", give or take " + ut + ".";
         (r.alts || []).forEach(function (a) {
           if (!a.hero) return;
-          var more = Math.round((datum - datumWith(r, a.cill, a.feet)) * 100);
-          if (more > 0) say += " If the CSIG's other figure (" + a.feet + " ft) is the right one, there's about " + more + " cm more water than this.";
-          else if (more < 0) say += " If " + (a.heroLess || "the CSIG's other figure") + " is the right one, there's about " + (-more) + " cm less water than this, so don't count on the extra until a gauge reading or lead-line check confirms it.";
+          var more = inNear(datum - datumWith(r, a.cill, a.feet));
+          if (more > 0) say += " If the CSIG's other figure (" + a.feet + " ft) is the right one, there's about " + ftInText(more) + " more water than this.";
+          else if (more < 0) say += " If " + (a.heroLess || "the CSIG's other figure") + " is the right one, there's about " + ftInText(more) + " less water than this, so don't count on the extra until a gauge reading or lead-line check confirms it.";
         });
-        say += " A lead-line check settles it.";
+        if (!r.confirmed) say += " A lead-line check settles it.";
       }
       $("say").textContent = say;
-      $("g-datum").textContent = datum.toFixed(3) + " m " + (cd ? "(your checks)" : "±" + uncOf(r).toFixed(2) + " (unconfirmed)");
+      $("g-datum").textContent = datum.toFixed(3) + " m " + (cd ? "(your checks)" : "±" + uncOf(r).toFixed(2) + (r.confirmed ? " (confirmed)" : " (unconfirmed)"));
     }
     if (man && datum != null) {
       var live = state.feeds[r.gauge.doc], la = Date.now() - new Date(live.time).getTime();
-      $("say").textContent += " The " + r.gauge.name + " gauge says " + signed(live.level - datum, 2) + " m (" + ageText(la) + ").";
+      $("say").textContent += " The " + r.gauge.name + " gauge says " + signedIn(inSafe(live.level - datum)) + " (" + ageText(la) + ").";
     }
     $("unc-why").textContent = cd ? (cd.n === 1 ?
-      "±10 cm: one check, so this allows for misreading the line, the charted spot and the wind. More checks narrow it." :
-      "±" + Math.round(cd.unc * 100) + " cm: the spread of your " + cd.n + " checks, plus a few centimetres for reading the line and the chart.") :
+      "±4 in: one check, so this allows for misreading the line, the charted spot and the wind. More checks narrow it." :
+      "±" + ftInText(inUp(cd.unc)) + ": the spread of your " + cd.n + " checks, plus an inch or two for reading the line and the chart.") :
       (r.uncWhy || "");
     buildSelector();
     showOnline();
@@ -2325,17 +2325,17 @@ a { color: var(--water); }
   function drawGauge(level, datum) {
     var svg = $("gauge"); svg.textContent = "";
     var ref = datum == null ? level : datum;
-    var lo = -0.5, hi = 1.0, top = 16, bot = 304;
+    var lo = -1.5 * FOOT, hi = 3.5 * FOOT, top = 16, bot = 304;
     var y = function (rel) { return bot - (rel - lo) / (hi - lo) * (bot - top); };
     var rel = level - ref, clamped = Math.max(lo, Math.min(hi, rel));
     var x0 = 54, w = 34;
     svg.appendChild(el("rect", { x: x0, y: top, width: w, height: bot - top, fill: "var(--sunk)", stroke: "var(--line-strong)" }));
     svg.appendChild(el("rect", { "class": "waterfill", x: x0 + 1, y: y(clamped), width: w - 2, height: bot - y(clamped), fill: "var(--water-soft)" }));
     svg.appendChild(el("line", { x1: x0, x2: x0 + w, y1: y(clamped), y2: y(clamped), stroke: "var(--water)", "stroke-width": 2.5 }));
-    for (var i = 0; i <= 15; i++) {
-      var t = lo + i * 0.1, yy = y(t), major = i % 5 === 0;
+    for (var i = -6; i <= 14; i++) {
+      var t = i * 3 * INCH, yy = y(t), major = i % 4 === 0;
       svg.appendChild(el("line", { x1: x0, x2: x0 + (major ? 14 : 7), y1: yy, y2: yy, stroke: "var(--muted)", "stroke-width": major ? 1.5 : 1 }));
-      if (major) svg.appendChild(el("text", { x: x0 - 6, y: yy + 4, "text-anchor": "end", "font-size": 11, "font-family": "var(--mono)", fill: "var(--muted)" }, (t > 0.001 ? "+" : t < -0.001 ? "−" : "") + Math.abs(t).toFixed(1)));
+      if (major) svg.appendChild(el("text", { x: x0 - 6, y: yy + 4, "text-anchor": "end", "font-size": 11, "font-family": "var(--mono)", fill: "var(--muted)" }, (i > 0 ? "+" : i < 0 ? "−" : "") + Math.abs(i / 4)));
     }
     if (datum != null) {
       svg.appendChild(el("line", { x1: x0 - 4, x2: x0 + w + 8, y1: y(0), y2: y(0), stroke: "var(--ink)", "stroke-width": 1.5, "stroke-dasharray": "4 3" }));
@@ -2343,7 +2343,7 @@ a { color: var(--water); }
     }
     var note = rel > hi ? "off scale ↑" : rel < lo ? "off scale ↓" : "Water";
     svg.appendChild(el("text", { x: x0 + w + 6, y: y(clamped) + 14, "font-size": 11, fill: "var(--water)", "font-weight": 600, "font-family": "var(--body)" }, note));
-    svg.appendChild(el("text", { x: 2, y: top - 9, "font-size": 9, fill: "var(--muted)", "font-family": "var(--body)" }, datum == null ? "m from now" : "m from datum"));
+    svg.appendChild(el("text", { x: 2, y: top - 9, "font-size": 9, fill: "var(--muted)", "font-family": "var(--body)" }, datum == null ? "ft from now" : "ft from datum"));
   }
 
   function drawSpark(h, datum) {
@@ -2352,19 +2352,19 @@ a { color: var(--water); }
     box.hidden = false;
     var svg = $("spark-svg"); svg.textContent = "";
     var ref = datum == null ? h[h.length - 1].v : datum;
-    var W = 320, H = 90, L = 40, R = 6, T = 8, B = 20;
+    var W = 320, H = 90, L = 64, R = 6, T = 8, B = 20;
     var ts = h.map(function (p) { return new Date(p.t).getTime(); });
     var vs = h.map(function (p) { return p.v - ref; });
     var t0 = Math.min.apply(null, ts), t1 = Math.max.apply(null, ts);
     var v0 = Math.min(0, Math.min.apply(null, vs)), v1 = Math.max(0, Math.max.apply(null, vs));
-    var pad = Math.max(0.03, (v1 - v0) * 0.15); v0 -= pad; v1 += pad;
+    var pad = Math.max(INCH, (v1 - v0) * 0.15); v0 -= pad; v1 += pad;
     var X = function (t) { return L + (t - t0) / Math.max(1, t1 - t0) * (W - L - R); };
     var Y = function (v) { return T + (v1 - v) / (v1 - v0) * (H - T - B); };
     if (datum != null) svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(0), y2: Y(0), stroke: "var(--ink)", "stroke-dasharray": "4 3", "stroke-width": 1 }));
     svg.appendChild(el("text", { x: L - 4, y: Y(0) + 4, "text-anchor": "end", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }, datum == null ? "now" : "0"));
     [v0 + pad, v1 - pad].forEach(function (v) {
       if (Math.abs(Y(v) - Y(0)) < 10) return;
-      svg.appendChild(el("text", { x: L - 4, y: Y(v) + 4, "text-anchor": "end", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }, signed(v, 2)));
+      svg.appendChild(el("text", { x: L - 4, y: Y(v) + 4, "text-anchor": "end", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }, signedIn(inSafe(v))));
     });
     var pts = h.map(function (p, i) { return X(ts[i]).toFixed(1) + "," + Y(vs[i]).toFixed(1); });
     svg.appendChild(el("polygon", { points: X(ts[0]) + "," + Y(v0) + " " + pts.join(" ") + " " + X(ts[ts.length - 1]) + "," + Y(v0), fill: "var(--water-soft)" }));
@@ -2469,7 +2469,7 @@ a { color: var(--water); }
     if (!cd) {
       sum.textContent = mine.length ? "Your check will count once the page has the " + r.gauge.name + " reading for that time." :
         "No checks yet on " + r.name + ". Until you take one, the page uses the published datum." +
-        ((r.alts || []).some(function (a) { return a.hero; }) ? " The CSIG have given two figures here, about " + Math.round(Math.max.apply(null, (r.alts || []).filter(function (a) { return a.hero; }).map(function (a) { return Math.abs(pubD - datumWith(r, a.cill, a.feet)); })) * 100) + " cm apart, and one good check tells you which is right." : "");
+        ((r.alts || []).some(function (a) { return a.hero; }) ? " The CSIG have given two figures here, about " + ftInText(Math.round(Math.max.apply(null, (r.alts || []).filter(function (a) { return a.hero; }).map(function (a) { return Math.abs(pubD - datumWith(r, a.cill, a.feet)); })) / INCH))+ " apart, and one good check tells you which is right." : "");
     } else {
       var opts = [{ label: "the published datum, " + r.feet + " ft over the " + r.cills[0].name.replace(/ \(.*\)$/, ""), v: pubD }];
       (r.alts || []).forEach(function (a) { opts.push({ label: a.label, v: datumWith(r, a.cill, a.feet) }); });
@@ -2479,7 +2479,7 @@ a { color: var(--water); }
         (cd.n > 1 ? " (spread " + Math.round(cd.spread * 100) + " cm)" : "") + ": " +
         opts.map(function (o) { return Math.round(o.gap * 100) + " cm from " + o.label + " (" + o.v.toFixed(3) + ")"; }).join(", and ") + ". ";
       t += near.gap <= 0.10 ? "That backs " + near.label + "." :
-        "That doesn't match either published figure. Check the line's marks and the spot depths, and take a few more.";
+        "That doesn't match " + (opts.length > 1 ? "either published figure" : "the published figure") + ". Check the line's marks and the spot depths, and take a few more.";
       sum.textContent = t;
     }
     msg.textContent = (state.chkMsg ? state.chkMsg + " " : "") +
@@ -2635,171 +2635,4 @@ a { color: var(--water); }
   }
 })();
 </script>
-<script>
-// Break in case of Vinny: 10 seconds of 16-bit getaway, drawn at 160x90 and scaled up, with an original chiptune
-// (square lead, FM-style bass, noise drums) synthesised live with Web Audio. Nothing is downloaded.
-(function () {
-  "use strict";
-  var btn = document.getElementById("vinny-btn"), cv = document.getElementById("vinny-cv");
-  if (!btn || !cv) return;
-  var ctx = cv.getContext("2d"), playing = false, DUR = 10;
 
-  function music() {
-    var AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return null;
-    var ac = new AC(), t0 = ac.currentTime + 0.05, beat = 60 / 150;
-    var master = ac.createGain(); master.gain.value = 0.22; master.connect(ac.destination);
-    var hz = function (n) { return 440 * Math.pow(2, (n - 69) / 12); };
-    function lead(n, at, len) { // SNES-ish square with a touch of vibrato
-      var o = ac.createOscillator(), g = ac.createGain(), v = ac.createOscillator(), vg = ac.createGain();
-      o.type = "square"; o.frequency.value = hz(n); v.frequency.value = 6; vg.gain.value = 4;
-      v.connect(vg); vg.connect(o.frequency);
-      g.gain.setValueAtTime(0.0001, at); g.gain.linearRampToValueAtTime(0.35, at + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, at + len);
-      o.connect(g); g.connect(master); o.start(at); v.start(at); o.stop(at + len + 0.05); v.stop(at + len + 0.05);
-    }
-    function bass(n, at, len) { // Mega Drive-ish 2-operator FM bass
-      var car = ac.createOscillator(), mod = ac.createOscillator(), mg = ac.createGain(), g = ac.createGain();
-      car.frequency.value = hz(n); mod.frequency.value = hz(n) * 2; mg.gain.setValueAtTime(hz(n) * 3, at); mg.gain.exponentialRampToValueAtTime(hz(n) * 0.3, at + len);
-      mod.connect(mg); mg.connect(car.frequency);
-      g.gain.setValueAtTime(0.5, at); g.gain.exponentialRampToValueAtTime(0.0001, at + len);
-      car.connect(g); g.connect(master); car.start(at); mod.start(at); car.stop(at + len + 0.05); mod.stop(at + len + 0.05);
-    }
-    var noise = ac.createBuffer(1, ac.sampleRate * 0.3, ac.sampleRate), d = noise.getChannelData(0);
-    for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    function drum(at, hat) {
-      var s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
-      s.buffer = noise; f.type = hat ? "highpass" : "lowpass"; f.frequency.value = hat ? 7000 : 900;
-      g.gain.setValueAtTime(hat ? 0.12 : 0.6, at); g.gain.exponentialRampToValueAtTime(0.0001, at + (hat ? 0.05 : 0.18));
-      s.connect(f); f.connect(g); g.connect(master); s.start(at); s.stop(at + 0.3);
-    }
-    // Original tune in A minor: two 8-beat phrases, then a run up and a final hit (25 beats = 10 s at 150 bpm).
-    var mel = [69,72,76,74,72,74,76,79, 77,76,74,72,74,72,71,69, 69,72,76,79,81,79,76,72, 74,76,77,79,81,83,84,null, 81];
-    var lens = [1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 0.5,0.5,0.5,0.5,0.5,0.5,1,1, 3];
-    var sum = lens.reduce(function (a, b) { return a + b; }, 0), u = 9 / sum, t = t0;
-    mel.forEach(function (n, k) { if (n != null) lead(n, t, lens[k] * u * 0.9); t += lens[k] * u; });
-    // 32 eighth-note steps over the first 9 seconds, then a final hit.
-    var roots = [45, 41, 43, 40, 45, 41, 43, 47], step = 9 / 32;
-    for (var b = 0; b < 32; b++) {
-      var at = t0 + b * step;
-      if (b % 2 === 0) bass(roots[Math.floor(b / 4) % roots.length] + (b % 4 === 2 ? 12 : 0), at, step * 1.6);
-      drum(at, b % 2 === 1); if (b % 8 === 6) drum(at + step / 2, false);
-    }
-    bass(33, t0 + 9, 1); drum(t0 + 9, false);
-    setTimeout(function () { try { ac.close(); } catch (e) {} }, (DUR + 1) * 1000);
-    return ac;
-  }
-
-  // 16-bit palette
-  var SKY = ["#1a1040", "#3a1860", "#6a2080", "#b03070", "#e8605a", "#f8a050", "#ffd070"];
-  var SEA = ["#103060", "#184880", "#2060a0", "#3080c0"];
-  function px(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); }
-  var FONT = { // 3x5 pixel font for the few letters we need
-    A:"010101111101101",C:"011100100100011",D:"110101101101110",E:"111100110100111",F:"111100110100100",G:"011100101101011",H:"101101111101101",
-    I:"111010010010111",L:"100100100100111",N:"101111111111101",O:"010101101101010",P:"110101110100100",R:"110101110101101",S:"011100010001110",
-    T:"111010010010010",U:"101101101101111",V:"101101101101010",W:"101101111111101",Y:"101101010010010",K:"101101110101101",M:"101111111101101",
-    "!":"010010010000010"," ":"000000000000000",".":"000000000000010"
-  };
-  function text(s, x, y, c, sc) {
-    sc = sc || 1;
-    for (var i = 0; i < s.length; i++) {
-      var g = FONT[s[i]] || FONT[" "];
-      for (var k = 0; k < 15; k++) if (g[k] === "1") px(x + (i * 4 + (k % 3)) * sc, y + Math.floor(k / 3) * sc, sc, sc, c);
-    }
-  }
-  function centre(s, y, c, sc) { text(s, Math.round((160 - s.length * 4 * sc) / 2), y, c, sc); }
-  function boat(x, y, bob) {
-    y += bob;
-    px(x, y + 6, 26, 4, "#f4f4f4"); px(x + 2, y + 10, 22, 2, "#c02030"); px(x + 4, y + 12, 18, 1, "#802020");
-    px(x + 6, y + 2, 12, 4, "#e8e8f0"); px(x + 8, y + 3, 3, 2, "#3080c0"); px(x + 12, y + 3, 3, 2, "#3080c0");
-    px(x + 10, y - 1, 2, 3, "#f8d040"); // the skipper, legging it
-    px(x + 26, y + 7, 3, 2, "#f4f4f4");
-  }
-
-  // A giant hand from the sky with a very large hand-rolled cigarette between two fingers. Drawn at double scale.
-  function hand(cx, by, closed, t) {
-    var S = 2, SK = "#f0b088", SH = "#c8805c", SL = "#4a5a8a", SLD = "#33406a";
-    var P = function (x, y, w, hh, c) { px(cx + x * S, by + y * S, w * S, hh * S, c); };
-    px(cx - 7 * S, 0, 14 * S, Math.max(0, by - 11 * S), SL); px(cx + 4 * S, 0, 3 * S, Math.max(0, by - 11 * S), SLD); // sleeve
-    P(-8, -12, 16, 3, "#e8e0d0");                                            // shirt cuff
-    P(-7, -9, 14, 9, SK); P(4, -9, 3, 9, SH);                                // palm
-    if (!closed) {
-      [-7, -3, 1, 5].forEach(function (fx, i) {                               // four spread fingers, reaching down
-        var len = (i === 0 || i === 3) ? 6 : 7;
-        P(fx + (i === 0 ? -1 : i === 3 ? 1 : 0), 0, 3, len, SK); P(fx + 2 + (i === 0 ? -1 : i === 3 ? 1 : 0), 0, 1, len - 1, SH);
-      });
-      P(-10, -6, 3, 6, SK);                                                  // thumb
-    } else {
-      P(-7, 0, 14, 4, SK); for (var k = -7; k < 7; k += 4) P(k + 3, 0, 1, 4, SH); // knuckles
-      P(-9, -4, 3, 5, SK);
-    }
-    // the rollie, wedged between two fingers and sticking out to the side, drooping a little at the lit end
-    var cy = closed ? 1 : 3, x0 = 4;
-    for (var j = 0; j < 22; j++) P(x0 + j, cy + (j > 16 ? 1 : 0), 1, 3, j % 7 === 3 ? "#e4dccb" : "#f6f1e6");
-    P(x0 - 1, cy - 1, 3, 1, "#f6f1e6"); P(x0 - 1, cy + 3, 2, 1, "#d8cfbd");        // twisted paper end at the fingers
-    var ex = x0 + 22;
-    P(ex, cy + 1, 2, 3, Math.floor(t * 6) % 2 ? "#ff5a20" : "#ffb030"); P(ex + 2, cy + 2, 1, 1, "#802010"); // ember
-    for (var s = 0; s < 7; s++) {                                             // smoke curling up
-      var sy = by + (cy - 3 - s * 4) * S - ((t * 14) % 8), sx = cx + (ex + 1) * S + Math.round(Math.sin(t * 3 + s) * 3) + (s % 2) * 2;
-      if (sy > 0) px(sx, sy, 3, 3, s < 2 ? "rgba(220,220,230,0.8)" : "rgba(200,200,215,0.45)");
-    }
-  }
-
-  function frame(t) { // t in seconds, 0..DUR
-    // sky bands, sun sinking
-    for (var i = 0; i < SKY.length; i++) px(0, i * 7, 160, 7, SKY[i]);
-    var sunY = 30 + t * 1.2;
-    for (var r = 0; r < 10; r++) px(80 - (10 - r), sunY + r, (10 - r) * 2, 1, r % 3 === 2 ? SKY[4] : "#ffe890");
-    // far hills, parallax
-    for (var hx = 0; hx < 180; hx += 2) {
-      var h = 6 + 4 * Math.sin((hx + t * 8) / 11) + 3 * Math.sin((hx + t * 8) / 5);
-      px(hx - ((t * 8) % 2), 49 - h, 2, h, "#2a1848");
-    }
-    // sea with scrolling glints
-    for (var s = 0; s < SEA.length; s++) px(0, 49 + s * 10, 160, 10, SEA[s]);
-    for (var g = 0; g < 26; g++) {
-      var gx = (g * 37 + t * (30 + (g % 4) * 18)) % 170 - 5, gy = 51 + (g * 13) % 38;
-      px(160 - gx, gy, 3 + (g % 3), 1, g % 2 ? "#80c0f0" : "#ffffff");
-    }
-    // the getaway: boat runs in, idles nervously, then full speed off the right edge
-    var bx = t < 2 ? -30 + t * 30 : t < 5 ? 30 + Math.sin(t * 12) * 2 : 30 + Math.pow(t - 5, 2) * 9;
-    var bob = Math.round(Math.sin(t * 9) * 1.2);
-    // wake
-    var wakeLen = t < 5 ? 10 : 40;
-    for (var w = 0; w < wakeLen; w += 3) px(bx - w - 2, 64 + bob + (w % 2), 2, 1, "#ffffff");
-    boat(bx, 54, bob);
-    // the hand comes down while the boat idles, grabs at thin air as it bolts, then gives up
-    if (t > 1.2 && t < 8.4) {
-      var hy, hcx, shut = false;
-      if (t < 4.8) { hy = -30 + (t - 1.2) / 3.6 * 70; hcx = 46 + Math.sin(t * 2.3) * 4; }   // fingertips reach the cabin roof
-      else if (t < 5.6) { hy = 40 + (t - 4.8) * 12; hcx = 46; shut = t > 5.15; }          // lunge and grab... nothing
-      else { hy = 50 - (t - 5.6) * 30; hcx = 46; shut = true; }                            // gives up
-      hand(Math.round(hcx), Math.round(hy), shut, t);
-    }
-    // captions
-    if (t > 1.6 && t < 4.6 && Math.floor(t * 4) % 2 === 0) centre("VINNY DETECTED!", 8, "#ffffff", 2);
-    if (t >= 4.6 && t < 8.4) { centre("FULL SPEED", 6, "#ffd070", 2); centre("AHEAD!", 20, "#ffd070", 2); }
-    if (t >= 8.4) centre("PHEW. SAFE.", 12, "#ffffff", 2);
-    // scanlines for that CRT look
-    ctx.fillStyle = "rgba(0,0,0,0.18)";
-    for (var y = 0; y < 90; y += 2) ctx.fillRect(0, y, 160, 1);
-  }
-
-  btn.addEventListener("click", function () {
-    if (playing) return;
-    playing = true;
-    btn.classList.add("broken", "shake");
-    setTimeout(function () { btn.classList.remove("shake"); }, 350);
-    cv.hidden = false;
-    try { music(); } catch (e) {}
-    var start = performance.now();
-    (function loop(now) {
-      var t = Math.min(DUR, (now - start) / 1000);
-      frame(t);
-      if (t < DUR) requestAnimationFrame(loop);
-      else setTimeout(function () { playing = false; cv.hidden = true; btn.classList.remove("broken"); }, 1200);
-    })(start);
-  });
-})();
-</script>
-
-</body></html>
