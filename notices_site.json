@@ -1,7 +1,18 @@
 {
-"checked": "2026-11-11T10:19:42Z",
+"checked": "2026-11-11T12:13:04Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
+{
+"no": "122",
+"year": "2026",
+"update": true,
+"special": false,
+"title": "Update to Marine Notice No. 122 of 2026",
+"detail": "Cancellation of Industrial Action – 12 November 2026 Posted: 11/11/2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-122-of-2026",
+"firstSeen": "2026-11-06T19:17:56Z",
+"changed": "2026-11-11T12:13:04Z"
+},
 {
 "no": "123",
 "year": "2026",
@@ -11,16 +22,6 @@
 "detail": "Tarmonbarry Lock Closure 17 November 2026 Posted: 09/11/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-123-of-2026",
 "firstSeen": "2026-11-09T19:18:06Z"
-},
-{
-"no": "122",
-"year": "2026",
-"update": false,
-"special": false,
-"title": "Marine Notice No. 122 of 2026",
-"detail": "Industrial Action 12 November 2026 Impact on Navigation Services Posted: 06/11/2026",
-"url": "https://www.waterwaysireland.org/news/marine-notice-no-122-of-2026",
-"firstSeen": "2026-11-06T19:17:56Z"
 },
 {
 "no": "118",
