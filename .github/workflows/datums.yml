@@ -1,0 +1,41 @@
+name: Make datums.json
+# datums.json gives the OpenCPN plugin (gettierswhole/shannon-depth-opencpn) the same datums,
+# bands and caveats as this page. It is made from the REACHES table in index.html, so the figures
+# live in one place, plus the stretch boundaries and lock zones in tools/boundaries.json.
+on:
+  push:
+    branches: [main]
+    paths: ["index.html", "tools/export_datums.js", "tools/boundaries.json", "tools/check_datums.py", ".github/workflows/datums.yml"]
+  schedule:
+    - cron: "23 4 * * *"   # daily safety net, in case index.html was changed by a workflow push
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: data-json
+  cancel-in-progress: false
+jobs:
+  datums:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Make, check and commit datums.json
+        run: |
+          git config user.name "gauge-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            node tools/export_datums.js index.html tools/boundaries.json > datums.json.new
+            python3 tools/check_datums.py datums.json.new
+            mv datums.json.new datums.json
+            git add datums.json
+            if git diff --cached --quiet; then echo "datums.json up to date"; exit 0; fi
+            git commit -q -m "Update datums.json for the OpenCPN plugin"
+            git push -q origin HEAD:main && exit 0
+            sleep 5
+          done
+          exit 1
