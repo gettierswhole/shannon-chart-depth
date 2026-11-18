@@ -1,5 +1,5 @@
 {
-"checked": "2026-11-18T14:16:37Z",
+"checked": "2026-11-18T22:07:39Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
 {
@@ -11,16 +11,6 @@
 "detail": "Shannon Navigation – Temporary Restriction at Athlone Town Bridge Posted: 16/11/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-125-of-2026",
 "firstSeen": "2026-11-16T22:19:09Z"
-},
-{
-"no": "123",
-"year": "2026",
-"update": false,
-"special": false,
-"title": "Marine Notice No. 123 of 2026",
-"detail": "Tarmonbarry Lock Closure 17 November 2026 Posted: 09/11/2026",
-"url": "https://www.waterwaysireland.org/news/marine-notice-no-123-of-2026",
-"firstSeen": "2026-11-09T19:18:06Z"
 },
 {
 "no": "118",
@@ -154,6 +144,16 @@
 "url": "https://www.waterwaysireland.org/news/special-marine-notice-no1-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true
+},
+{
+"no": "123",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice No. 123 of 2026",
+"detail": "Tarmonbarry Lock Closure 17 November 2026 Posted: 09/11/2026",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-123-of-2026",
+"firstSeen": "2026-11-09T19:18:06Z"
 },
 {
 "no": "124",
