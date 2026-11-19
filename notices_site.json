@@ -1,5 +1,5 @@
 {
-"checked": "2026-11-19T03:40:08Z",
+"checked": "2026-11-19T13:29:59Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
 {
@@ -209,5 +209,6 @@
 "baseline": true
 }
 ],
-"ok": true
+"ok": false,
+"error": "<urlopen error timed out>"
 }
