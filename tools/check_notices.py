@@ -7,7 +7,11 @@
 # - refuses to run again within 60 minutes of the last check (the time is kept in notices_site.json),
 # - identifies itself by name, with the page's address, so their web team can recognise or block it,
 # - keeps only each notice's number, official title and link: nothing is republished in full.
-# The page uses it to flag a notice that is on their site but hasn't reached us by email.
+# The page treats this list as the index: a Shannon notice on it with no summary yet is shown at once with their
+# title and link, and a summarised notice that has gone from the list is flagged as possibly lifted.
+# Each item carries: shannon (it concerns the Shannon or all navigations), listed (true while on the list page;
+# false once it has been missing from two checks running, with delisted = the first check that missed it).
+# Only the first list page is read (one request), so an item older than the oldest on that page is left unmarked.
 import html, json, os, re, ssl, subprocess, sys, tempfile, urllib.error, urllib.request
 from datetime import datetime, timezone, timedelta
 
@@ -21,6 +25,20 @@ HOST = "www.waterwaysireland.org"
 # authority (the address named in the site's own certificate) and kept here for later runs.
 CA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "wi_intermediate.pem")
 KEEP = 60
+POSTED = re.compile(r"Posted:\s*(\d{1,2})/(\d{1,2})/(\d{4})")
+SHANNON = re.compile(r"shannon|all navigations|lough (derg|ree|key|allen|boderg|forbes)|ardnacrusha|killaloe|portumna|banagher|athlone|"
+                     r"lanesborough|tarmonbarry|roosk|carrick|boyle|leitrim|meelick|shannonbridge|dromod|jamestown|drumsna|scarriff|"
+                     r"dromineer|limerick|clondra|camlin", re.I)
+
+def posted(i):
+    """The card's 'Posted: DD/MM/YYYY' as YYYY-MM-DD, or None."""
+    m = POSTED.search(i.get("detail") or "")
+    return f"{m.group(3)}-{int(m.group(2)):02d}-{int(m.group(1)):02d}" if m else None
+
+def shannonish(i):
+    """True if the title or card text names the Shannon navigation or all navigations (the Shannon-Erne Waterway alone doesn't count)."""
+    text = re.sub(r"shannon\s*[-\u2013]\s*erne(\s+waterway)?", " ", (i.get("title") or "") + " " + (i.get("detail") or ""), flags=re.I)
+    return bool(SHANNON.search(text))
 
 def iso(d): return d.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 def ts(s): return datetime.fromisoformat(s.replace("Z", "+00:00"))
@@ -130,10 +148,33 @@ def main(path):
                 f["baseline"] = True
             if p and not f["title"]:
                 f["title"] = p.get("title", "")
+            f["listed"] = True
+            f["shannon"] = shannonish(f)
             items.append(f)
         # Keep anything seen before that has dropped off the list page, for a while, below the current ones.
+        # One that would still belong on the first page (posted no earlier than the oldest card there) and is
+        # missing from two checks running is marked as off the list, from the first check that missed it.
         urls = {i["url"] for i in items}
-        items += [p for p in data["items"] if p["url"] not in urls]
+        dates = [d for d in (posted(f) for f in found) if d]
+        oldest = min(dates) if dates else None
+        for p in data["items"]:
+            if p["url"] in urls:
+                continue
+            p = dict(p)
+            p["shannon"] = shannonish(p)
+            d = posted(p)
+            if p.get("listed") is not False and oldest and d and d >= oldest:
+                p.setdefault("missedSince", iso(now))
+                p["missed"] = int(p.get("missed", 0)) + 1
+                if p["missed"] >= 2:
+                    p["listed"] = False
+                    p["delisted"] = p["missedSince"]
+                    print("Off the list:", p["no"], p.get("title", "")[:60])
+            if p.get("listed") is True:
+                del p["listed"]
+            if p.get("listed") is False:
+                p.pop("missed", None); p.pop("missedSince", None)
+            items.append(p)
         data["items"] = items[:KEEP]
         data["ok"] = True
         new = [f for f in found if f["url"] not in prev]
