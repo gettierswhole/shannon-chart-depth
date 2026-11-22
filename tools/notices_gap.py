@@ -1,13 +1,17 @@
 # Compare Waterways Ireland's notices list (notices_site.json) with the page's summarised notices.
-# Usage: notices_gap.py <notices_site.json> <notices live document .json> <state .json or -> [now ISO]
+# Usage: notices_gap.py <notices_site.json> <notices live document .json> <state .json or -> [<handled .json or ->]
+#   state:   what this script printed as "state" last time ({"alerted": [...], "seen": {...}}), or - if there is none
+#   handled: {"<email message id>": "<email date, ISO 8601>", ...} for the emails dealt with in this run, or -
 # Prints one JSON object:
 #   unsummarised: Shannon notices on their list with no summary on the page (number, their title, link, hours waiting)
 #   delisted:     summarised notices that have gone from their list since our summary was written
 #   alert:        short lines to tell the owner about, each only once (6 hours' grace for a missing summary)
-#   state:        what to store for next time, so nothing is alerted twice
+#   state:        what to store for next time, so nothing is alerted twice and no email is read twice
+#                 (seen = the message ids already dealt with, kept for 30 days)
 # It reads two local files and writes nothing. No network.
 import json, sys
-from datetime import datetime, timezone
+import os
+from datetime import datetime, timezone, timedelta
 
 def ts(s): return datetime.fromisoformat(s.replace("Z", "+00:00"))
 def doc(path):
@@ -19,7 +23,8 @@ def doc(path):
 
 site, live = doc(sys.argv[1]), doc(sys.argv[2])
 state = doc(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[3] != "-" else {}
-now = ts(sys.argv[4]) if len(sys.argv) > 4 else datetime.now(timezone.utc)
+handled = doc(sys.argv[4]) if len(sys.argv) > 4 and sys.argv[4] != "-" else {}
+now = ts(os.environ["GAP_NOW"]) if os.environ.get("GAP_NOW") else datetime.now(timezone.utc)
 items = [i for i in site.get("items", []) if isinstance(i, dict) and i.get("url")]
 notices = [n for n in live.get("notices", []) if isinstance(n, dict) and n.get("no")]
 known = {str(n["no"]): n for n in notices}
@@ -56,5 +61,14 @@ for g in gone:
         told.add(key)
 # Forget keys for notices that are no longer in either place.
 live_keys = {"new-" + u["no"] for u in uns} | {"gone-" + g["no"] for g in gone}
+seen = {}
+for src in (state.get("seen"), handled):
+    if isinstance(src, dict):
+        for k, v in src.items():
+            try:
+                if now - ts(str(v)) < timedelta(days=30):
+                    seen[str(k)] = str(v)
+            except Exception:
+                pass
 print(json.dumps({"siteChecked": site.get("checked"), "siteOk": site.get("ok"), "unsummarised": uns, "delisted": gone,
-                  "alert": alert, "state": {"alerted": sorted(told & live_keys)}}, ensure_ascii=False))
+                  "alert": alert, "state": {"alerted": sorted(told & live_keys), "seen": seen}}, ensure_ascii=False))
