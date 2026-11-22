@@ -1,5 +1,5 @@
 {
-"checked": "2026-11-22T16:26:13Z",
+"checked": "2026-11-22T22:33:32Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
 {
@@ -11,8 +11,8 @@
 "detail": "Shannon Navigation – Temporary Restriction at Athlone Town Bridge Posted: 16/11/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-125-of-2026",
 "firstSeen": "2026-11-16T22:19:09Z",
-"shannon": true,
-"listed": true
+"listed": true,
+"shannon": true
 },
 {
 "no": "118",
@@ -25,8 +25,8 @@
 "firstSeen": "2026-11-03T23:03:53Z",
 "changed": "2026-11-06T16:08:11Z",
 "baseline": true,
-"shannon": true,
-"listed": true
+"listed": true,
+"shannon": true
 },
 {
 "no": "114",
@@ -38,8 +38,8 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-114-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": true,
-"listed": true
+"listed": true,
+"shannon": true
 },
 {
 "no": "117",
@@ -51,8 +51,8 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-117-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": false,
-"listed": true
+"listed": true,
+"shannon": false
 },
 {
 "no": "104",
@@ -64,8 +64,8 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-104-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": false,
-"listed": true
+"listed": true,
+"shannon": false
 },
 {
 "no": "112",
@@ -77,8 +77,8 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-112-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": false,
-"listed": true
+"listed": true,
+"shannon": false
 },
 {
 "no": "107",
@@ -90,8 +90,8 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-107-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": true,
-"listed": true
+"listed": true,
+"shannon": true
 },
 {
 "no": "106",
@@ -103,8 +103,8 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-106-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": true,
-"listed": true
+"listed": true,
+"shannon": true
 },
 {
 "no": "88",
@@ -116,8 +116,8 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-88-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": false,
-"listed": true
+"listed": true,
+"shannon": false
 },
 {
 "no": "87",
@@ -129,8 +129,8 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-87-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": true,
-"listed": true
+"listed": true,
+"shannon": true
 },
 {
 "no": "53",
@@ -142,8 +142,8 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-53-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": true,
-"listed": true
+"listed": true,
+"shannon": true
 },
 {
 "no": "35",
@@ -155,8 +155,8 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-35-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": true,
-"listed": true
+"listed": true,
+"shannon": true
 },
 {
 "no": "1",
@@ -168,8 +168,8 @@
 "url": "https://www.waterwaysireland.org/news/special-marine-notice-no1-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": false,
-"listed": true
+"listed": true,
+"shannon": false
 },
 {
 "no": "123",
@@ -221,7 +221,9 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-113-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": false
+"shannon": false,
+"missedSince": "2026-11-22T22:33:32Z",
+"missed": 1
 },
 {
 "no": "121",
@@ -232,7 +234,9 @@
 "detail": "Lough Erne - Enniskillen - Fours Head of the River Rowing Race Posted: 04/11/2026",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-121-of-2026",
 "firstSeen": "2026-11-04T16:14:02Z",
-"shannon": false
+"shannon": false,
+"missedSince": "2026-11-22T22:33:32Z",
+"missed": 1
 },
 {
 "no": "120",
@@ -244,7 +248,9 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-120-of-2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
-"shannon": false
+"shannon": false,
+"missedSince": "2026-11-22T22:33:32Z",
+"missed": 1
 }
 ],
 "ok": true
