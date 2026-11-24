@@ -1,0 +1,24 @@
+name: ESB probe (temporary)
+on:
+  push:
+    branches: [esb-probe]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch the two ESB PDFs
+        run: |
+          mkdir out
+          for f in 05-Portumna-Bridge 06-Pier-Head-Killaloe; do
+            curl -sS -L --max-time 60 -A "shannon-chart-depth (github.com/gettierswhole/shannon-chart-depth)" -o "out/$f.pdf" -D "out/$f.headers" "http://www.esbhydro.ie/Shannon/$f.pdf" || echo "curl failed for $f"
+            ls -l "out/$f.pdf" || true
+            head -c 8 "out/$f.pdf" | xxd || true
+            cat "out/$f.headers" || true
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: esb-pdfs
+          path: out
