@@ -1,12 +1,12 @@
 name: Check marine notices
 # One visit an hour at most to Waterways Ireland's marine notices: the list of live notices, then the pages of the
 # Shannon notices on it that are new or changed (see tools/check_notices.py). By their Inspector's written permission.
-# By day the scheduled task "Shannon notices check" starts this job once an hour (workflow_dispatch). The schedule
-# below covers the night. The script keeps the visits an hour apart whoever starts it: a start in the last quarter
-# of the hour waits it out, an earlier one does nothing.
+# It is started once an hour by day from outside (workflow_dispatch), because GitHub's own schedule below has only
+# been starting 2 to 4 runs a day. The schedule stays as the fallback. The script keeps the visits an hour apart
+# whoever starts it: a start in the last quarter of the hour waits it out, an earlier one does nothing.
 on:
   schedule:
-    - cron: "23 23,0-5 * * *"
+    - cron: "23 * * * *"
   workflow_dispatch:
 permissions:
   contents: write
