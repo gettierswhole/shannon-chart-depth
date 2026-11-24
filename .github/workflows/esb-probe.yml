@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - uses: actions/checkout@v4
       - name: Fetch the two ESB PDFs
         run: |
           mkdir out
@@ -18,7 +19,6 @@ jobs:
             head -c 8 "out/$f.pdf" | xxd || true
             cat "out/$f.headers" || true
           done
-      - uses: actions/upload-artifact@v4
-        with:
-          name: esb-pdfs
-          path: out
+      - name: Show the text
+        run: |
+          python3 tools/esb_probe.py out/06-Pier-Head-Killaloe.pdf
