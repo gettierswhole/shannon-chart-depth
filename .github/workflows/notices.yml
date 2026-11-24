@@ -1,22 +1,25 @@
 name: Check marine notices
-# One request an hour at most to Waterways Ireland's marine notices list, by their written permission.
-# The script also refuses to run within 60 minutes of its last check, so a manual run can't add a second request.
+# One visit an hour at most to Waterways Ireland's marine notices: the list of live notices, then the pages of the
+# Shannon notices on it that are new or changed (see tools/check_notices.py). By their Inspector's written permission.
+# By day the scheduled task "Shannon notices check" starts this job once an hour (workflow_dispatch). The schedule
+# below covers the night. The script keeps the visits an hour apart whoever starts it: a start in the last quarter
+# of the hour waits it out, an earlier one does nothing.
 on:
   schedule:
-    - cron: "23 * * * *"
+    - cron: "23 23,0-5 * * *"
   workflow_dispatch:
 permissions:
   contents: write
 concurrency:
-  group: data-json
+  group: notices
   cancel-in-progress: false
 jobs:
   notices:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - name: Check the marine notices list
+      - name: Read the marine notices
         run: python3 tools/check_notices.py notices_site.json
       - name: Commit if changed
         run: |
@@ -27,5 +30,5 @@ jobs:
           git config user.name "gauge-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Check marine notices"
-          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && exit 0; sleep 5; done
+          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push -q origin main && exit 0; sleep 7; done
           exit 1

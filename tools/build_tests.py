@@ -14,6 +14,7 @@ TRIM_CSS = r'''
 #sun-bar, #sun-note, #trip > .fine, #food-asof { display: none !important; }
 .notice-list { gap: 8px; }
 .notice-list li:not(.urgent) > span:not(.ended-tag):not(.ended-note) { display: none; }
+.notice-list li:not(.urgent) > details { display: none; }
 .fold { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; border-top: 1px solid var(--line); }
 .fold + .fold { margin-top: 0; }
 .fold > summary { font-weight: 600; min-height: 24px; }
@@ -102,8 +103,8 @@ document.addEventListener("DOMContentLoaded", function () {
     var f = document.getElementById("food-box"); if (f && f.closest(".fold")) f.closest(".fold").hidden = f.hidden;
   }, 1000);
   // One short line under the notices.
-  var nf = [].slice.call(document.querySelectorAll(".notices > .fine")).filter(function (p) { return /AI assistant/.test(p.textContent); })[0];
-  if (nf) nf.innerHTML = 'Short AI summaries, not checked each time. <a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">Official notices on waterwaysireland.org</a>.';
+  var nf = [].slice.call(document.querySelectorAll(".notices > .fine")).filter(function (p) { return /own words|AI assistant/.test(p.textContent); })[0];
+  if (nf) nf.innerHTML = 'In Waterways Ireland\'s own words, from their list of live notices. <a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">Official notices on waterwaysireland.org</a>.';
 });
 </script>
 '''

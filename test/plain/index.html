@@ -196,6 +196,9 @@ h2 { font-family: var(--body); font-weight: 500; font-size: 1.12rem; line-height
 .notice-list .ended-tag { justify-self: start; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
   color: var(--ok); border: 1px solid var(--ok); border-radius: 4px; padding: 1px 6px; margin: 2px 0; }
 .notice-list .ended-note { font-size: 0.85rem; color: var(--muted); }
+.notice-list .n-meta { font-size: 0.85rem; color: var(--muted); }
+.notice-list details.n-words > summary { cursor: pointer; font-size: 0.85rem; color: var(--muted); padding: 2px 0; }
+.notice-list .n-text { white-space: pre-line; margin: 4px 0 2px; padding: 8px 12px; border-left: 3px solid var(--line-strong); background: var(--water-soft); border-radius: 0 8px 8px 0; }
 .notice-list a { font-weight: 600; text-decoration: none; }
 .notice-list a:hover { text-decoration: underline; }
 .notice-list span { font-size: 0.9rem; color: var(--muted); }
@@ -331,7 +334,7 @@ a { color: var(--water); }
         </div>
         <ul class="notice-list" id="notices"></ul>
         <p class="fine" id="site-checked" hidden></p>
-        <p class="fine">These are short summaries written by an AI assistant and not checked by a person each time, so they may contain mistakes. The official text is on Waterways Ireland's website: <a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">all live marine notices on waterwaysireland.org</a>. Summaries are written from Waterways Ireland's emails, which are read four times a day (about 08:00, 12:00, 16:00 and 20:00). Their notices list is also read, with their permission, at most once an hour and in practice a few times a day. A Shannon notice on that list with no summary here yet is shown with Waterways Ireland's own title and a link. A notice that has gone from their list is marked, as it may have been lifted.</p>
+        <p class="fine">Each notice is shown in Waterways Ireland's own words, copied from their website by an automatic check and not by a person, so look at their site before relying on one: <a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">all live marine notices on waterwaysireland.org</a>. Their list shows only live notices. This page reads it about once an hour by day and a few times overnight. A notice that leaves their list is marked here for three days and then removed. A line marked as our summary was written by an AI assistant from their email and may contain mistakes.</p>
         <div id="events-box" hidden>
           <h3 class="ev-head">Events on the water</h3>
           <ul class="notice-list" id="events"></ul>
@@ -564,7 +567,7 @@ a { color: var(--water); }
     <ul class="credit-list">
       <li><strong>Office of Public Works (OPW)</strong>: water levels from the gauges at Portumna, Banagher, Shannonbridge, Athlone, Hodson's Bay and Carrick-on-Shannon, from <a href="https://waterlevel.ie/" target="_blank" rel="noopener">waterlevel.ie</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Readings are provisional, as the OPW publish them. This page compares them with reference levels and works out depth corrections from them; those workings are ours, not the OPW's.</li>
       <li><strong>Met Éireann</strong>: the inland lakes forecast and the HARMONIE model point forecast. Copyright Met Éireann. Source <a href="https://www.met.ie/" target="_blank" rel="noopener">www.met.ie</a>. This data is published under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Met Éireann does not accept any liability whatsoever for any error or omission in the data, their availability, or for any loss or damage arising from their use. This page has modified the data: it shortens the written forecast, picks out the lakes on this stretch, and converts and summarises the model's wind and rain.</li>
-      <li><strong>Waterways Ireland</strong>: marine notices, lock opening hours, ordinary summer levels, lock cill heights and the daily navigation levels report. With the written permission of their Inspector of Navigation, this page checks their marine notices list no more than once an hour, and keeps only each notice's number, title and link.</li>
+      <li><strong>Waterways Ireland</strong>: marine notices, lock opening hours, ordinary summer levels, lock cill heights and the daily navigation levels report. With the written permission of their Inspector of Navigation, this page reads their list of live marine notices, and the Shannon notices on it, no more than once an hour, and shows each one in their own words while it is on their list.</li>
       <li><strong>ESB</strong>: the once-a-day 09:00 levels for Lough Derg at Pier Head, Killaloe and at Portumna Bridge, in metres over Poolbeg datum, which are behind the “Killaloe end” line; and links to its Shannon flow and level reports. All from <a href="http://www.esbhydro.ie/" target="_blank" rel="noopener">esbhydro.ie</a>. Copyright ESB. ESB does not guarantee the accuracy of its data and accepts no liability for its use.</li>
       <li><strong>CSIG</strong>: the chart datum figures behind the depth correction come from the CSIG's published articles and forum posts. The depth correction is meant for use with CSIG charts. No CSIG chart data is shown or shared on this page.</li>
       <li><strong>IWAI Athlone branch</strong>: the Lough Ree chart datum and the lake's record low used to set it, and the method and bridge height behind the Athlone M6 bridge air draft.</li>
@@ -1373,112 +1376,133 @@ a { color: var(--water); }
     if (state.events && state.events.updated) $("events-note").textContent = "Regattas, rallies and festivals from club calendars and venue newsletters, next 60 days. Checked " +
       new Date(state.events.updated).toLocaleDateString("en-IE", { day: "numeric", month: "short", timeZone: "Europe/Dublin" }) + ".";
   }
+  // Marine notices. Waterways Ireland's own list of live notices is the authority. It is read about once an hour
+  // by the GitHub job (tools/check_notices.py), which also keeps the text of each Shannon notice. A Shannon notice
+  // on their list is shown here in their own words. One that has left their list is marked "no longer listed" for
+  // 72 hours and then goes. Our own entries (notices/live) are shown only where their list has nothing for that
+  // number: a notice known so far only from their email, or one the owner added by hand.
+  var noticeOpen = {};
+  var N_LIST = "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices";
+  var N_RELIEF = /re-?open|operational|lifted|cancel|restored|resum|repairs? complete|back in operation/i;
+  var N_RESTRICT = /clos|restrict|industrial action|not operat|suspen|out of service|fault|obstruct|sunk|block|impassable|no passage|hazard|danger/i;
+  function siteHeading(i) { return (i.heading != null ? i.heading : (i.detail || "").replace(/\s*Posted:[\s\S]*$/i, "")).trim(); }
+  function sitePosted(i) { if (i.posted) return i.posted; var m = /Posted:\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(i.detail || ""); return m ? m[3] + "-" + ("0" + m[2]).slice(-2) + "-" + ("0" + m[1]).slice(-2) : null; }
+  function siteDay(iso) { var d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-CA", { timeZone: "Europe/Dublin" }); }
+  function siteKind(i) { if (typeof i.kind === "string") return i.kind; var t = (i.title || "") + " " + siteHeading(i); return N_RELIEF.test(t) ? "relief" : N_RESTRICT.test(t) ? "restriction" : ""; }
+  function siteShannon(i) { return typeof i.shannon === "boolean" ? i.shannon : SHANNONISH.test(((i.title || "") + " " + siteHeading(i)).replace(/shannon\s*[-–]\s*erne(\s+waterway)?/ig, " ")); }
+  function siteKey(i) { return (i.special ? "S" : "") + String(i.no); }
+  // When the latest word on a listed notice was posted: its posted date, or a later change to its card or text.
+  function siteWhen(i) {
+    var p = sitePosted(i), t = p ? Date.parse(p + "T12:00:00Z") : NaN;
+    [i.cardChanged, i.textChanged].forEach(function (c) { var v = c ? Date.parse(c) : NaN; if (!isNaN(v) && (isNaN(t) || v > t)) t = v; });
+    if (isNaN(t)) t = Date.parse(i.firstSeen);
+    return isNaN(t) ? null : t;
+  }
+  function noticeSpan(cls, text) { var s = document.createElement("span"); if (cls) s.className = cls; s.textContent = text; return s; }
   function renderNotices() {
     renderEvents();
     var today = dublinISO(0), ul = $("notices"); ul.textContent = "";
-    $("notices-asof").textContent = "Live notices as of " + noticesAsOf;
-    // A notice that has ended, whether lifted by an update (n.ended) or run past its last day (n.until), stays for
-    // 72 hours at the top of the list with a green tag, so the change sinks in before it disappears.
-    var HOLD = 72 * 3600e3, now = Date.now();
-    var rows = NOTICES.map(function (n) {
+    // A notice that has ended stays for 72 hours with a green tag, so the change sinks in before it disappears.
+    var HOLD = 72 * 3600e3, RECENT = 14 * 864e5, now = Date.now();
+    var items = SITE && Array.isArray(SITE.items) ? SITE.items.filter(function (i) { return i && i.url && i.no != null && siteShannon(i); }) : [];
+    $("notices-asof").textContent = SITE && SITE.checked ? "Their list as read " + fmtTime(SITE.lastGood || SITE.checked) : "Live notices as of " + noticesAsOf;
+    var listed = {}, gone = {}, ours = {}, rows = [];
+    items.forEach(function (i) {
+      var k = siteKey(i);
+      if (i.listed === true) { if (!listed[k] || (siteWhen(i) || 0) > (siteWhen(listed[k]) || 0)) listed[k] = i; }
+      else if (i.listed === false) gone[k] = true;
+    });
+    items.forEach(function (i) {
+      if (i.listed === true) rows.push({ site: i, t: siteWhen(i), end: null });
+      else if (i.listed === false && i.delisted && !listed[siteKey(i)]) {
+        var d = Date.parse(i.delisted);
+        if (!isNaN(d) && now - d < HOLD) rows.push({ site: i, t: d, end: d });
+      }
+    });
+    NOTICES.forEach(function (n) {
+      var k = String(n.no), s = listed[k];
+      if (s) {
+        // Their list has this number. Our entry is kept back, unless it comes from a later email than their card
+        // (an update their list does not show yet).
+        var p = sitePosted(s);
+        if (!(n.src === "email" && n.sent && p && siteDay(n.sent) > p)) { ours[k] = n; return; }
+      }
       var end = n.ended ? new Date(n.ended).getTime() : (n.until < today ? endOfIrishDay(n.until) : null);
       if (end != null && end > now) end = null;
-      return { n: n, end: end };
-    }).filter(function (x) { return x.end == null || now - x.end < HOLD; }).concat(siteOnly());
-    // Newest first, by when the latest word on each notice was sent: an update or reopening counts from when it was
-    // sent, a new notice from when it was issued. Notices with no recorded time go below, highest number first.
-    function sentAt(x) { if (x.site) return x.t; var t = x.n.ended ? x.n.ended : x.n.sent; var v = t ? Date.parse(t) : NaN; return isNaN(v) ? null : v; }
+      if (end != null) { if (now - end < HOLD) rows.push({ n: n, t: end, end: end }); return; }
+      if (!s && gone[k] && /^\d+$/.test(k)) return;   // their list has dropped it; the row above says so for 72 hours
+      var t = n.sent ? Date.parse(n.sent) : NaN;
+      rows.push({ n: n, t: isNaN(t) ? null : t, end: null });
+    });
+    // Newest first, by when the latest word on each notice came. Entries with no recorded time go below.
     rows.sort(function (x, y) {
-      var a = sentAt(x), b = sentAt(y);
-      if (a != null && b != null) return b - a;
-      if (a != null) return -1;
-      if (b != null) return 1;
-      return (parseInt(y.n.no, 10) || 0) - (parseInt(x.n.no, 10) || 0);
+      if (x.t != null && y.t != null) return y.t - x.t;
+      if (x.t != null) return -1;
+      if (y.t != null) return 1;
+      return (parseInt((y.n || y.site).no, 10) || 0) - (parseInt((x.n || x.site).no, 10) || 0);
     });
     rows.forEach(function (x) {
+      var li = document.createElement("li"), a = document.createElement("a");
+      a.target = "_blank"; a.rel = "noopener";
       if (x.site) {
-        // On Waterways Ireland's list with no summary here yet: their own title and link, nothing more.
-        var i = x.site, sli = document.createElement("li"), sa = document.createElement("a"), ss = document.createElement("span");
-        sli.className = "active";
-        sa.href = i.url; sa.target = "_blank"; sa.rel = "noopener";
-        var head = (i.detail || "").replace(/\s*(Posted:\s*)?(\d{1,2}\/\d{1,2}\/\d{4}|read more).*$/i, "").slice(0, 110);
-        sa.textContent = (i.special ? "Special MN " : i.update ? "Update to MN " : "MN ") + i.no + (head ? ": " + head : "");
-        ss.textContent = "Waterways Ireland's own title, " + (i.changed ? "changed on their list " + fmtTime(i.changed) : "on their list since " + fmtTime(i.firstSeen)) +
-          ". No summary here yet: open it for the details.";
-        sli.appendChild(sa); sli.appendChild(ss); ul.appendChild(sli);
+        var i = x.site, k = siteKey(i), head = siteHeading(i), p = sitePosted(i), recent = x.t != null && now - x.t < RECENT;
+        li.className = x.end != null ? "ended" : siteKind(i) === "restriction" ? (recent ? "urgent" : "active") : "";
+        a.href = x.end != null ? N_LIST : i.url;
+        a.textContent = (i.special ? "Special MN " : i.update ? "Update to MN " : "MN ") + i.no + (head ? ": " + head : "");
+        li.appendChild(a);
+        if (x.end != null) {
+          li.appendChild(noticeSpan("ended-tag", "no longer listed · " + fmtTime(i.delisted)));
+          li.appendChild(noticeSpan("", "Waterways Ireland no longer lists this as a live notice."));
+          li.appendChild(noticeSpan("ended-note", "Leaves this list " + fmtTime(new Date(x.end + HOLD).toISOString()) + "."));
+        }
+        var when = p ? "Posted " + new Date(p + "T12:00:00Z").toLocaleDateString("en-IE", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Dublin" })
+                     : "On their list since " + fmtTime(i.firstSeen);
+        if (i.textChanged) when += " · their text changed " + fmtTime(i.textChanged);
+        li.appendChild(noticeSpan("n-meta", when));
+        if (i.text) {
+          var d = document.createElement("details"), sm = document.createElement("summary"), tx = document.createElement("div");
+          d.className = "n-words"; tx.className = "n-text";
+          sm.textContent = "Waterways Ireland's notice, in their words";
+          tx.textContent = i.text + (i.textCut ? "\n\n… The notice continues on their site." : "");
+          d.open = i.url in noticeOpen ? noticeOpen[i.url] : (x.end == null && recent);
+          d.addEventListener("toggle", function () { noticeOpen[i.url] = d.open; });
+          d.appendChild(sm); d.appendChild(tx); li.appendChild(d);
+        } else if (x.end == null && ours[k]) {
+          li.appendChild(noticeSpan("", ours[k].text));
+          li.appendChild(noticeSpan("ended-note", "Our summary, written by an AI assistant. Their own words will replace it once their page has been read."));
+        } else if (x.end == null) {
+          li.appendChild(noticeSpan("ended-note", "Their text has not been read yet: open the notice for the details."));
+        }
+        ul.appendChild(li);
         return;
       }
-      var n = x.n, li = document.createElement("li"), a = document.createElement("a"), s = document.createElement("span");
+      var n = x.n;
       li.className = x.end != null ? "ended" : n.level;
-      a.href = n.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "MN " + n.no + ": " + n.title;
+      a.href = n.url; a.textContent = "MN " + n.no + ": " + n.title;
       li.appendChild(a);
       if (x.end != null) {
-        var tag = document.createElement("span"), note = document.createElement("span");
-        tag.className = "ended-tag";
-        tag.textContent = (n.endedHow || "ended") + " · " + fmtTime(new Date(x.end).toISOString());
-        s.textContent = n.endedText || (n.ended ? "This notice has been lifted." : "Its last day, " +
-          new Date(n.until + "T12:00:00Z").toLocaleDateString("en-IE", { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Dublin" }) + ", has passed.");
-        note.className = "ended-note";
-        note.textContent = "Leaves this list " + fmtTime(new Date(x.end + HOLD).toISOString()) + ".";
-        li.appendChild(tag); li.appendChild(s); li.appendChild(note);
+        li.appendChild(noticeSpan("ended-tag", (n.endedHow || "ended") + " · " + fmtTime(new Date(x.end).toISOString())));
+        li.appendChild(noticeSpan("", n.endedText || (n.ended ? "This notice has been lifted." : "Its last day, " +
+          new Date(n.until + "T12:00:00Z").toLocaleDateString("en-IE", { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Dublin" }) + ", has passed.")));
+        li.appendChild(noticeSpan("ended-note", "Leaves this list " + fmtTime(new Date(x.end + HOLD).toISOString()) + "."));
       } else {
-        s.textContent = n.text;
-        li.appendChild(s);
-        var gone = siteGone(n);
-        if (gone) {
-          var g = document.createElement("span");
-          g.className = "ended-note"; g.style.color = "var(--warn)"; g.style.fontWeight = "600";
-          g.textContent = "No longer on Waterways Ireland's list since " + fmtTime(gone) + ". It may have been lifted: check with them before relying on it.";
-          li.appendChild(g);
-        }
+        li.appendChild(noticeSpan("", n.text));
+        if (n.src === "email") li.appendChild(noticeSpan("ended-note", "From Waterways Ireland's email" + (n.sent ? " of " + fmtTime(n.sent) : "") +
+          ", summarised by an AI assistant. Their list does not show this yet; their own words will replace it when it does."));
       }
       ul.appendChild(li);
     });
     renderSiteNotices();
-  }
-  // Waterways Ireland's own list is the index (read by their permission, at most once an hour: number, title and
-  // link only). A Shannon notice on it with no summary here yet goes straight into the list above, with their title
-  // and a link. A summarised notice that has gone from their list is marked, since it may have been lifted.
-  function siteText(i) { return ((i.title || "") + " " + (i.detail || "")).replace(/shannon\s*[-–]\s*erne(\s+waterway)?/ig, " "); }
-  function sitePosted(i) { var m = /Posted:\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(i.detail || ""); return m ? m[3] + "-" + ("0" + m[2]).slice(-2) + "-" + ("0" + m[1]).slice(-2) : null; }
-  function siteDay(iso) { var d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-CA", { timeZone: "Europe/Dublin" }); }
-  function siteOnly() {
-    if (!SITE || !Array.isArray(SITE.items)) return [];
-    var known = {}, cutoff = Date.now() - 21 * 864e5, upd = noticesUpdated ? new Date(noticesUpdated).getTime() : 0;
-    NOTICES.forEach(function (n) { known[String(n.no)] = n; });
-    return SITE.items.filter(function (i) {
-      if (!i || !i.url || !i.firstSeen || (i.baseline && !i.changed)) return false;
-      var seen = new Date(i.changed || i.firstSeen).getTime();
-      // On their list now, where the check records that; otherwise first seen in the last three weeks.
-      if (typeof i.listed === "boolean" ? !i.listed : !(seen > cutoff)) return false;
-      if (!(typeof i.shannon === "boolean" ? i.shannon : SHANNONISH.test(siteText(i)))) return false;
-      if (i.special) return !upd || seen > upd;
-      var k = known[String(i.no)];
-      if (!k) return !(i.update || i.changed) || !upd || seen > upd;
-      if (!(i.update || i.changed)) return false;
-      // An update to a notice held here: covered once our entry was written from an email sent on or after the day they posted it.
-      var ours = k.ended || k.sent, p = sitePosted(i);
-      if (ours && p) return siteDay(ours) < p;
-      return seen > (ours ? Date.parse(ours) : upd);
-    }).map(function (i) { return { site: i, t: new Date(i.changed || i.firstSeen).getTime(), end: null }; });
-  }
-  // When a summarised notice went from their list (the first check that missed it), or null if it is still there or unknown.
-  function siteGone(n) {
-    if (!SITE || !Array.isArray(SITE.items) || n.ended) return null;
-    var its = SITE.items.filter(function (i) { return i && !i.special && String(i.no) === String(n.no); });
-    if (!its.length || its.some(function (i) { return i.listed !== false; })) return null;
-    var t = its.map(function (i) { return i.delisted || ""; }).sort().pop();
-    if (!t) return null;
-    var ours = n.sent ? Date.parse(n.sent) : NaN;
-    return isNaN(ours) || Date.parse(t) > ours ? t : null;
   }
   function renderSiteNotices() {
     var chk = $("site-checked");
     if (!SITE || !SITE.checked) { chk.hidden = true; return; }
     var age = Date.now() - new Date(SITE.checked).getTime();
     chk.hidden = false;
-    chk.textContent = "Waterways Ireland's notices list last read " + fmtTime(SITE.checked) +
-      (SITE.ok === false ? " (the read didn't get through)" : "") + (age > 12 * 3600e3 ? ". That's more than 12 hours ago." : ".");
+    chk.textContent = "Waterways Ireland's list of live notices last read " + fmtTime(SITE.checked) +
+      (SITE.ok === false ? " (the read didn't get through)" : "") +
+      (SITE.suspect ? ". That read looked short, so nothing was taken down on it" : "") +
+      (age > 3 * 3600e3 ? ". That's more than 3 hours ago: check their site." : ".");
   }
   // Midnight at the end of an Irish calendar day (YYYY-MM-DD), as a UTC time.
   function endOfIrishDay(iso) {
@@ -2933,6 +2957,7 @@ a { color: var(--water); }
 #sun-bar, #sun-note, #trip > .fine, #food-asof { display: none !important; }
 .notice-list { gap: 8px; }
 .notice-list li:not(.urgent) > span:not(.ended-tag):not(.ended-note) { display: none; }
+.notice-list li:not(.urgent) > details { display: none; }
 .fold { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; border-top: 1px solid var(--line); }
 .fold + .fold { margin-top: 0; }
 .fold > summary { font-weight: 600; min-height: 24px; }
@@ -3017,8 +3042,8 @@ document.addEventListener("DOMContentLoaded", function () {
     var f = document.getElementById("food-box"); if (f && f.closest(".fold")) f.closest(".fold").hidden = f.hidden;
   }, 1000);
   // One short line under the notices.
-  var nf = [].slice.call(document.querySelectorAll(".notices > .fine")).filter(function (p) { return /AI assistant/.test(p.textContent); })[0];
-  if (nf) nf.innerHTML = 'Short AI summaries, not checked each time. <a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">Official notices on waterwaysireland.org</a>.';
+  var nf = [].slice.call(document.querySelectorAll(".notices > .fine")).filter(function (p) { return /own words|AI assistant/.test(p.textContent); })[0];
+  if (nf) nf.innerHTML = 'In Waterways Ireland\'s own words, from their list of live notices. <a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">Official notices on waterwaysireland.org</a>.';
 });
 </script>
 </body>
