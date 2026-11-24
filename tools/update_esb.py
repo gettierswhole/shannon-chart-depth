@@ -1,32 +1,40 @@
-# Reads the ESB's daily 09:00 levels for Lough Derg (Pier Head, Killaloe and Portumna Bridge) from the
-# chart PDFs the ESB publish, and writes them to esb.json.
+# Reads the ESB's daily 09:00 levels for Lough Derg (Pier Head, Killaloe and Portumna Bridge) and the daily
+# flows out of the lake (Ardnacrusha, and the Parteen Weir total) from the chart PDFs the ESB publish, and
+# writes them to esb.json.
 #
 # Why: the Lough Derg chart datum is set at Killaloe, but the page's live gauge is at Portumna, at the other
 # end of the lake. Pier Head shows the Killaloe end. See claude/esb-pier-head.md in the project notes.
 #
-# The ESB give one reading a day, in metres over Poolbeg datum, and each file holds about 30 days.
+# The ESB give one reading a day, levels in metres over Poolbeg datum and flows in cubic metres per second,
+# and each file holds about 30 days. The flows are kept to see how the lake's slope from Portumna to
+# Killaloe goes with the flow leaving it; the page does not use them.
 # esb.json keeps every day seen, so the record grows past 30 days.
 #
 # Nothing is guessed. If a file cannot be fetched or does not read as expected, that gauge is left as it
 # was and the script exits with an error, so the run shows as failed.
 #
 # Usage: python3 tools/update_esb.py esb.json            (fetch and update)
-#        python3 tools/update_esb.py --parse file.pdf    (print what a saved PDF holds)
+#        python3 tools/update_esb.py --parse pierHead file.pdf    (print what a saved PDF holds, read as that gauge)
 import datetime, json, re, sys, urllib.request, zlib
 from zoneinfo import ZoneInfo
 
 BASE = "http://www.esbhydro.ie/Shannon/"
+# Lough Derg has stood between 32.0 (statutory minimum) and 34.76 (Portumna, Nov 2009) m Poolbeg.
+# Ardnacrusha takes up to about 400 m3/s; the Parteen total has passed 650 in floods.
 GAUGES = {
-    "pierHead": {"file": "06-Pier-Head-Killaloe.pdf", "name": "Pier Head, Killaloe"},
-    "portumna": {"file": "05-Portumna-Bridge.pdf", "name": "Portumna Bridge"},
+    "pierHead": {"file": "06-Pier-Head-Killaloe.pdf", "name": "Pier Head, Killaloe", "field": "level",
+                 "value": r"^\d\d\.\d\d$", "low": 31.5, "high": 35.5, "jump": 0.6},
+    "portumna": {"file": "05-Portumna-Bridge.pdf", "name": "Portumna Bridge", "field": "level",
+                 "value": r"^\d\d\.\d\d$", "low": 31.5, "high": 35.5, "jump": 0.6},
+    "ardnacrusha": {"file": "07-Total-Ardnacrusha-Flow.pdf", "name": "Ardnacrusha, total average daily flow", "field": "flow",
+                    "value": r"^\d{1,4}(\.\d+)?$", "low": -0.001, "high": 700, "jump": None},
+    "parteen": {"file": "08-Total-Parteen-Weir-Flow.pdf", "name": "Parteen Weir, total flow (Ardnacrusha plus the old river)", "field": "flow",
+                "value": r"^\d{1,4}(\.\d+)?$", "low": -0.001, "high": 1500, "jump": None},
 }
 AGENT = "shannon-chart-depth (github.com/gettierswhole/shannon-chart-depth)"
 DUBLIN = ZoneInfo("Europe/Dublin")
 MONTHS = {m: i + 1 for i, m in enumerate("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split())}
 STAMP = re.compile(r"^(\d\d)-([A-Z][a-z]{2})-(\d\d) (\d\d):(\d\d):(\d\d)$")
-VALUE = re.compile(r"^\d\d\.\d\d$")
-# Lough Derg has stood between 32.0 (statutory minimum) and 34.76 (Portumna, Nov 2009) m Poolbeg.
-LOW, HIGH = 31.5, 35.5
 
 
 def streams(pdf):
@@ -66,8 +74,9 @@ def chunks(content):
     return out
 
 
-def readings(pdf):
-    """{UTC time: level} from the table of daily readings: a timestamp and a value on the same line."""
+def readings(pdf, value):
+    """{UTC time: value} from the table of daily readings: a timestamp and a value on the same line."""
+    VALUE = re.compile(value)
     found = {}
     for raw in streams(pdf):
         content = raw.decode("latin-1")
@@ -91,19 +100,19 @@ def readings(pdf):
     return found
 
 
-def check(found, now):
-    """Refuse anything that does not look like a month of daily lake levels."""
+def check(found, now, g):
+    """Refuse anything that does not look like a month of daily readings for this gauge."""
     if len(found) < 20:
         raise ValueError("only %d readings found; expected about 30" % len(found))
-    if not all(LOW < v < HIGH for v in found.values()):
-        raise ValueError("a level outside %.1f to %.1f m Poolbeg" % (LOW, HIGH))
+    if not all(g["low"] < v < g["high"] for v in found.values()):
+        raise ValueError("a value outside %.1f to %.1f" % (g["low"], g["high"]))
     ts = sorted(found)
     newest = datetime.datetime.strptime(ts[-1], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
     if newest > now + datetime.timedelta(hours=1):
         raise ValueError("newest reading is in the future: " + ts[-1])
     steps = [abs(found[b] - found[a]) for a, b in zip(ts, ts[1:])]
-    if max(steps) > 0.6:
-        raise ValueError("a jump of %.2f m between days" % max(steps))
+    if g["jump"] is not None and max(steps) > g["jump"]:
+        raise ValueError("a jump of %.2f between days" % max(steps))
 
 
 def fetch(name):
@@ -113,12 +122,13 @@ def fetch(name):
 
 
 def main():
-    if len(sys.argv) == 3 and sys.argv[1] == "--parse":
-        found = readings(open(sys.argv[2], "rb").read())
+    if len(sys.argv) == 4 and sys.argv[1] == "--parse":
+        g = GAUGES[sys.argv[2]]
+        found = readings(open(sys.argv[3], "rb").read(), g["value"])
         for t in sorted(found):
             print(t, "%.2f" % found[t])
         print(len(found), "readings")
-        check(found, datetime.datetime.now(datetime.timezone.utc))
+        check(found, datetime.datetime.now(datetime.timezone.utc), g)
         return 0
     if len(sys.argv) != 2:
         print("usage: update_esb.py esb.json", file=sys.stderr)
@@ -132,8 +142,8 @@ def main():
     failed, changed = [], False
     for key, g in GAUGES.items():
         try:
-            found = readings(fetch(g["file"]))
-            check(found, now)
+            found = readings(fetch(g["file"]), g["value"])
+            check(found, now, g)
         except Exception as e:  # leave this gauge as it was
             failed.append("%s: %s" % (g["name"], e))
             continue
@@ -141,14 +151,14 @@ def main():
         days = {p["t"]: p["v"] for p in old.get("history", []) if isinstance(p, dict) and "t" in p and "v" in p}
         days.update(found)  # the ESB's latest figure for a day wins
         ts = sorted(days)
-        new = {"name": g["name"], "file": g["file"], "level": days[ts[-1]], "time": ts[-1],
+        new = {"name": g["name"], "file": g["file"], g["field"]: days[ts[-1]], "time": ts[-1],
                "history": [{"t": t, "v": days[t]} for t in ts]}
         if new != old:
             doc[key] = new
             changed = True
-        print("%s: %d days held, newest %s %.2f m" % (g["name"], len(ts), ts[-1], days[ts[-1]]))
+        print("%s: %d days held, newest %s %.2f" % (g["name"], len(ts), ts[-1], days[ts[-1]]))
     if changed:
-        doc["units"] = "m OD Poolbeg; one reading a day at 09:00 Irish time; times here are UTC"
+        doc["units"] = "levels in m OD Poolbeg, flows in m3/s; one reading a day at 09:00 Irish time; times here are UTC"
         doc["source"] = "ESB hydrometric information, esb.ie/what-we-do/generation-and-trading/hydrometric-information (chart PDFs under " + BASE + ")"
         doc["note"] = "The ESB do not guarantee these figures. Untested experiment, not an aid to navigation."
         doc["updated"] = now.strftime("%Y-%m-%dT%H:%M:%SZ")

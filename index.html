@@ -300,6 +300,14 @@ a { color: var(--water); }
           </div>
           <span class="pill" id="airdraft-age"></span>
         </div>
+        <div class="today-row" id="kairdraft-box" hidden>
+          <div>
+            <p class="label">Killaloe bridges: air draft</p>
+            <p class="today-main" id="kairdraft-main"></p>
+            <p class="fine" id="kairdraft-note"></p>
+          </div>
+          <span class="pill" id="kairdraft-age"></span>
+        </div>
         <div>
           <p class="label">Phone</p>
           <ul class="contacts" id="contacts"></ul>
@@ -959,6 +967,10 @@ a { color: var(--water); }
   function resolveChecks() {
     var changed = false;
     state.checks.forEach(function (c) {
+      if (c.wantSlope && c.slope == null) {
+        var sl = dergSlopeAt(new Date(c.time).getTime());
+        if (sl) { c.slope = sl.slope; c.slopeAt = sl.at; delete c.wantSlope; changed = true; }
+      }
       if (c.gauge) return;
       var r = byId(c.reach);
       if (!r) return;
@@ -968,7 +980,9 @@ a { color: var(--water); }
     if (changed) storeChecks();
   }
   function checksFor(r) { return state.checks.filter(function (c) { return c.reach === r.id; }); }
-  function checkDatum(c) { return c.gauge ? c.gauge.level - (c.lead - c.spot) : null; }
+  // A Killaloe board reading is taken at the far end of the lake from the Portumna gauge, so the lake's slope that day (c.slope, metres,
+  // from the ESB's two gauges) is taken off the Portumna level first. Checks saved before 24 Nov 2026 carry no slope and are left as they were.
+  function checkDatum(c) { return c.gauge ? c.gauge.level - (c.slope || 0) - (c.lead - c.spot) : null; }
   function median(a) {
     var s = a.slice().sort(function (x, y) { return x - y; }), n = s.length;
     return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2;
@@ -1044,6 +1058,43 @@ a { color: var(--water); }
     var pill = $("airdraft-age");
     pill.className = "pill " + (age > 6 * 3600e3 ? "warn" : "ok");
     pill.textContent = age > 6 * 3600e3 ? "Reading " + Math.round(age / 3600e3) + " h old" : "Live";
+  }
+  // Killaloe's two fixed bridges, from the ESB's Pier Head gauge at Killaloe (one 09:00 reading a day, m OD Poolbeg; owner's decision, 24 Nov 2026).
+  // Waterways Ireland's bridge table of 29 March 2025 (on the IWAI's site) gives air drafts of 3.85 m (road bridge) and 3.37 m (canal bridge)
+  // at the ordinary summer level of 33.38 m Poolbeg, so the undersides stand at 37.23 and 36.75 m Poolbeg. Figures are rounded down.
+  var KILLALOE_OSL = 33.38, KILLALOE_ROAD = 3.85, KILLALOE_CANAL = 3.37;
+  function renderKillaloeAirDraft() {
+    var box = $("kairdraft-box"), e = state.esb && state.esb.pierHead;
+    if (!box) return;
+    if (!e || typeof e.level !== "number" || !e.time) { box.hidden = true; return; }
+    var age = Date.now() - new Date(e.time).getTime();
+    if (!(age >= 0 && age < 36 * 3600e3)) { box.hidden = true; return; }
+    var down = function (m) { return (Math.floor(m * 100 + 1e-6) / 100).toFixed(2); };
+    var rise = e.level - KILLALOE_OSL;
+    box.hidden = false;
+    $("kairdraft-main").textContent = "Road bridge " + down(KILLALOE_ROAD - rise) + " m · canal bridge " + down(KILLALOE_CANAL - rise) + " m";
+    $("kairdraft-note").innerHTML = "Water surface to the underside, from the ESB's Pier Head gauge at Killaloe (" + e.level.toFixed(2) + " m Poolbeg, " + fmtTime(e.time) +
+      "). One reading a day, so the lake may have moved since. Bridge heights from Waterways Ireland's table of 29 March 2025, on the " +
+      "<a href=\"https://www.iwai.ie/bridge-air-drafts/\" target=\"_blank\" rel=\"noopener\">IWAI's site</a>: " + KILLALOE_ROAD.toFixed(2) + " m and " + KILLALOE_CANAL.toFixed(2) +
+      " m at the ordinary summer level of " + KILLALOE_OSL.toFixed(2) + " m Poolbeg. Rounded down. Not to be relied on alone: check the air-draft boards at the bridge and leave a margin.";
+    var pill = $("kairdraft-age");
+    pill.className = "pill warn";
+    pill.textContent = "Reading " + Math.round(age / 3600e3) + " h old";
+  }
+  // The lake's slope from Portumna down to Killaloe near a given time: the ESB's Portumna reading less its Pier Head one, from the
+  // 09:00 pair nearest that time, if within 24 hours. Null when the page holds no such pair. Used for Killaloe gauge-board checks.
+  function dergSlopeAt(t) {
+    var e = state.esb;
+    if (!e || !e.pierHead || !e.portumna) return null;
+    var pts = function (g) { var a = Array.isArray(g.history) ? g.history.slice() : []; if (typeof g.level === "number" && g.time) a.push({ t: g.time, v: g.level }); return a; };
+    var q = {}, best = null;
+    pts(e.portumna).forEach(function (p) { if (p && p.t && typeof p.v === "number") q[p.t] = p.v; });
+    pts(e.pierHead).forEach(function (p) {
+      if (!p || !p.t || typeof p.v !== "number" || typeof q[p.t] !== "number") return;
+      var d = Math.abs(new Date(p.t).getTime() - t);
+      if (isFinite(d) && d <= 24 * 3600e3 && (!best || d < best.d)) best = { d: d, at: p.t, slope: Math.round((q[p.t] - p.v) * 1000) / 1000 };
+    });
+    return best ? { slope: best.slope, at: best.at } : null;
   }
   function ftIn(m) {
     var totalIn = Math.round(Math.abs(m) * FT * 12);
@@ -1505,6 +1556,7 @@ a { color: var(--water); }
     }
 
     renderAirDraft();
+    renderKillaloeAirDraft();
     renderFood(r, t);
     renderSights(r);
     var ul = $("contacts"); ul.textContent = "";
@@ -2301,6 +2353,7 @@ a { color: var(--water); }
         p.textContent = "Killaloe end: " + (n === 0 ? "at chart datum" : ftInText(n) + (n > 0 ? " over" : " under") + " chart datum") +
           " by the ESB's Pier Head gauge (" + e.level.toFixed(2) + " m Poolbeg, " + fmtTime(e.time) + ")." +
           (gap == null ? "" : gap === 0 ? " The ESB's Portumna gauge read the same at that hour." : " The ESB's Portumna gauge read " + Math.abs(gap) + " cm " + (gap > 0 ? "higher" : "lower") + " at that hour.") +
+          " The Killaloe canal-entrance board should have read about " + ftIn(e.level - cill.poolbeg) + " then." +
           " One reading a day, so the lake may have moved since. It is not part of the figure above.";
         show = true;
       }
@@ -2608,7 +2661,8 @@ a { color: var(--water); }
       left.appendChild(document.createTextNode(c.kind === "board" ? " gauge board against datum" : " line against chart"));
       var when = document.createElement("div"); when.className = "when";
       if (c.kind === "board") {
-        when.textContent = fmtTime(c.time) + (c.where ? " · " + c.where : "") + " · " + (c.boardName || "gauge board") + " read " + ftIn(c.feet * FOOT) + ", datum " + ftIn(c.datumFt * FOOT);
+        when.textContent = fmtTime(c.time) + (c.where ? " · " + c.where : "") + " · " + (c.boardName || "gauge board") + " read " + ftIn(c.feet * FOOT) + ", datum " + ftIn(c.datumFt * FOOT) +
+          (c.slope != null ? " · " + Math.round(c.slope * 100) + " cm allowed for the lake's slope" : c.wantSlope ? " · lake slope not yet allowed for" : "");
       } else {
         var line = c.unit === "ft" ? c.raw + " ft (" + c.lead.toFixed(2) + " m)" : c.lead.toFixed(2) + " m";
         when.textContent = fmtTime(c.time) + (c.where ? " · " + c.where : "") + " · line " + line + ", chart " + c.spot.toFixed(1) + " m";
@@ -2678,9 +2732,15 @@ a { color: var(--water); }
         lead: Math.round((feet - b.datumFt) * FOOT * 1000) / 1000, spot: 0, unit: "ft", raw: feet,
         where: $("chk-where").value.trim().slice(0, 60), gauge: null };
       bc.gauge = gaugeAt(r.gauge.doc, t.getTime());
+      var slopeMsg = "";
+      if (b.id === "killaloe") {
+        var bsl = dergSlopeAt(t.getTime());
+        if (bsl) { bc.slope = bsl.slope; bc.slopeAt = bsl.at; slopeMsg = " " + Math.round(bsl.slope * 100) + " cm was allowed for the lake's slope from Portumna that day (the ESB's two gauges, " + fmtTime(bsl.at) + ")."; }
+        else { bc.wantSlope = true; slopeMsg = " The page has no ESB reading within a day of that time, so the lake's slope from Portumna is not allowed for yet. It will be when the reading arrives."; }
+      }
       state.checks = mergeChecks(state.checks, [bc], state.checksGone);
       $("chk-ft").value = ""; $("chk-in").value = ""; $("chk-where").value = ""; $("chk-when").value = "";
-      state.chkMsg = bc.gauge ? "Saved." : "Saved. It will count once the page has the " + r.gauge.name + " reading for that time.";
+      state.chkMsg = (bc.gauge ? "Saved." : "Saved. It will count once the page has the " + r.gauge.name + " reading for that time.") + slopeMsg;
       storeChecks(); render(); return;
     }
     var spot = parseFloat($("chk-spot").value), raw = parseFloat($("chk-lead").value), unit = $("chk-unit").value;
@@ -2716,6 +2776,8 @@ a { color: var(--water); }
       if (!db) return;
       db.doc("esb/derg").onSnapshot(function (snap) {
         state.esb = snap.exists ? snap.data() : null;
+        resolveChecks();
+        renderKillaloeAirDraft();
         render();
       }, function () { /* keep the last reading shown */ });
       Object.keys(BAKED).concat(["athlone", "shannonbridge"]).forEach(function (key) {
