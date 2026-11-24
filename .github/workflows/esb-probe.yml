@@ -10,15 +10,27 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Fetch the two ESB PDFs
+      - name: Run the reader
         run: |
-          mkdir out
-          for f in 05-Portumna-Bridge 06-Pier-Head-Killaloe; do
-            curl -sS -L --max-time 60 -A "shannon-chart-depth (github.com/gettierswhole/shannon-chart-depth)" -o "out/$f.pdf" -D "out/$f.headers" "http://www.esbhydro.ie/Shannon/$f.pdf" || echo "curl failed for $f"
-            ls -l "out/$f.pdf" || true
-            head -c 8 "out/$f.pdf" | xxd || true
-            cat "out/$f.headers" || true
-          done
-      - name: Show the text
+          python3 tools/update_esb.py esb.json
+          python3 - <<'PY'
+          import json
+          d = json.load(open("esb.json"))
+          for k in ("pierHead", "portumna"):
+              g = d[k]; print(k, g["level"], g["time"], len(g["history"]))
+              print(" ".join("%s=%.2f" % (p["t"][5:10], p["v"]) for p in g["history"]))
+          print(d["units"]); print(len(open("esb.json").read()), "bytes")
+          PY
+      - name: Words on the Pier Head pages
         run: |
-          python3 tools/esb_probe.py out/06-Pier-Head-Killaloe.pdf
+          curl -sS -o ph.pdf -A "shannon-chart-depth (github.com/gettierswhole/shannon-chart-depth)" http://www.esbhydro.ie/Shannon/06-Pier-Head-Killaloe.pdf
+          python3 - <<'PY'
+          import sys, re
+          sys.path.insert(0, "tools")
+          import update_esb as u
+          for raw in u.streams(open("ph.pdf", "rb").read()):
+              c = raw.decode("latin-1")
+              if "TJ" not in c: continue
+              for x, y, t in u.chunks(c):
+                  if re.search(r"[A-Za-z]{3}", t) and not u.STAMP.match(t): print(repr(t[:400]))
+          PY
