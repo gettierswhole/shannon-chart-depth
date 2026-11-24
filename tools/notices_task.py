@@ -7,9 +7,13 @@
 # email (src "email"), and entries the owner added by hand. This script decides, the same way every time, what goes
 # into that document, what the owner is told, and what is remembered. The task only writes summaries and picks out facts.
 #
-#   notices_task.py toread <site.json> <live.json>
+#   notices_task.py toread <site.json> <live.json> <state.json or ->
 #       Prints a JSON list of the Shannon notices on their list that have no summary of their present text:
 #       [{no, title, heading, posted, url, text}]. The task summarises each and reads it for whole-day closures.
+#
+# A plain entry for a notice that is on their list (one with no src: an earlier summary, or one the owner wrote or
+# edited on the Controls panel) stands as that notice's summary and is not written over, until their text changes.
+# The state remembers the text each such entry was seen against ("pinned").
 #
 #   notices_task.py merge <site.json> <live.json> <state.json or -> <extracted.json or -> <out dir>
 #       extracted.json, written by the task:
@@ -54,11 +58,24 @@ def shannon_items(site):
 def site_entries(notices):
     return {n.get("url"): n for n in notices if isinstance(n, dict) and n.get("src") == "site" and n.get("url")}
 
-def toread(site, live):
-    have = site_entries(live.get("notices", []))
+def plain_numbers(notices):
+    """Numbers of the plain entries: no src, not ended, a notice number. The owner's or an earlier summary."""
+    return {str(n.get("no")) for n in notices if isinstance(n, dict) and not n.get("src") and not n.get("ended")
+            and re.fullmatch(r"\d+", str(n.get("no") or ""))}
+
+def stands(i, plain, pinned):
+    """True if a plain entry is this notice's summary and their text has not changed since it was first seen with it."""
+    if i.get("special") or str(i.get("no")) not in plain:
+        return False
+    pin = pinned.get(i["url"])
+    return not pin or not i.get("textHash") or pin == i["textHash"]
+
+def toread(site, live, state):
+    notices = live.get("notices", [])
+    have, plain, pinned = site_entries(notices), plain_numbers(notices), state.get("pinned") or {}
     out = []
     for i in shannon_items(site):
-        if i.get("listed") is True and i.get("text") and (have.get(i["url"]) or {}).get("hash") != i.get("textHash"):
+        if i.get("listed") is True and i.get("text") and not stands(i, plain, pinned) and (have.get(i["url"]) or {}).get("hash") != i.get("textHash"):
             out.append({k: i.get(k) for k in ("no", "title", "heading", "posted", "url", "text")})
     return out
 
@@ -128,15 +145,20 @@ def merge(site, live, state, ext, now):
         facts.append("from email, not yet on their list: " + no)
     # Summaries the task wrote this run, each tied to the text it was written from.
     by_url = {i["url"]: i for i in items if i.get("listed") is True}
+    pinned = {u: v for u, v in (state.get("pinned") or {}).items() if u in by_url}
+    plain = plain_numbers(notices)
     for s in ext.get("summaries") or []:
         i = by_url.get(str(s.get("url") or "")) if isinstance(s, dict) else None
-        if not i or not i.get("text") or not s.get("title") or not s.get("text"):
+        if not i or not i.get("text") or not s.get("title") or not s.get("text") or stands(i, plain, pinned):
             continue
         until = s.get("until") if re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(s.get("until") or "")) else "2099-12-31"
         notices = [n for n in notices if not (n.get("src") == "site" and n.get("url") == i["url"])]
         notices.append({"no": str(i.get("no")), "src": "site", "url": i["url"], "title": str(s["title"])[:90], "text": str(s["text"])[:400],
                         "hash": i.get("textHash"), "posted": i.get("posted"), "until": until, "level": ""})
         facts.append("summary written: " + str(i.get("no")))
+    have = site_entries(notices)
+    # Where a plain entry stands as a notice's summary, a summary written by the task for the same notice gives way.
+    notices = [n for n in notices if not (n.get("src") == "site" and n.get("url") in by_url and stands(by_url[n["url"]], plain, pinned))]
     have = site_entries(notices)
     kept, pending = [], []
     for n in notices:
@@ -159,8 +181,14 @@ def merge(site, live, state, ext, now):
         if numeric:
             L = listed.get(no)
             later_email = n.get("src") == "email" and n.get("sent") and L and irish_day(ts(n["sent"])) > (L.get("posted") or "")
-            if L and not later_email and L["url"] in have:
-                continue      # a summary written from their site has taken its place
+            if L and not later_email and not n.get("src"):
+                if L["url"] in have and not stands(L, plain, pinned):
+                    pinned.pop(L["url"], None)
+                    continue  # their text changed and a new summary has been written from it
+                if not pinned.get(L["url"]):
+                    pinned[L["url"]] = L.get("textHash") or ""   # this entry stands as the summary of this text
+            elif L and not later_email and L["url"] in have:
+                continue      # an email entry: the summary written from their site has taken its place
             if not L and no in gone and not (n.get("src") == "email" and n.get("sent")):
                 continue      # their list has dropped it
             if n.get("src") == "email" and n.get("sent") and (not L or later_email):
@@ -210,12 +238,12 @@ def merge(site, live, state, ext, now):
                     if now - ts(v) < timedelta(days=30): seen[str(k)] = str(v)
                 except Exception:
                     pass
-    new_state = {"v": 2, "alerted": told[-300:], "seen": seen, "known": known, "readBad": runs_bad}
+    new_state = {"v": 2, "alerted": told[-300:], "seen": seen, "known": known, "pinned": pinned, "readBad": runs_bad}
     live_now = [i for i in items if i.get("listed") is True]
     summary = {"siteChecked": site.get("checked"), "siteOk": site.get("ok"), "suspect": bool(site.get("suspect")), "lastGood": last_good,
                "liveShannon": sorted({str(i.get("no")) for i in live_now}, key=lambda s: -int(s) if s.isdigit() else 0),
                "noTextYet": [str(i.get("no")) for i in live_now if not i.get("text")],
-               "noSummaryYet": [str(i.get("no")) for i in live_now if (have.get(i["url"]) or {}).get("hash") != (i.get("textHash") or "-")],
+               "noSummaryYet": [str(i.get("no")) for i in live_now if (have.get(i["url"]) or {}).get("hash") != (i.get("textHash") or "-") and not stands(i, plain, pinned)],
                "emailOnly": pending, "ownEntries": [str(n.get("no")) for n in kept], "closureDays": [c["date"] for c in closures],
                "facts": facts, "firstRun": first_run}
     feeds = [{"name": "Notices: Waterways Ireland's list last read", "at": last_good or site.get("checked"), "limit_h": 9,
@@ -227,7 +255,7 @@ if __name__ == "__main__":
     now = ts(os.environ["TASK_NOW"]) if os.environ.get("TASK_NOW") else datetime.now(timezone.utc)
     mode = sys.argv[1] if len(sys.argv) > 1 else ""
     if mode == "toread":
-        print(json.dumps(toread(doc(sys.argv[2]), doc(sys.argv[3])), ensure_ascii=False))
+        print(json.dumps(toread(doc(sys.argv[2]), doc(sys.argv[3]), doc(sys.argv[4]) if len(sys.argv) > 4 else {}), ensure_ascii=False))
     elif mode == "merge":
         site, live, state, ext, out = doc(sys.argv[2]), doc(sys.argv[3]), doc(sys.argv[4]), doc(sys.argv[5]), sys.argv[6]
         if not isinstance(live.get("notices"), list):
@@ -238,4 +266,4 @@ if __name__ == "__main__":
         json.dump(new_state, open(os.path.join(out, "state.json"), "w"), ensure_ascii=False)
         print(json.dumps(result, ensure_ascii=False))
     else:
-        sys.exit("usage: notices_task.py toread <site> <live> | merge <site> <live> <state|-> <extracted|-> <out dir>")
+        sys.exit("usage: notices_task.py toread <site> <live> <state|-> | merge <site> <live> <state|-> <extracted|-> <out dir>")
