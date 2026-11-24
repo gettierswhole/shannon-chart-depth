@@ -1,5 +1,6 @@
 {
-"checked": "2026-11-24T19:49:56Z",
+"v": 2,
+"checked": "2026-11-24T20:50:01Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
 {
@@ -8,11 +9,14 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 126 of 2026",
-"detail": "Grand Canal Closures Lock 25 to Lock 30 Posted: 24/11/2026",
+"heading": "Grand Canal Closures Lock 25 to Lock 30",
+"posted": "2026-11-24",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-126-of-2026",
+"detail": "Grand Canal Closures Lock 25 to Lock 30 Posted: 24/11/2026",
 "firstSeen": "2026-11-24T12:41:40Z",
 "listed": true,
-"shannon": false
+"shannon": false,
+"kind": "restriction"
 },
 {
 "no": "125",
@@ -20,11 +24,19 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 125 of 2026",
-"detail": "Shannon Navigation – Temporary Restriction at Athlone Town Bridge Posted: 16/11/2026",
+"heading": "Shannon Navigation – Temporary Restriction at Athlone Town Bridge",
+"posted": "2026-11-16",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-125-of-2026",
+"detail": "Shannon Navigation – Temporary Restriction at Athlone Town Bridge Posted: 16/11/2026",
 "firstSeen": "2026-11-16T22:19:09Z",
 "listed": true,
-"shannon": true
+"shannon": true,
+"kind": "restriction",
+"textTried": "2026-11-24T20:50:04Z",
+"text": "Waterways Ireland advises masters of vessels that minor works by Westmeath County Council on Athlone Town Bridge between Tuesday 17 November and Tuesday 24 November 2026 will impact vessel passage under the bridge.\n\nThe works will require the temporary closure of the navigable arch. Masters of vessels must comply with all instructions given by the safety boat crews throughout the works.\n\nWaterways Ireland thanks its customers for their cooperation and understanding during these works.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
+"textHash": "43ce1d8523c8f173",
+"textAt": "2026-11-24T20:50:04Z",
+"pageHeading": "Shannon Navigation – Temporary Restriction at Athlone Town Bridge"
 },
 {
 "no": "118",
@@ -32,13 +44,21 @@
 "update": true,
 "special": false,
 "title": "Update to Marine Notice No. 118 of 2026",
-"detail": "Shannon Navigation Roosky Bridge Operational Posted: 06/11/2026",
+"heading": "Shannon Navigation Roosky Bridge Operational",
+"posted": "2026-11-06",
 "url": "https://www.waterwaysireland.org/news/update-to-marine-notice-no-118-of-2026",
+"detail": "Shannon Navigation Roosky Bridge Operational Posted: 06/11/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "changed": "2026-11-06T16:08:11Z",
 "baseline": true,
 "listed": true,
-"shannon": true
+"shannon": true,
+"kind": "relief",
+"textTried": "2026-11-24T20:50:07Z",
+"text": "Waterways Ireland advises masters of vessels that repairs to Roosky Bridge have been successfully completed and the bridge has returned to normal operation in accordance with winter operating hours.\n\nWaterways Ireland thanks its customers for their patience and understanding.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
+"textHash": "b0187e356f74f99f",
+"textAt": "2026-11-24T20:50:07Z",
+"pageHeading": "Shannon Navigation Roosky Bridge Operational"
 },
 {
 "no": "114",
@@ -46,12 +66,20 @@
 "update": true,
 "special": false,
 "title": "Update to Marine Notice No.114 of 2026",
-"detail": "Shannon Navigation Tarmonbarry Bridge Reopening Posted: 27/10/2026",
+"heading": "Shannon Navigation Tarmonbarry Bridge Reopening",
+"posted": "2026-10-27",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-114-of-2026",
+"detail": "Shannon Navigation Tarmonbarry Bridge Reopening Posted: 27/10/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
 "listed": true,
-"shannon": true
+"shannon": true,
+"kind": "relief",
+"textTried": "2026-11-24T20:50:10Z",
+"text": "Tarmonbarry Bridge reopens for normal operation on Wednesday, 28 October 2026, following successful repairs by Waterways Ireland’s Mechanical and Electrical (M&E) staff.\n\nM&E staff are working to restore normal operation to Roosky Bridge as soon as possible, update will follow under: Marine Notice No. 118 of 2026.\n\nWaterways Ireland thanks its customers for their continued patience and cooperation.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
+"textHash": "bb2e7e040ab6aeb6",
+"textAt": "2026-11-24T20:50:10Z",
+"pageHeading": "Shannon Navigation Tarmonbarry Bridge Reopening"
 },
 {
 "no": "117",
@@ -59,12 +87,15 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 117 of 2026",
-"detail": "Lower Bann – Carnroe Lock Closure Posted: 26/10/2026",
+"heading": "Lower Bann – Carnroe Lock Closure",
+"posted": "2026-10-26",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-117-of-2026",
+"detail": "Lower Bann – Carnroe Lock Closure Posted: 26/10/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
 "listed": true,
-"shannon": false
+"shannon": false,
+"kind": "restriction"
 },
 {
 "no": "104",
@@ -72,12 +103,15 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 104 of 2026",
-"detail": "Grand Canal Temporary Closure of 7th Lock Posted: 19/10/2026",
+"heading": "Grand Canal Temporary Closure of 7th Lock",
+"posted": "2026-10-19",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-104-of-2026",
+"detail": "Grand Canal Temporary Closure of 7th Lock Posted: 19/10/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
 "listed": true,
-"shannon": false
+"shannon": false,
+"kind": "restriction"
 },
 {
 "no": "112",
@@ -85,12 +119,15 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 112 of 2026",
-"detail": "Shannon–Erne Waterway Winter Closure for Essential Maintenance Posted: 09/10/2026",
+"heading": "Shannon–Erne Waterway Winter Closure for Essential Maintenance",
+"posted": "2026-10-09",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-112-of-2026",
+"detail": "Shannon–Erne Waterway Winter Closure for Essential Maintenance Posted: 09/10/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
 "listed": true,
-"shannon": false
+"shannon": false,
+"kind": "restriction"
 },
 {
 "no": "107",
@@ -98,12 +135,20 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No.107 of 2026",
-"detail": "Winter Mooring 2026–2027 Shannon & Shannon-Erne Waterway Posted: 25/09/2026",
+"heading": "Winter Mooring 2026–2027 Shannon & Shannon-Erne Waterway",
+"posted": "2026-09-25",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-107-of-2026",
+"detail": "Winter Mooring 2026–2027 Shannon & Shannon-Erne Waterway Posted: 25/09/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
 "listed": true,
-"shannon": true
+"shannon": true,
+"kind": "",
+"textTried": "2026-11-24T20:50:12Z",
+"text": "The winter mooring period for public harbours on the Shannon Navigation and Shannon-Erne Waterway runs from 1 November 2026 to 31 March 2027, in accordance with Shannon Bye-law 30(1).\n\nBoaters wishing to avail of winter mooring are asked to note:\n\n• Applications and payment must be made online through the Waterways Ireland Winter Mooring portal.\n\n• The portal opens 1 October 2026.\n\n• The winter mooring fee of €63.50 must be paid in full by 1 November 2026.\n\n• Where possible, applicants will be allocated their preferred location. Where this is not possible, an appropriate alternative will be offered.\n\n• Electricity and water supplies at public moorings will be disconnected from November to March and reinstated before the 2027 boating season.\n\n• Vessels are moored at the owner's risk, and owners are advised to check their vessels periodically throughout the winter, particularly following periods of high winds or flooding.\n\n• The waterways remain active year-round. Masters may therefore be asked to allow space for visiting craft at specific locations.\n\nBye-Law 17 (5-Day Rule) remains in force for masters who do not avail of winter mooring, and for those not approved due to repeated breaches of the Bye-Laws during 2026.\n\nWaterways Ireland appreciates the cooperation of all masters and thanks the boating community for its continued support throughout the winter months. We look forward to welcoming you back on the waterways in Spring 2027.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
+"textHash": "2b450c2624599346",
+"textAt": "2026-11-24T20:50:12Z",
+"pageHeading": "Winter Mooring 2026–2027 Shannon & Shannon-Erne Waterway"
 },
 {
 "no": "106",
@@ -111,12 +156,20 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 106 of 2026",
-"detail": "Shannon Navigation Ardnacrusha Locks – Temporary Closure Posted: 14/09/2026",
+"heading": "Shannon Navigation Ardnacrusha Locks – Temporary Closure",
+"posted": "2026-09-14",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-106-of-2026",
+"detail": "Shannon Navigation Ardnacrusha Locks – Temporary Closure Posted: 14/09/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
 "listed": true,
-"shannon": true
+"shannon": true,
+"kind": "restriction",
+"textTried": "2026-11-24T20:50:15Z",
+"text": "ESB Ardnacrusha Navigation Locks will temporarily close for six months, starting on Thursday, 1 October 2026, to Wednesday, 31 March 2027 inclusive.\n\nClosure is required by ESB to facilitate essential maintenance on plant and electrical equipment associated with the operation of the navigation lock gates. During this period, vessels will not be able to transit the Ardnacrusha navigation locks.\n\nMasters of vessels navigating this section of the Shannon are requested to take account of the closure when planning their journeys and to make alternative arrangements where necessary.\n\nESB has advised that it will provide a further update on the progress of the works in advance of the planned reopening date, here: ESB Sustainable Rivers\n\nWaterways Ireland recognises this may cause inconvenience for some boaters; please reach out to us if you need assistance.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
+"textHash": "46462886a04bebce",
+"textAt": "2026-11-24T20:50:15Z",
+"pageHeading": "Shannon Navigation Ardnacrusha Locks – Temporary Closure"
 },
 {
 "no": "88",
@@ -124,12 +177,15 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 88 of 2026",
-"detail": "Canal Navigations: Water Levels & Lock Gates Posted: 30/07/2026",
+"heading": "Canal Navigations: Water Levels & Lock Gates",
+"posted": "2026-07-30",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-88-of-2026",
+"detail": "Canal Navigations: Water Levels & Lock Gates Posted: 30/07/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
 "listed": true,
-"shannon": false
+"shannon": false,
+"kind": ""
 },
 {
 "no": "87",
@@ -137,12 +193,15 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 87 of 2026",
-"detail": "All Navigations: Boater's Guide to Fire Safety Posted: 29/07/2026",
+"heading": "All Navigations: Boater's Guide to Fire Safety",
+"posted": "2026-07-29",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-87-of-2026",
+"detail": "All Navigations: Boater's Guide to Fire Safety Posted: 29/07/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
 "listed": true,
-"shannon": true
+"shannon": true,
+"kind": ""
 },
 {
 "no": "53",
@@ -150,12 +209,30 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 53 of 2026",
-"detail": "Shannon Navigation Restrictions for Construction of New Hartley Bridge Posted: 03/05/2026",
+"heading": "Shannon Navigation Restrictions for Construction of New Hartley Bridge",
+"posted": "2026-05-03",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-53-of-2026",
+"detail": "Shannon Navigation Restrictions for Construction of New Hartley Bridge Posted: 03/05/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
 "listed": true,
-"shannon": true
+"shannon": true,
+"kind": "restriction"
+},
+{
+"no": "46",
+"year": "2026",
+"update": false,
+"special": false,
+"title": "Marine Notice 46 of 2026",
+"heading": "River Barrow – Restricted Navigation",
+"posted": "2026-04-30",
+"url": "https://www.waterwaysireland.org/news/marine-notice-46-of-2026",
+"detail": "River Barrow – Restricted Navigation Posted: 30/04/2026",
+"firstSeen": "2026-11-24T20:50:01Z",
+"listed": true,
+"shannon": false,
+"kind": "restriction"
 },
 {
 "no": "35",
@@ -163,12 +240,15 @@
 "update": false,
 "special": false,
 "title": "Marine Notice No. 35 of 2026",
-"detail": "All Navigations: Mandatory Wearing of Personal Flotation Devices at Navigation Locks Posted: 20/03/2026",
+"heading": "All Navigations: Mandatory Wearing of Personal Flotation Devices at Navigation Locks",
+"posted": "2026-03-20",
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-35-of-2026",
+"detail": "All Navigations: Mandatory Wearing of Personal Flotation Devices at Navigation Locks Posted: 20/03/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
 "listed": true,
-"shannon": true
+"shannon": true,
+"kind": ""
 },
 {
 "no": "1",
@@ -176,12 +256,15 @@
 "update": false,
 "special": true,
 "title": "Special Marine Notice No1. 2026",
-"detail": "Notice to all Waterway Users Posted: 03/03/2026 Page 1 (first page) Page 2 (last page) Next page Last page No results to display here yet, please check back soon. <div id=\"tab-panel-tabbedsection-3\" class=\"js-wi-tabs-panel\" role=\"tabpanel\" ",
+"heading": "Notice to all Waterway Users",
+"posted": "2026-03-03",
 "url": "https://www.waterwaysireland.org/news/special-marine-notice-no1-2026",
+"detail": "Notice to all Waterway Users Posted: 03/03/2026",
 "firstSeen": "2026-11-03T23:03:53Z",
 "baseline": true,
 "listed": true,
-"shannon": false
+"shannon": true,
+"kind": ""
 },
 {
 "no": "123",
@@ -194,7 +277,10 @@
 "firstSeen": "2026-11-09T19:18:06Z",
 "shannon": true,
 "listed": false,
-"delisted": "2026-11-18T22:07:39Z"
+"delisted": "2026-11-18T22:07:39Z",
+"heading": "Tarmonbarry Lock Closure 17 November 2026",
+"posted": "2026-11-09",
+"kind": "restriction"
 },
 {
 "no": "124",
@@ -207,7 +293,10 @@
 "firstSeen": "2026-11-13T22:42:40Z",
 "shannon": true,
 "listed": false,
-"delisted": "2026-11-17T22:59:11Z"
+"delisted": "2026-11-17T22:59:11Z",
+"heading": "Shannon Navigation Tarmonbarry Bridge Closure",
+"posted": "2026-11-13",
+"kind": "restriction"
 },
 {
 "no": "122",
@@ -219,9 +308,12 @@
 "url": "https://www.waterwaysireland.org/news/marine-notice-no-122-of-2026",
 "firstSeen": "2026-11-06T19:17:56Z",
 "changed": "2026-11-11T12:13:04Z",
-"shannon": false,
+"shannon": true,
 "listed": false,
-"delisted": "2026-11-13T22:42:40Z"
+"delisted": "2026-11-13T22:42:40Z",
+"heading": "Cancellation of Industrial Action – 12 November 2026",
+"posted": "2026-11-11",
+"kind": "relief"
 },
 {
 "no": "113",
@@ -235,7 +327,10 @@
 "baseline": true,
 "shannon": false,
 "listed": false,
-"delisted": "2026-11-22T22:33:32Z"
+"delisted": "2026-11-22T22:33:32Z",
+"heading": "Lough Erne Pump-Out Facilities",
+"posted": "2026-10-13",
+"kind": ""
 },
 {
 "no": "121",
@@ -248,7 +343,10 @@
 "firstSeen": "2026-11-04T16:14:02Z",
 "shannon": false,
 "listed": false,
-"delisted": "2026-11-22T22:33:32Z"
+"delisted": "2026-11-22T22:33:32Z",
+"heading": "Lough Erne - Enniskillen - Fours Head of the River Rowing Race",
+"posted": "2026-11-04",
+"kind": ""
 },
 {
 "no": "120",
@@ -262,8 +360,14 @@
 "baseline": true,
 "shannon": false,
 "listed": false,
-"delisted": "2026-11-22T22:33:32Z"
+"delisted": "2026-11-22T22:33:32Z",
+"heading": "Erne System Tullyinishmore Jetty Closure",
+"posted": "2026-11-03",
+"kind": "restriction"
 }
 ],
-"ok": true
+"liveNote": true,
+"count": 15,
+"ok": true,
+"lastGood": "2026-11-24T20:50:01Z"
 }
