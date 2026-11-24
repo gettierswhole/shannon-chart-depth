@@ -1,11 +1,11 @@
 name: Update ESB Lough Derg levels
 # The ESB publish one 09:00 level a day for Pier Head (Killaloe) and Portumna Bridge, in chart PDFs that are
-# renewed about midday. tools/update_esb.py reads the two files and keeps every day seen in esb.json.
+# renewed about midday (11:53 UTC on 24 Nov 2026). tools/update_esb.py reads the two files and keeps every day seen in esb.json.
 # GitHub often starts scheduled runs hours late or not at all, so several are asked for; a run that finds
 # nothing new changes nothing.
 on:
   schedule:
-    - cron: "41 11,13,15,18,21 * * *"
+    - cron: "11 12,13,15,18,21 * * *"
   workflow_dispatch:
   push:
     branches: [main]
