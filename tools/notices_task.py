@@ -1,18 +1,20 @@
 # The fixed part of the "Shannon notices check" task. It reads local files and writes local files. No network.
 #
 # Waterways Ireland's list of live notices (notices_site.json, written by tools/check_notices.py) is the authority.
-# The page shows each Shannon notice on it in their own words. The page's own notices document (notices/live) now
-# holds only: lock closure days, notices known so far only from their email (src "email"), and entries the owner
-# added by hand. This script decides, the same way every time, what goes into that document, what the owner is
-# told, and what is remembered for next time. The task only extracts facts from emails and notice texts.
+# The page shows a short summary of each Shannon notice on it, written by the task from their own text, with a link
+# to their notice. The page's own notices document (notices/live) holds: those summaries (src "site", one per notice
+# link, with the hash of the text it was written from), lock closure days, notices known so far only from their
+# email (src "email"), and entries the owner added by hand. This script decides, the same way every time, what goes
+# into that document, what the owner is told, and what is remembered. The task only writes summaries and picks out facts.
 #
-#   notices_task.py toread <site.json> <state.json or ->
-#       Prints a JSON list of the Shannon notices on their list whose text is new or changed since the last run:
-#       [{no, title, heading, posted, url, text}]. The task reads these for whole-day lock or bridge closures.
+#   notices_task.py toread <site.json> <live.json>
+#       Prints a JSON list of the Shannon notices on their list that have no summary of their present text:
+#       [{no, title, heading, posted, url, text}]. The task summarises each and reads it for whole-day closures.
 #
 #   notices_task.py merge <site.json> <live.json> <state.json or -> <extracted.json or -> <out dir>
 #       extracted.json, written by the task:
-#         {"emails":   [{"id", "no", "sent", "title", "text", "until", "level"}],   Shannon notice emails not seen before
+#         {"summaries": [{"url", "title", "text", "until"}],                       one for each notice from toread
+#          "emails":   [{"id", "no", "sent", "title", "text", "until", "level"}],   Shannon notice emails not seen before
 #          "handled":  {"<email message id>": "<email time, ISO 8601 UTC>"},       every email looked at this run
 #          "closures": [{"date", "why", "notice", "url"}],                          whole days locks or bridges are shut
 #          "cancelled": ["YYYY-MM-DD"]}                                             closure days a later notice calls off
@@ -49,11 +51,14 @@ def key(i): return ("S" if i.get("special") else "") + str(i.get("no"))
 def shannon_items(site):
     return [i for i in site.get("items", []) if isinstance(i, dict) and i.get("url") and i.get("shannon")]
 
-def toread(site, state):
-    known = state.get("known") or {}
+def site_entries(notices):
+    return {n.get("url"): n for n in notices if isinstance(n, dict) and n.get("src") == "site" and n.get("url")}
+
+def toread(site, live):
+    have = site_entries(live.get("notices", []))
     out = []
     for i in shannon_items(site):
-        if i.get("listed") is True and i.get("text") and (known.get(i["url"]) or {}).get("hash") != i.get("textHash"):
+        if i.get("listed") is True and i.get("text") and (have.get(i["url"]) or {}).get("hash") != i.get("textHash"):
             out.append({k: i.get(k) for k in ("no", "title", "heading", "posted", "url", "text")})
     return out
 
@@ -121,10 +126,25 @@ def merge(site, live, state, ext, now):
         notices = [n for n in notices if str(n.get("no")) != no or not (n.get("src") == "email" or re.fullmatch(r"\d+", str(n.get("no"))))]
         notices.append(entry)
         facts.append("from email, not yet on their list: " + no)
+    # Summaries the task wrote this run, each tied to the text it was written from.
+    by_url = {i["url"]: i for i in items if i.get("listed") is True}
+    for s in ext.get("summaries") or []:
+        i = by_url.get(str(s.get("url") or "")) if isinstance(s, dict) else None
+        if not i or not i.get("text") or not s.get("title") or not s.get("text"):
+            continue
+        until = s.get("until") if re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(s.get("until") or "")) else "2099-12-31"
+        notices = [n for n in notices if not (n.get("src") == "site" and n.get("url") == i["url"])]
+        notices.append({"no": str(i.get("no")), "src": "site", "url": i["url"], "title": str(s["title"])[:90], "text": str(s["text"])[:400],
+                        "hash": i.get("textHash"), "posted": i.get("posted"), "until": until, "level": ""})
+        facts.append("summary written: " + str(i.get("no")))
+    have = site_entries(notices)
     kept, pending = [], []
     for n in notices:
         no = str(n.get("no"))
         numeric = bool(re.fullmatch(r"\d+", no))
+        if n.get("src") == "site":
+            if n.get("url") in by_url: kept.append(n)   # gone from their list: the summary goes too
+            continue
         if n.get("ended"):
             try:
                 if now - ts(n["ended"]) > HOLD: continue
@@ -139,8 +159,8 @@ def merge(site, live, state, ext, now):
         if numeric:
             L = listed.get(no)
             later_email = n.get("src") == "email" and n.get("sent") and L and irish_day(ts(n["sent"])) > (L.get("posted") or "")
-            if L and not later_email and L.get("text"):
-                continue      # their own words are on the page now
+            if L and not later_email and L["url"] in have:
+                continue      # a summary written from their site has taken its place
             if not L and no in gone and not (n.get("src") == "email" and n.get("sent")):
                 continue      # their list has dropped it
             if n.get("src") == "email" and n.get("sent") and (not L or later_email):
@@ -195,10 +215,11 @@ def merge(site, live, state, ext, now):
     summary = {"siteChecked": site.get("checked"), "siteOk": site.get("ok"), "suspect": bool(site.get("suspect")), "lastGood": last_good,
                "liveShannon": sorted({str(i.get("no")) for i in live_now}, key=lambda s: -int(s) if s.isdigit() else 0),
                "noTextYet": [str(i.get("no")) for i in live_now if not i.get("text")],
+               "noSummaryYet": [str(i.get("no")) for i in live_now if (have.get(i["url"]) or {}).get("hash") != (i.get("textHash") or "-")],
                "emailOnly": pending, "ownEntries": [str(n.get("no")) for n in kept], "closureDays": [c["date"] for c in closures],
                "facts": facts, "firstRun": first_run}
     feeds = [{"name": "Notices: Waterways Ireland's list last read", "at": last_good or site.get("checked"), "limit_h": 9,
-              "note": "%d Shannon notices live; %d without their text yet" % (len(live_now), len(summary["noTextYet"]))},
+              "note": "%d Shannon notices live; %d without a summary yet" % (len(live_now), len(summary["noSummaryYet"]))},
              {"name": "Notices: our own entries last changed", "at": new_live.get("updated")}]
     return new_live, new_state, {"changed": changed, "alert": alert, "summary": summary, "feeds": [f for f in feeds if f.get("at")]}
 
@@ -206,7 +227,7 @@ if __name__ == "__main__":
     now = ts(os.environ["TASK_NOW"]) if os.environ.get("TASK_NOW") else datetime.now(timezone.utc)
     mode = sys.argv[1] if len(sys.argv) > 1 else ""
     if mode == "toread":
-        print(json.dumps(toread(doc(sys.argv[2]), doc(sys.argv[3]) if len(sys.argv) > 3 else {}), ensure_ascii=False))
+        print(json.dumps(toread(doc(sys.argv[2]), doc(sys.argv[3])), ensure_ascii=False))
     elif mode == "merge":
         site, live, state, ext, out = doc(sys.argv[2]), doc(sys.argv[3]), doc(sys.argv[4]), doc(sys.argv[5]), sys.argv[6]
         if not isinstance(live.get("notices"), list):
@@ -217,4 +238,4 @@ if __name__ == "__main__":
         json.dump(new_state, open(os.path.join(out, "state.json"), "w"), ensure_ascii=False)
         print(json.dumps(result, ensure_ascii=False))
     else:
-        sys.exit("usage: notices_task.py toread <site> <state|-> | merge <site> <live> <state|-> <extracted|-> <out dir>")
+        sys.exit("usage: notices_task.py toread <site> <live> | merge <site> <live> <state|-> <extracted|-> <out dir>")
