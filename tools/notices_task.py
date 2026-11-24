@@ -174,7 +174,7 @@ def merge(site, live, state, ext, now):
     # ----- is their list being read? -----
     bad = site.get("ok") is False or bool(site.get("suspect"))
     last_good = site.get("lastGood") or (site.get("checked") if not bad else None)
-    stale = (not last_good) or now - ts(last_good) > timedelta(hours=6)
+    stale = (not last_good) or now - ts(last_good) > timedelta(hours=3)
     runs_bad = int(state.get("readBad") or 0) + 1 if (bad or stale) else 0
     if runs_bad >= 2:
         once("read-bad", "Waterways Ireland's list of notices has not been read properly since %s (%s). The page may be out of date." % (
@@ -197,7 +197,7 @@ def merge(site, live, state, ext, now):
                "noTextYet": [str(i.get("no")) for i in live_now if not i.get("text")],
                "emailOnly": pending, "ownEntries": [str(n.get("no")) for n in kept], "closureDays": [c["date"] for c in closures],
                "facts": facts, "firstRun": first_run}
-    feeds = [{"name": "Notices: Waterways Ireland's list last read", "at": last_good or site.get("checked"), "limit_h": 3,
+    feeds = [{"name": "Notices: Waterways Ireland's list last read", "at": last_good or site.get("checked"), "limit_h": 9,
               "note": "%d Shannon notices live; %d without their text yet" % (len(live_now), len(summary["noTextYet"]))},
              {"name": "Notices: our own entries last changed", "at": new_live.get("updated")}]
     return new_live, new_state, {"changed": changed, "alert": alert, "summary": summary, "feeds": [f for f in feeds if f.get("at")]}
