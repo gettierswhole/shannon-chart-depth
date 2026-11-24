@@ -18,7 +18,7 @@ shim = r'''<script>
 // The page keeps every document on the phone and shows it at once, so these only bring it up to date.
 (function () {
   var BASE = window.SHANNON_BASE || "";
-  var subs = [], cache = null, site, food = {}, full = {}, foodWanted = {}, fullWanted = {};
+  var subs = [], cache = null, site, esb, food = {}, full = {}, foodWanted = {}, fullWanted = {};
   function get(name) {
     return fetch(BASE + name + "?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
@@ -33,6 +33,7 @@ shim = r'''<script>
   }
   function pick(path) {
     if (path === "notices/site") return site;
+    if (path === "esb/derg") return esb;
     var p = path.split("/");
     if (p[0] === "food") return food[p[1]] || (cache && cache.food ? cache.food[p[1]] : undefined);
     if (!cache) return undefined;
@@ -61,6 +62,8 @@ shim = r'''<script>
     }).then(function (j) { if (j) { cache = j; deliver(); } });
     // Waterways Ireland's notices list, as the hourly check last found it (number, title and link only).
     get("notices_site.json").then(function (j) { if (j && Array.isArray(j.items)) { site = j; deliver("notices/site"); } });
+    // The ESB's once-a-day Lough Derg levels (tools/update_esb.py), for the "Killaloe end" line.
+    get("esb.json").then(function (j) { if (j && j.pierHead && typeof j.pierHead.level === "number") { esb = j; deliver("esb/derg"); } });
     foodWanted = {}; loadFood(shownReach());
   }
   // A lead-line check over a week old needs the gauge's month of readings: fetch it as the time is entered.

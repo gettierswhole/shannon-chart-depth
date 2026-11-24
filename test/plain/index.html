@@ -557,7 +557,7 @@ a { color: var(--water); }
       <li><strong>Office of Public Works (OPW)</strong>: water levels from the gauges at Portumna, Banagher, Shannonbridge, Athlone, Hodson's Bay and Carrick-on-Shannon, from <a href="https://waterlevel.ie/" target="_blank" rel="noopener">waterlevel.ie</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Readings are provisional, as the OPW publish them. This page compares them with reference levels and works out depth corrections from them; those workings are ours, not the OPW's.</li>
       <li><strong>Met Éireann</strong>: the inland lakes forecast and the HARMONIE model point forecast. Copyright Met Éireann. Source <a href="https://www.met.ie/" target="_blank" rel="noopener">www.met.ie</a>. This data is published under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Met Éireann does not accept any liability whatsoever for any error or omission in the data, their availability, or for any loss or damage arising from their use. This page has modified the data: it shortens the written forecast, picks out the lakes on this stretch, and converts and summarises the model's wind and rain.</li>
       <li><strong>Waterways Ireland</strong>: marine notices, lock opening hours, ordinary summer levels, lock cill heights and the daily navigation levels report. With the written permission of their Inspector of Navigation, this page checks their marine notices list no more than once an hour, and keeps only each notice's number, title and link.</li>
-      <li><strong>ESB</strong>: links to its Shannon flow and level reports on <a href="http://www.esbhydro.ie/" target="_blank" rel="noopener">esbhydro.ie</a>.</li>
+      <li><strong>ESB</strong>: the once-a-day 09:00 levels for Lough Derg at Pier Head, Killaloe and at Portumna Bridge, in metres over Poolbeg datum, which are behind the “Killaloe end” line; and links to its Shannon flow and level reports. All from <a href="http://www.esbhydro.ie/" target="_blank" rel="noopener">esbhydro.ie</a>. Copyright ESB. ESB does not guarantee the accuracy of its data and accepts no liability for its use.</li>
       <li><strong>CSIG</strong>: the chart datum figures behind the depth correction come from the CSIG's published articles and forum posts. The depth correction is meant for use with CSIG charts. No CSIG chart data is shown or shared on this page.</li>
       <li><strong>IWAI Athlone branch</strong>: the Lough Ree chart datum and the lake's record low used to set it, and the method and bridge height behind the Athlone M6 bridge air draft.</li>
       <li><strong>shannon-river.com</strong>: the distance chart behind the cruising-time estimates.</li>
@@ -589,7 +589,7 @@ a { color: var(--water); }
 // The page keeps every document on the phone and shows it at once, so these only bring it up to date.
 (function () {
   var BASE = window.SHANNON_BASE || "";
-  var subs = [], cache = null, site, food = {}, full = {}, foodWanted = {}, fullWanted = {};
+  var subs = [], cache = null, site, esb, food = {}, full = {}, foodWanted = {}, fullWanted = {};
   function get(name) {
     return fetch(BASE + name + "?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
@@ -604,6 +604,7 @@ a { color: var(--water); }
   }
   function pick(path) {
     if (path === "notices/site") return site;
+    if (path === "esb/derg") return esb;
     var p = path.split("/");
     if (p[0] === "food") return food[p[1]] || (cache && cache.food ? cache.food[p[1]] : undefined);
     if (!cache) return undefined;
@@ -632,6 +633,8 @@ a { color: var(--water); }
     }).then(function (j) { if (j) { cache = j; deliver(); } });
     // Waterways Ireland's notices list, as the hourly check last found it (number, title and link only).
     get("notices_site.json").then(function (j) { if (j && Array.isArray(j.items)) { site = j; deliver("notices/site"); } });
+    // The ESB's once-a-day Lough Derg levels (tools/update_esb.py), for the "Killaloe end" line.
+    get("esb.json").then(function (j) { if (j && j.pierHead && typeof j.pierHead.level === "number") { esb = j; deliver("esb/derg"); } });
     foodWanted = {}; loadFood(shownReach());
   }
   // A lead-line check over a week old needs the gauge's month of readings: fetch it as the time is entered.
@@ -2288,7 +2291,7 @@ a { color: var(--water); }
   // Lough Derg only: the Killaloe end of the lake by the ESB's Pier Head gauge, shown beside the Portumna figure and never mixed into it
   // (owner's decision, 24 Nov 2026). The ESB publish one 09:00 reading a day, in Poolbeg, the lock table's own datum, so it is
   // set against the cill directly. The reading comes from this page's store (esb/derg); with none, or one over 36 hours old, nothing is shown.
-  function renderSouthEnd(r, s, cill) {
+  function renderSouthEnd(r, s, cill, datum) {
     var p = $("south-end");
     if (!p) return;
     var e = state.esb && state.esb.pierHead, show = false;
@@ -2301,6 +2304,22 @@ a { color: var(--water); }
           " by the ESB's Pier Head gauge (" + e.level.toFixed(2) + " m Poolbeg, " + fmtTime(e.time) + ")." +
           (gap == null ? "" : gap === 0 ? " The ESB's Portumna gauge read the same at that hour." : " The ESB's Portumna gauge read " + Math.abs(gap) + " cm " + (gap > 0 ? "higher" : "lower") + " at that hour.") +
           " One reading a day, so the lake may have moved since. It is not part of the figure above.";
+        show = true;
+      }
+    }
+    // Lough Ree only: the open lake by the Hodson's Bay gauge, beside the figure from the Athlone quay gauge (owner's decision, 24 Nov 2026).
+    // The quay gauge stays the basis: it is beside the lock where the datum is set, and it reads a little under the lake.
+    var h = state.feeds.hodsons, qy = state.feeds.athloneus;
+    if (r.id === "ree" && h && typeof h.level === "number" && h.time && datum != null && !isOsl(r)) {
+      var ht = new Date(h.time).getTime(), hage = Date.now() - ht;
+      if (isFinite(ht) && hage >= 0 && hage < 16 * 3600e3) {
+        var hn = inSafe(h.level - datum);
+        var qt = qy && qy.time ? new Date(qy.time).getTime() : NaN;
+        var hgap = isFinite(qt) && Math.abs(qt - ht) <= 90 * 60e3 && typeof qy.level === "number" ? Math.round((h.level - qy.level) * 100) : null;
+        p.textContent = "Open lake: " + (hn === 0 ? "at chart datum" : ftInText(hn) + (hn > 0 ? " over" : " under") + " chart datum") +
+          " by the Hodson's Bay gauge (OPW 26088, " + h.level.toFixed(2) + " m, " + fmtTime(h.time) + ")." +
+          (hgap == null ? "" : hgap === 0 ? " The Athlone quay gauge read the same at about that hour." : " That is " + Math.abs(hgap) + " cm " + (hgap > 0 ? "above" : "below") + " the Athlone quay gauge at about that hour.") +
+          " The figure above uses the quay gauge, beside the lock where the datum is set. This line is not part of it.";
         show = true;
       }
     }
@@ -2355,7 +2374,7 @@ a { color: var(--water); }
     var tr = man ? null : trend(state.histories[r.gauge.doc]);
     if (tr) $("src").innerHTML += " · <b>" + tr + "</b>";
 
-    renderSouthEnd(r, s, cill);
+    renderSouthEnd(r, s, cill, datum);
     $("g-level").textContent = rd.level.toFixed(3) + " m";
     $("g-cill").textContent = cill ? ftIn(rd.level - cill.malin) + " (" + cill.name.replace(/ cill$/, "") + ")" : "No cill set for this stretch";
 
