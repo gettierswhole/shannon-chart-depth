@@ -1,6 +1,6 @@
 {
 "v": 2,
-"checked": "2026-11-25T19:52:38Z",
+"checked": "2026-11-25T20:52:43Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
 {
@@ -31,8 +31,8 @@
 "firstSeen": "2026-11-16T22:19:09Z",
 "text": "Waterways Ireland advises masters of vessels that minor works by Westmeath County Council on Athlone Town Bridge between Tuesday 17 November and Tuesday 24 November 2026 will impact vessel passage under the bridge.\n\nThe works will require the temporary closure of the navigable arch. Masters of vessels must comply with all instructions given by the safety boat crews throughout the works.\n\nWaterways Ireland thanks its customers for their cooperation and understanding during these works.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
 "textHash": "43ce1d8523c8f173",
-"textAt": "2026-11-24T20:50:04Z",
-"textTried": "2026-11-24T20:50:04Z",
+"textAt": "2026-11-25T20:52:46Z",
+"textTried": "2026-11-25T20:52:46Z",
 "pageHeading": "Shannon Navigation – Temporary Restriction at Athlone Town Bridge",
 "listed": true,
 "shannon": true,
@@ -387,7 +387,7 @@
 "kind": "restriction"
 }
 ],
-"lastGood": "2026-11-25T19:52:38Z",
+"lastGood": "2026-11-25T20:52:43Z",
 "count": 15,
 "liveNote": true,
 "ok": true
