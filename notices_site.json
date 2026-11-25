@@ -1,6 +1,6 @@
 {
 "v": 2,
-"checked": "2026-11-25T21:52:48Z",
+"checked": "2026-11-25T22:52:53Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
 {
@@ -74,8 +74,8 @@
 "baseline": true,
 "text": "Tarmonbarry Bridge reopens for normal operation on Wednesday, 28 October 2026, following successful repairs by Waterways Ireland’s Mechanical and Electrical (M&E) staff.\n\nM&E staff are working to restore normal operation to Roosky Bridge as soon as possible, update will follow under: Marine Notice No. 118 of 2026.\n\nWaterways Ireland thanks its customers for their continued patience and cooperation.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
 "textHash": "bb2e7e040ab6aeb6",
-"textAt": "2026-11-24T20:50:10Z",
-"textTried": "2026-11-24T20:50:10Z",
+"textAt": "2026-11-25T22:52:56Z",
+"textTried": "2026-11-25T22:52:56Z",
 "pageHeading": "Shannon Navigation Tarmonbarry Bridge Reopening",
 "listed": true,
 "shannon": true,
@@ -387,7 +387,7 @@
 "kind": "restriction"
 }
 ],
-"lastGood": "2026-11-25T21:52:48Z",
+"lastGood": "2026-11-25T22:52:53Z",
 "count": 15,
 "liveNote": true,
 "ok": true
