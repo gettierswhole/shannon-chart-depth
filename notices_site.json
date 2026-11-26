@@ -1,6 +1,6 @@
 {
 "v": 2,
-"checked": "2026-11-26T06:51:00Z",
+"checked": "2026-11-26T07:51:12Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
 {
@@ -201,8 +201,8 @@
 "baseline": true,
 "text": "Waterways Ireland, in partnership with the National Directorate for Fire and Emergency Management, Inland Waterways Association of Ireland and the Heritage Boat Association, has launched A Boater's Guide to Fire Safety.\n\nThe digital guide is available from the National Directorate for Fire and Emergency Management website: A Boater's Guide to Fire Safety\n\nThe initiative follows a number of serious vessel fires in recent years and seeks to raise awareness of the fire risks associated with boating while encouraging practical steps that can help prevent incidents before they occur.\n\nWhile fire incidents on the inland waterways remain relatively uncommon, even a small fire on board can escalate rapidly, making prevention and early detection critical. By increasing awareness and encouraging simple preventative measures, the campaign aims to positively influence the behaviours of the many thousands of people who enjoy Ireland's inland waterways.\n\nA Boater's Guide to Fire Safety provides clear, practical advice for boat owners and users, including:\n• Fitting and testing smoke and carbon monoxide alarms.\n• Safe use and storage of LPG cylinders.\n• Electrical safety and battery charging.\n• Safe cooking and heating practices.\n• Fire extinguishers and fire blankets.\n• Developing a fire action plan.\n• Carrying out a simple nightly fire safety check before going to bed.\n\nMarine Notice No. 127 of 2025 – All Navigations Safety Notice for Boaters: Liquefied Petroleum Gas (LPG), developed in collaboration with the Irish Boat Rental Association complements A Boater's Guide to Fire Safety. IBRA vessels are maintained in accordance with ISO 10239:2025, the internationally recognised standard for LPG systems on small craft. It is anticipated that future inland waterway Bye-Laws will require compliance with ISO 10239:2025\n\nIn the coming weeks and months, Waterways Ireland Inspectorate staff will be distributing printed copies of A Boater's Guide to Fire Safety throughout the navigation network. Entities wishing to support the distribution of this important safety resource are invited to contact Inspectorate.Athlone@waterwaysireland.org.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
 "textHash": "c9c472958389ea1c",
-"textAt": "2026-11-24T21:51:40Z",
-"textTried": "2026-11-24T21:51:40Z",
+"textAt": "2026-11-26T07:51:15Z",
+"textTried": "2026-11-26T07:51:15Z",
 "pageHeading": "All Navigations: Boater's Guide to Fire Safety",
 "listed": true,
 "shannon": true,
@@ -387,7 +387,7 @@
 "kind": "restriction"
 }
 ],
-"lastGood": "2026-11-26T06:51:00Z",
+"lastGood": "2026-11-26T07:51:12Z",
 "count": 15,
 "liveNote": true,
 "ok": true
