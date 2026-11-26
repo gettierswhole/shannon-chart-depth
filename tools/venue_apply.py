@@ -74,8 +74,7 @@ def check_set(venue, s):
                 return "a menu label must be 1 to 50 characters"
             if not URL.match(e[1]):
                 return "a menu link must be a plain http(s) address"
-            if "facebook.com" in e[1].lower() or "fb.com" in e[1].lower():
-                return "Facebook is never linked"
+            # Facebook links are allowed (owner's decision 2026-11-26)
     if "days" in s and s["days"] is not None:
         d = s["days"]
         if not isinstance(d, dict) or sorted(d) != [str(i) for i in range(7)]:
