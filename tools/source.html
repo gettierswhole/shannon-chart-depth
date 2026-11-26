@@ -2132,11 +2132,11 @@ a { color: var(--water); }
     if (!r.food) return;
     var dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(t.wd);
     wrap.textContent = "";
-    var rated = r.food.some(function (v) { return typeof v.stars === "number"; });
+    var rated = r.food.some(function (v) { return typeof v.grating === "number"; });
     var asof = r.foodChecked ? new Date(r.foodChecked).toLocaleDateString("en-IE", { day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Dublin" }) : "13 Oct 2026";
-    $("food-asof").textContent = (rated ?
-      "Walk times are estimates from the public moorings. Claude's rating weighs the crowd's score by how many reviews it rests on, adds awards and guide listings, and spreads it onto a five-star scale. Rate places yourself to test it. " :
-      "") + "Hours, phones and menus from each venue's own website, checked " + asof + " and refreshed twice a month. Crowd ratings and reviews are on each venue's Google listing.";
+    $("food-asof").textContent = "Walk times are estimates from the public moorings. " +
+      (rated ? "Google rating and review count from each venue's Google listing, updated weekly. " : "") +
+      "Hours, phones and menus checked " + asof + " and refreshed twice a month.";
     // Split into two collapsible menus: places to eat, and drinks-only pubs. Harbour headings repeat in each where needed.
     var isPub = function (v) { return v.kind === "pub" || /^(Pub[: ]|Ireland's oldest pub)/.test(v.note || ""); };
     var sections = [{ key: "eat", title: "Eating ashore", items: [] }, { key: "pubs", title: "Pubs", items: [] }];
@@ -2161,7 +2161,6 @@ a { color: var(--water); }
       sum.querySelector(".food-count").textContent = count + (count === 1 ? " place" : " places");
       det.appendChild(sum);
       var inner = document.createElement("div"); inner.className = "food";
-      if (s.key === "eat" && rated) inner.appendChild(scoreCard(r));
       s.items.forEach(function (v) { inner.appendChild(venueCard(v)); });
       det.appendChild(inner);
       wrap.appendChild(det);
@@ -2175,7 +2174,7 @@ a { color: var(--water); }
       d.appendChild(top);
       if (v.where) { var w = document.createElement("span"); w.className = "where"; w.textContent = v.where; d.appendChild(w); }
       if (v.walk) { var wk = document.createElement("span"); wk.className = "where"; wk.textContent = v.walk; d.appendChild(wk); }
-      if (typeof v.stars === "number") d.appendChild(ratingRow(v));
+      if (typeof v.grating === "number") d.appendChild(ratingRow(v));
       if (v.days) {
         var td = document.createElement("span"), today = v.days[dow];
         td.className = "today-hrs" + (today === null ? " closed" : "");
@@ -2201,16 +2200,11 @@ a { color: var(--water); }
   function ratingRow(v) {
     var row = document.createElement("div"); row.className = "rate";
     var c = document.createElement("span"); c.className = "rate-claude";
-    c.innerHTML = '<span class="rate-k">Claude</span> <span class="stars"></span>';
-    c.querySelector(".stars").textContent = starText(v.stars) + " " + v.stars.toFixed(1);
+    c.innerHTML = '<span class="rate-k">Google</span> <span class="stars"></span>';
+    var gText = starText(v.grating) + " " + v.grating.toFixed(1);
+    if (typeof v.greviews === "number") gText += " (" + v.greviews.toLocaleString() + " reviews)";
+    c.querySelector(".stars").textContent = gText;
     row.appendChild(c);
-    // The profile method, locked on 13 Oct 2026, shown beside the current one while your new ratings decide between them.
-    if (typeof v.stars2 === "number") {
-      var c2 = document.createElement("span"); c2.className = "rate-claude";
-      c2.innerHTML = '<span class="rate-k">Profile</span> <span class="stars"></span>';
-      c2.querySelector(".stars").textContent = starText(v.stars2) + " " + v.stars2.toFixed(1);
-      row.appendChild(c2);
-    }
     var lab = document.createElement("label"); lab.className = "rate-you";
     var sel = document.createElement("select"); sel.id = "rate-" + v.id;
     var opts = ["–", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"];
