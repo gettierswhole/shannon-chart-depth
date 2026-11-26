@@ -2,10 +2,12 @@
 // Pages: the saved copy is shown straight away and checked for a newer one in the background (used next time).
 // Data files: the network first, the saved copy if the network fails. The page itself shows its last data
 // straight away from the phone's own storage while the fresh files arrive.
-var CACHE = "shannon-v2";
+var CACHE = "shannon-v3";
 self.addEventListener("install", function (e) {
+  // Pre-cache the page and slim.json (3.5 kB gz: gauge levels, no history).
+  // live.json (9 kB gz, adds history/sparklines) is fetched lazily after first paint.
   e.waitUntil(caches.open(CACHE).then(function (c) {
-    return Promise.all(["./", "live.json"].map(function (u) { return c.add(u).catch(function () {}); }));
+    return Promise.all(["./", "slim.json"].map(function (u) { return c.add(u).catch(function () {}); }));
   }).then(function () { return self.skipWaiting(); }));
 });
 self.addEventListener("activate", function (e) {

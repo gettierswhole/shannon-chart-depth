@@ -1,7 +1,14 @@
 # Builds the public, sign-in-free copy of the page from derg-depth.html.
 # The copy reads its live data from small files beside it (made from data.json by tools/slim_data.py)
 # instead of the artifact database.
-import sys
+# JS and CSS are minified (rjsmin + basic CSS strip) to reduce the gzipped page size.
+import sys, re
+try:
+    import rjsmin
+    _have_rjsmin = True
+except ImportError:
+    _have_rjsmin = False
+
 src, out = sys.argv[1], sys.argv[2]
 h = open(src).read()
 # Accept either the page source or the published page as the artifact service returns it
@@ -12,19 +19,22 @@ if h.lstrip().lower().startswith('<!doctype') and '<body>' in h[:3000]:
         h = h.rstrip()[:-len('</body></html>')]
 shim = r'''<script>
 // Public copy: stand in for the artifact database with the small files beside the page, re-read every 10 minutes.
-// live.json holds the gauges (a week of history), notices, forecasts and events. Venues come one stretch at a time
-// (food-<stretch>.json, for the stretch on screen), and a gauge's full month (history-<gauge>.json) only when a
-// lead-line check is entered over a week late. If live.json can't be had, the full data.json?t= is used instead.
-// The page keeps every document on the phone and shows it at once, so these only bring it up to date.
+// Two-stage load for fast first paint on a slow connection:
+//   1. slim.json (~3.5 kB gz): gauge levels only (no history). Delivers live readings immediately.
+//   2. live.json (~9 kB gz): 7-day history for sparklines and trend. Loaded right after.
+// Venues: food-<stretch>.json, loaded only for the reach on screen.
+// Old lead-line check: history-<gauge>.json, loaded only when a check is entered over a week late.
+// Fallback: if slim.json and live.json both fail, tries data.json.
 (function () {
   var BASE = window.SHANNON_BASE || "";
-  var subs = [], cache = null, site, esb, food = {}, full = {}, foodWanted = {}, fullWanted = {};
+  var subs = [], slim = null, cache = null, site, esb, food = {}, full = {}, foodWanted = {}, fullWanted = {};
   function get(name) {
     return fetch(BASE + name + "?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
   }
   function merged(key) {
-    var g = cache && cache.gauge && cache.gauge[key];
+    // Prefer live.json gauge (has history); fill from slim.json if live not yet arrived.
+    var g = (cache && cache.gauge && cache.gauge[key]) || (slim && slim.gauge && slim.gauge[key]);
     if (!g || !full[key]) return g;
     var seen = {}, h = [];
     full[key].concat(g.history || []).forEach(function (p) { if (p && p.t && !seen[p.t]) { seen[p.t] = 1; h.push(p); } });
@@ -36,9 +46,10 @@ shim = r'''<script>
     if (path === "esb/derg") return esb;
     var p = path.split("/");
     if (p[0] === "food") return food[p[1]] || (cache && cache.food ? cache.food[p[1]] : undefined);
-    if (!cache) return undefined;
+    var src = cache || slim;
+    if (!src) return undefined;
     if (p[0] === "gauge") return merged(p[1]);
-    var col = cache[p[0]];
+    var col = src[p[0]];
     return col ? col[p[1]] : undefined;
   }
   function deliver(only) {
@@ -56,10 +67,16 @@ shim = r'''<script>
   }
   function shownReach() { try { return localStorage.getItem("shannon.reach") || "derg"; } catch (e) { return "derg"; } }
   function load() {
-    get("live.json").then(function (j) {
-      if (j && j.gauge) return j;
-      return fetch(BASE + "data.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
-    }).then(function (j) { if (j) { cache = j; deliver(); } });
+    // Stage 1: slim.json — level + time only, ~3.5 kB gz. First paint with live readings.
+    get("slim.json").then(function (j) {
+      if (j && j.gauge) { slim = j; deliver(); }
+      // Stage 2: live.json — 7-day history for sparklines/trend, ~9 kB gz.
+      return get("live.json").then(function (k) {
+        if (k && k.gauge) return k;
+        // Last resort: full data.json (no-history split may not be deployed yet).
+        return fetch(BASE + "data.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+      });
+    }).then(function (j) { if (j && j.gauge) { cache = j; deliver(); } });
     // Waterways Ireland's notices list, as the hourly check last found it (number, title and link only).
     get("notices_site.json").then(function (j) { if (j && Array.isArray(j.items)) { site = j; deliver("notices/site"); } });
     // The ESB's once-a-day Lough Derg levels (tools/update_esb.py), for the "Killaloe end" line.
@@ -114,4 +131,16 @@ h = h[:i] + shim + h[i:]
 h = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
      '<meta name="description" content="Live Shannon water levels against CSIG chart datum, with lake forecasts, lock times, marine notices and places to eat ashore.">\n'
      '</head>\n<body>\n' + h + '\n</body>\n</html>\n')
+# Minify inline JS and CSS to reduce gzipped page size (~8-9 kB gz saving).
+if _have_rjsmin:
+    def _min_script(m):
+        return '<script>' + rjsmin.jsmin(m.group(1)) + '</script>'
+    h = re.sub(r'<script>(.*?)</script>', _min_script, h, flags=re.S)
+# Basic CSS: strip comments and collapse whitespace (saves ~1 kB gz).
+def _min_style(m):
+    css = re.sub(r'/\*.*?\*/', '', m.group(1), flags=re.S)
+    css = re.sub(r'\s+', ' ', css)
+    css = re.sub(r' ?([{};:,>+~]) ?', r'\1', css)
+    return '<style>' + css.strip() + '</style>'
+h = re.sub(r'<style>(.*?)</style>', _min_style, h, flags=re.S)
 open(out, 'w').write(h)

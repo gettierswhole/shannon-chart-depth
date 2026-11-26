@@ -1,6 +1,8 @@
 # Makes the small files the public page loads, from data.json (which stays the full record other tools read).
-#   live.json            everything the page needs straight away: gauges with a week of hourly history,
-#                        notices, forecasts and events. No venues.
+#   slim.json            first-paint payload: gauge level+time (no history), notices, weather, events.
+#                        ~3.5 kB gzipped. The page shows live levels as soon as this arrives.
+#   live.json            full first-week payload: gauges with 7 days of history, notices, weather, events.
+#                        ~9 kB gzipped. Loaded right after slim.json; fills in sparklines and trend arrows.
 #   food-<stretch>.json  the venues for one stretch, loaded only for the stretch on screen.
 #   history-<gauge>.json a gauge's full month of history, loaded only for a lead-line check entered over a week late.
 # Writes a file only when its content changes, so an unchanged run leaves nothing to commit.
@@ -9,6 +11,9 @@ import json, os, sys
 from datetime import datetime, timedelta, timezone
 
 WEEK = timedelta(days=7, hours=6)  # a little over a week, so the 7-day trend always has its start point
+
+# Fields kept per gauge in slim.json (level + provenance; no history).
+SLIM_GAUGE_FIELDS = ("level", "time", "fetchedAt", "name", "station", "source")
 
 
 def dump(obj):
@@ -35,6 +40,17 @@ def parse(t):
 def main(src, out):
     data = json.load(open(src, encoding="utf-8"))
     changed = []
+
+    # --- slim.json: first-paint payload, no history ---
+    slim_gauges = {}
+    for key, g in (data.get("gauge") or {}).items():
+        slim_gauges[key] = {f: g[f] for f in SLIM_GAUGE_FIELDS if f in g}
+    slim = {k: v for k, v in data.items() if k not in ("food", "gauge")}
+    slim["gauge"] = slim_gauges
+    if write(os.path.join(out, "slim.json"), dump(slim)):
+        changed.append("slim.json")
+
+    # --- live.json: 7-day history for sparklines/trend, plus history-*.json ---
     live = {k: v for k, v in data.items() if k != "food"}
     gauges = {}
     for key, g in (data.get("gauge") or {}).items():
@@ -52,6 +68,8 @@ def main(src, out):
     live["gauge"] = gauges
     if write(os.path.join(out, "live.json"), dump(live)):
         changed.append("live.json")
+
+    # --- food-<stretch>.json: on-demand per stretch ---
     for rid, doc in (data.get("food") or {}).items():
         if write(os.path.join(out, "food-%s.json" % rid), dump(doc)):
             changed.append("food-%s.json" % rid)
