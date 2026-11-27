@@ -4,7 +4,7 @@
 # Waterways Ireland's Inspector of Navigation gave written permission (letter received 3 Nov 2026) for this page to
 # read their marine notices no more than once per hour, and on 24 Nov 2026 told the owner the notices may be read
 # and shown freely. Their list page says "only live marine notices are displayed", so the list is the authority:
-# a notice is shown because it is on the list, in their own words, and comes down when it leaves the list.
+# a notice is shown because it is on the list, and is deleted when it is not (owner's decision, 27 Nov 2026).
 #
 # One visit, at least 60 minutes after the last:
 # - one request for the list page (it holds every live notice, including the cards hidden for "page 2"),
@@ -16,8 +16,10 @@
 # Each item: no, year, update, special, title (their card title), heading (their card line), posted (YYYY-MM-DD),
 # detail (heading + posted, as older page code reads it), url, firstSeen, changed (card or text changed),
 # shannon (true unless the heading names only another waterway), kind ("restriction", "relief" or ""),
-# listed (true while on the list; false once two good reads running have missed it, with delisted = the first
-# read that missed it), and for Shannon notices text (their words, as written), textAt, textHash.
+# listed, and for Shannon notices text (their words, as written), textAt, textHash.
+# Leaving the list: the first good read that misses a notice sets listed false, so it is off the page at once.
+# The second sets delisted (the time of the first miss) and drops its text; 24 hours later the item is deleted from
+# this file. That day is only so the notices task can tell the owner once. A notice that comes back is listed again.
 # A read that finds far fewer cards than the last one is marked suspect and takes nothing off the list.
 import hashlib, html, json, os, re, ssl, subprocess, sys, tempfile, time, urllib.error, urllib.request
 from datetime import datetime, timezone, timedelta
@@ -31,7 +33,7 @@ WAIT_FROM = timedelta(minutes=45)    # started a little early: wait out the hour
 MAX_PAGES = 5                        # notice pages read in one visit
 PAUSE = 2                            # seconds between requests in a visit
 REFRESH_AFTER = timedelta(hours=24)  # re-read a notice's text when it was last checked longer ago than this
-TEXT_HOLD = timedelta(hours=72)      # a notice's text is dropped this long after it leaves their list
+GONE_KEEP = timedelta(hours=24)      # a notice confirmed gone from their list is deleted from the file after this
 TEXT_MAX = 8000
 KEEP = 60
 HOST = "www.waterwaysireland.org"
@@ -282,17 +284,19 @@ def main(path):
             if not p.get("posted") and old_posted(p): p["posted"] = old_posted(p)
             p["shannon"] = shannonish(p.get("title"), p.get("heading"))
             p["kind"] = kind(p.get("title"), p.get("heading"))
-            if p.get("listed") is True and not suspect:
-                p.setdefault("missedSince", iso(now))
-                p["missed"] = int(p.get("missed", 0)) + 1
-                if p["missed"] >= 2:
-                    p["listed"] = False
-                    p["delisted"] = p["missedSince"]
+            if not suspect and not p.get("delisted"):
+                if p.get("listed") is True:
+                    p.update(listed=False, missed=1, missedSince=iso(now))     # off the page at once
+                    print("Missing from the list:", p["no"], p.get("title", "")[:60])
+                elif p.get("missedSince"):
+                    p["delisted"] = p.pop("missedSince")                       # missed twice: gone
+                    p.pop("missed", None)
                     print("Off the list:", p["no"], p.get("title", "")[:60])
-            if p.get("listed") is False:
-                p.pop("missed", None); p.pop("missedSince", None)
-                if p.get("delisted") and now - ts(p["delisted"]) > TEXT_HOLD:
-                    for k in ("text", "textHash", "textAt", "textCut", "pageHeading"): p.pop(k, None)
+            if p.get("delisted"):
+                if now - ts(p["delisted"]) > GONE_KEEP:
+                    print("Deleted:", p["no"], p.get("title", "")[:60])
+                    continue
+                for k in ("text", "textHash", "textAt", "textCut", "pageHeading", "textTries", "textTried", "textError", "textChanged"): p.pop(k, None)
             items.append(p)
         data["items"] = items[:KEEP]
         data["count"] = len(found)

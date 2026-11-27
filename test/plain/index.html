@@ -91,7 +91,7 @@
         </div>
         <ul class="notice-list" id="notices"></ul>
         <p class="fine" id="site-checked" hidden></p>
-        <p class="fine">These are short summaries written by an AI assistant from Waterways Ireland's own notices and not checked by a person each time, so they may contain mistakes. The official text is on Waterways Ireland's website: <a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">all live marine notices on waterwaysireland.org</a>. Their list shows only live notices. This page reads it about once an hour by day and a few times overnight, and each notice's heading here links to their notice. A notice that leaves their list is marked here for three days and then removed.</p>
+        <p class="fine">These are short summaries written by an AI assistant from Waterways Ireland's own notices and not checked by a person each time, so they may contain mistakes. The official text is on Waterways Ireland's website: <a href="https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices" target="_blank" rel="noopener">all live marine notices on waterwaysireland.org</a>. Their list shows only live notices. This page reads it about once an hour by day and a few times overnight, and each notice's heading here links to their notice. A notice that is no longer on their list is removed from this page at the next read.</p>
         <div id="events-box" hidden>
           <h3 class="ev-head">Events on the water</h3>
           <ul class="notice-list" id="events"></ul>
@@ -1191,7 +1191,7 @@
     var today = dublinISO(0), ul = $("notices"); ul.textContent = "";
     // A notice that has ended stays for 72 hours with a green tag, so the change sinks in before it disappears.
     var HOLD = 72 * 3600e3, RECENT = 14 * 864e5, now = Date.now();
-    var items = SITE && Array.isArray(SITE.items) ? SITE.items.filter(function (i) { return i && i.url && i.no != null && siteShannon(i); }) : [];
+    var items = SITE && Array.isArray(SITE.items) ? SITE.items.filter(function (i) { return i && i.url && i.no != null && i.listed === true && siteShannon(i); }) : [];
     $("notices-asof").textContent = SITE && SITE.checked ? "Their list as read " + fmtTime(SITE.lastGood || SITE.checked) : "Live notices as of " + noticesAsOf;
     var listed = {}, gone = {}, ours = {}, byUrl = {}, rows = [];
     items.forEach(function (i) {
@@ -1208,6 +1208,9 @@
     });
     NOTICES.forEach(function (n) {
       if (n.src === "site") { byUrl[n.url] = n; return; }   // a summary of a notice on their list: shown with that notice
+      // Any other entry with a notice number is a Waterways Ireland notice. It is used only as the summary of a notice
+      // that is on their list. One that is not on their list is not shown (owner's decision, 27 Nov 2026).
+      if (/^\d+$/.test(String(n.no)) || n.src === "email") { if (listed[String(n.no)] && !n.ended) ours[String(n.no)] = n; return; }
       var k = String(n.no), s = listed[k];
       if (s) {
         // Their list has this number. Our entry is kept back, unless it comes from a later email than their card
@@ -1283,7 +1286,7 @@
   }
   function renderSiteNotices() {
     var chk = $("site-checked");
-    if (!SITE || !SITE.checked) { chk.hidden = true; return; }
+    if (!SITE || !SITE.checked) { chk.hidden = false; chk.textContent = "Waterways Ireland's list of notices has not loaded, so none can be shown here. Check their site."; return; }
     var age = Date.now() - new Date(SITE.checked).getTime();
     chk.hidden = false;
     chk.textContent = "Waterways Ireland's list of live notices last read " + fmtTime(SITE.checked) +

@@ -2,10 +2,13 @@
 #
 # Waterways Ireland's list of live notices (notices_site.json, written by tools/check_notices.py) is the authority.
 # The page shows a short summary of each Shannon notice on it, written by the task from their own text, with a link
-# to their notice. The page's own notices document (notices/live) holds: those summaries (src "site", one per notice
-# link, with the hash of the text it was written from), lock closure days, notices known so far only from their
-# email (src "email"), and entries the owner added by hand. This script decides, the same way every time, what goes
-# into that document, what the owner is told, and what is remembered. The task only writes summaries and picks out facts.
+# to their notice. A notice that is not on their list is not kept: its entry is deleted (owner's decision, 27 Nov
+# 2026). So the page's own notices document (notices/live) holds only: one summary per listed notice (src "site",
+# with the hash of the text it was written from, or a plain entry the owner wrote on the panel), lock closure days
+# taken from listed notices, and entries the owner added by hand under a number of his own (M1 and so on).
+# A notice that comes by email and is not on their list is not put on the page: the owner is told once, that is all.
+# This script decides, the same way every time, what goes into that document, what the owner is told, and what is
+# remembered. The task only writes summaries and picks out facts.
 #
 #   notices_task.py toread <site.json> <live.json> <state.json or ->
 #       Prints a JSON list of the Shannon notices on their list that have no summary of their present text:
@@ -86,7 +89,6 @@ def merge(site, live, state, ext, now):
     for i in items:
         if i.get("listed") is True and (key(i) not in listed or (i.get("posted") or "") > (listed[key(i)].get("posted") or "")):
             listed[key(i)] = i
-    gone = {key(i) for i in items if i.get("listed") is False} - set(listed)
     first_run = "known" not in state
     known = dict(state.get("known") or {})
     told = list(state.get("alerted") or [])
@@ -119,7 +121,7 @@ def merge(site, live, state, ext, now):
             if first_run or now - ts(i["delisted"]) > timedelta(days=7):
                 once("gone-" + u, None)
             else:
-                if once("gone-" + u, "%s is no longer on Waterways Ireland's list of live notices." % label(i)):
+                if once("gone-" + u, "%s is no longer on Waterways Ireland's list of live notices and has been deleted from the page." % label(i)):
                     facts.append("gone from their list: " + str(i.get("no")))
     for u in list(known):
         if not any(i["url"] == u for i in items):
@@ -127,6 +129,7 @@ def merge(site, live, state, ext, now):
 
     # ----- the page's own document -----
     notices = [dict(n) for n in live.get("notices", []) if isinstance(n, dict) and n.get("no")]
+    mail_only = []
     for e in ext.get("emails") or []:
         try:
             no, sent = str(e["no"]).strip(), ts(e["sent"])
@@ -137,12 +140,9 @@ def merge(site, live, state, ext, now):
         on_list = listed.get(no)
         if on_list and (on_list.get("posted") or "") >= irish_day(sent):
             continue   # their list already shows it: the page has their words
-        until = e.get("until") if re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(e.get("until") or "")) else irish_day(sent + timedelta(days=7))
-        entry = {"no": no, "src": "email", "sent": iso(sent), "title": str(e["title"])[:90], "text": str(e["text"])[:400],
-                 "url": LIST, "until": until, "level": e.get("level") if e.get("level") in ("urgent", "active", "") else ""}
-        notices = [n for n in notices if str(n.get("no")) != no or not (n.get("src") == "email" or re.fullmatch(r"\d+", str(n.get("no"))))]
-        notices.append(entry)
-        facts.append("from email, not yet on their list: " + no)
+        mail_only.append(no)
+        if once("mail-%s-%s" % (no, iso(sent)), "By email, not on Waterways Ireland's list (so not on the page): MN %s, %s." % (no, str(e["title"])[:90])):
+            facts.append("by email only, owner told: " + no)
     # Summaries the task wrote this run, each tied to the text it was written from.
     by_url = {i["url"]: i for i in items if i.get("listed") is True}
     pinned = {u: v for u, v in (state.get("pinned") or {}).items() if u in by_url}
@@ -160,52 +160,47 @@ def merge(site, live, state, ext, now):
     # Where a plain entry stands as a notice's summary, a summary written by the task for the same notice gives way.
     notices = [n for n in notices if not (n.get("src") == "site" and n.get("url") in by_url and stands(by_url[n["url"]], plain, pinned))]
     have = site_entries(notices)
-    kept, pending = [], []
+    # What stays: a summary of a notice that is on their list (or missed by one read only), and the owner's own entries.
+    held = {i["url"] for i in items if not i.get("delisted")}
+    held_no = {key(i) for i in items if not i.get("delisted") and not i.get("special")}
+    kept = []
     for n in notices:
         no = str(n.get("no"))
-        numeric = bool(re.fullmatch(r"\d+", no))
         if n.get("src") == "site":
-            if n.get("url") in by_url: kept.append(n)   # gone from their list: the summary goes too
+            if n.get("url") in held: kept.append(n)
             continue
-        if n.get("ended"):
-            try:
-                if now - ts(n["ended"]) > HOLD: continue
-            except Exception:
-                pass
-            kept.append(n); continue
-        try:
-            if n.get("until") and (datetime.strptime(today, "%Y-%m-%d") - datetime.strptime(n["until"], "%Y-%m-%d")).days > 3:
-                continue
-        except Exception:
-            pass
-        if numeric:
+        if n.get("src") == "email" or n.get("ended"):
+            continue          # not on their list: deleted
+        if re.fullmatch(r"\d+", no):
             L = listed.get(no)
-            later_email = n.get("src") == "email" and n.get("sent") and L and irish_day(ts(n["sent"])) > (L.get("posted") or "")
-            if L and not later_email and not n.get("src"):
+            if no not in held_no:
+                continue      # not on their list: deleted
+            if L:
                 if L["url"] in have and not stands(L, plain, pinned):
                     pinned.pop(L["url"], None)
                     continue  # their text changed and a new summary has been written from it
                 if not pinned.get(L["url"]):
                     pinned[L["url"]] = L.get("textHash") or ""   # this entry stands as the summary of this text
-            elif L and not later_email and L["url"] in have:
-                continue      # an email entry: the summary written from their site has taken its place
-            if not L and no in gone and not (n.get("src") == "email" and n.get("sent")):
-                continue      # their list has dropped it
-            if n.get("src") == "email" and n.get("sent") and (not L or later_email):
-                hours = (now - ts(n["sent"])).total_seconds() / 3600
-                pending.append(no)
-                if hours >= 24:
-                    once("mail-%s-%s" % (no, n["sent"]), "MN %s came by email %d hours ago and Waterways Ireland's list still does not show it." % (no, hours))
+            kept.append(n)
+            continue
+        try:                  # the owner's own entry: kept until its last day has passed
+            if n.get("until") and n["until"] < today: continue
+        except Exception:
+            pass
         kept.append(n)
     def order(n):
         t = n.get("ended") or n.get("sent") or ""
         return (0 if t else 1, "" if not t else "".join(chr(255 - ord(c)) for c in t), -(int(n["no"]) if str(n["no"]).isdigit() else 0))
     kept.sort(key=order)
 
-    closures = [c for c in live.get("closures", []) if isinstance(c, dict) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(c.get("date") or "")) and c["date"] >= today]
+    def closure_ok(c):
+        u = str(c.get("url") or "")
+        return u == LIST or u in held        # the owner's own (the general link), or from a notice on their list
+    closures = [c for c in live.get("closures", []) if isinstance(c, dict) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(c.get("date") or ""))
+                and c["date"] >= today and closure_ok(c)]
     for c in ext.get("closures") or []:
         if (isinstance(c, dict) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(c.get("date") or "")) and c["date"] >= today
-                and str(c.get("url") or "").startswith(WI) and not any(x["date"] == c["date"] for x in closures)):
+                and str(c.get("url") or "") in by_url and not any(x["date"] == c["date"] for x in closures)):
             closures.append({"date": c["date"], "why": str(c.get("why") or "")[:60], "notice": str(c.get("notice") or "")[:40], "url": c["url"]})
             facts.append("closure day added: " + c["date"])
     off = {d for d in (ext.get("cancelled") or []) if isinstance(d, str)}
@@ -244,7 +239,7 @@ def merge(site, live, state, ext, now):
                "liveShannon": sorted({str(i.get("no")) for i in live_now}, key=lambda s: -int(s) if s.isdigit() else 0),
                "noTextYet": [str(i.get("no")) for i in live_now if not i.get("text")],
                "noSummaryYet": [str(i.get("no")) for i in live_now if (have.get(i["url"]) or {}).get("hash") != (i.get("textHash") or "-") and not stands(i, plain, pinned)],
-               "emailOnly": pending, "ownEntries": [str(n.get("no")) for n in kept], "closureDays": [c["date"] for c in closures],
+               "emailOnly": mail_only, "ownEntries": [str(n.get("no")) for n in kept], "closureDays": [c["date"] for c in closures],
                "facts": facts, "firstRun": first_run}
     feeds = [{"name": "Notices: Waterways Ireland's list last read", "at": last_good or site.get("checked"), "limit_h": 9,
               "note": "%d Shannon notices live; %d without a summary yet" % (len(live_now), len(summary["noSummaryYet"]))},
