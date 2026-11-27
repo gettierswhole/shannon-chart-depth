@@ -1,6 +1,6 @@
 {
 "v": 2,
-"checked": "2026-11-27T06:51:02Z",
+"checked": "2026-11-27T07:51:30Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
 {
@@ -164,8 +164,8 @@
 "baseline": true,
 "text": "ESB Ardnacrusha Navigation Locks will temporarily close for six months, starting on Thursday, 1 October 2026, to Wednesday, 31 March 2027 inclusive.\n\nClosure is required by ESB to facilitate essential maintenance on plant and electrical equipment associated with the operation of the navigation lock gates. During this period, vessels will not be able to transit the Ardnacrusha navigation locks.\n\nMasters of vessels navigating this section of the Shannon are requested to take account of the closure when planning their journeys and to make alternative arrangements where necessary.\n\nESB has advised that it will provide a further update on the progress of the works in advance of the planned reopening date, here: ESB Sustainable Rivers\n\nWaterways Ireland recognises this may cause inconvenience for some boaters; please reach out to us if you need assistance.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
 "textHash": "46462886a04bebce",
-"textAt": "2026-11-26T06:51:03Z",
-"textTried": "2026-11-26T06:51:03Z",
+"textAt": "2026-11-27T07:51:33Z",
+"textTried": "2026-11-27T07:51:33Z",
 "pageHeading": "Shannon Navigation Ardnacrusha Locks – Temporary Closure",
 "listed": true,
 "shannon": true,
@@ -288,7 +288,7 @@
 "kind": ""
 }
 ],
-"lastGood": "2026-11-27T06:51:02Z",
+"lastGood": "2026-11-27T07:51:30Z",
 "count": 15,
 "liveNote": true,
 "ok": true
