@@ -1,6 +1,6 @@
 {
 "v": 2,
-"checked": "2026-11-27T09:51:40Z",
+"checked": "2026-11-27T10:51:45Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
 {
@@ -56,27 +56,6 @@
 "textAt": "2026-11-26T22:52:33Z",
 "textTried": "2026-11-26T22:52:33Z",
 "pageHeading": "Shannon Navigation Roosky Bridge Operational",
-"listed": true,
-"shannon": true,
-"kind": "relief"
-},
-{
-"no": "114",
-"year": "2026",
-"update": true,
-"special": false,
-"title": "Update to Marine Notice No.114 of 2026",
-"heading": "Shannon Navigation Tarmonbarry Bridge Reopening",
-"posted": "2026-10-27",
-"url": "https://www.waterwaysireland.org/news/marine-notice-no-114-of-2026",
-"detail": "Shannon Navigation Tarmonbarry Bridge Reopening Posted: 27/10/2026",
-"firstSeen": "2026-11-03T23:03:53Z",
-"baseline": true,
-"text": "Tarmonbarry Bridge reopens for normal operation on Wednesday, 28 October 2026, following successful repairs by Waterways Ireland’s Mechanical and Electrical (M&E) staff.\n\nM&E staff are working to restore normal operation to Roosky Bridge as soon as possible, update will follow under: Marine Notice No. 118 of 2026.\n\nWaterways Ireland thanks its customers for their continued patience and cooperation.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
-"textHash": "bb2e7e040ab6aeb6",
-"textAt": "2026-11-27T02:05:16Z",
-"textTried": "2026-11-27T02:05:16Z",
-"pageHeading": "Shannon Navigation Tarmonbarry Bridge Reopening",
 "listed": true,
 "shannon": true,
 "kind": "relief"
@@ -258,8 +237,8 @@
 "baseline": true,
 "text": "1. Introducing New Boater New Safety Requirement. Waterways Ireland wishes to advise all masters of vessels and crew that, from 1 April 2026, the wearing of Personal Flotation Devices (PFDs) by boaters at all locks managed by Waterways Ireland will be mandatory (See Note 1 & 2). The use of PFDs is now reframed as a formal condition of entry and use of lock infrastructure. This policy aligns with Waterways Ireland’s statutory duty-holder responsibilities, within the context of its Health & Safety obligations.\n\n2. Background and Safety Rationale. Following a man-overboard incident at a Shannon lock in 2025, a subsequent Health & Safety audit identified significant non-compliance with voluntary PFD wearing at Locks by boaters. Navigation locks are active operational facilities and with hazards that include:\n\n• Slip, trip, and fall hazards at locks\n\n• Falls from vessels resulting in entrapment/crushing in the lock chamber\n\n• Deep-water turbulence and rapidly changing water levels\n\n• Restricted escape routes from within the lock chamber\n\n• Aerated water with lowered buoyancy\n\n3. Legal and Duty-Holder Position. Under both Irish and NI/UK Health & Safety legislation, Waterways Ireland has a clear responsibility as a duty holder to protect non-employees; specifically, boaters using our lock facilities. Locks are operational sites with defined Personal Protective Equipment requirements, consequently, Waterways Ireland is taking reasonable steps to protect lawful visitors from foreseeable risks.\n\n4. Implementation and Compliance. All persons undertaking boating activities (including mooring, tending lines, or operating gates) must wear a PFD while the vessel is within the lock chamber or on the lock quay walls. Beyond physical protection, the visible use of PFDs is intended to reinforce safety awareness and support a stronger safety culture across the inland navigation network. Waterways Ireland’s Locks-Keepers and Water Patrollers have been instructed to communicate this requirement to boaters.\n\n5. Conclusion. Our waterways remain exceptional locations to be enjoyed, this measure represents a proportionate, evidence-based response to enhance the user experience. While the physical hazards of a lock environment cannot be fully engineered out, the mandatory wearing of PFDs reduces risk to as low as reasonably practicable. Waterways Ireland thanks all users for their support in complying with the requirement to wear PFDs at locks.\n\nNote 1. Personal Flotation Device or PFD is the generic term for lifejackets and buoyancy aids. The main difference between lifejackets and buoyancy aids is that a lifejacket is designed to turn an unconscious person face up on entering the water. A buoyancy aid is not guaranteed to do this and is as the name describes, an aid to keeping you afloat.\n\nNote 2. This requirement applies to all locks across Waterways Ireland’s remit, covering the Shannon, the Shannon-Erne Waterway, Ulster Canal, Lough Erne, Lower Bann, the Royal & Grand Canals, and the River Barrow.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
 "textHash": "2b4834802a98e33b",
-"textAt": "2026-11-26T09:51:24Z",
-"textTried": "2026-11-26T09:51:24Z",
+"textAt": "2026-11-27T10:51:47Z",
+"textTried": "2026-11-27T10:51:47Z",
 "pageHeading": "All Navigations: Mandatory Wearing of Personal Flotation Devices at Navigation Locks",
 "listed": true,
 "shannon": true,
@@ -286,10 +265,33 @@
 "listed": true,
 "shannon": true,
 "kind": ""
+},
+{
+"no": "114",
+"year": "2026",
+"update": true,
+"special": false,
+"title": "Update to Marine Notice No.114 of 2026",
+"heading": "Shannon Navigation Tarmonbarry Bridge Reopening",
+"posted": "2026-10-27",
+"url": "https://www.waterwaysireland.org/news/marine-notice-no-114-of-2026",
+"detail": "Shannon Navigation Tarmonbarry Bridge Reopening Posted: 27/10/2026",
+"firstSeen": "2026-11-03T23:03:53Z",
+"baseline": true,
+"text": "Tarmonbarry Bridge reopens for normal operation on Wednesday, 28 October 2026, following successful repairs by Waterways Ireland’s Mechanical and Electrical (M&E) staff.\n\nM&E staff are working to restore normal operation to Roosky Bridge as soon as possible, update will follow under: Marine Notice No. 118 of 2026.\n\nWaterways Ireland thanks its customers for their continued patience and cooperation.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
+"textHash": "bb2e7e040ab6aeb6",
+"textAt": "2026-11-27T02:05:16Z",
+"textTried": "2026-11-27T02:05:16Z",
+"pageHeading": "Shannon Navigation Tarmonbarry Bridge Reopening",
+"listed": false,
+"shannon": true,
+"kind": "relief",
+"missed": 1,
+"missedSince": "2026-11-27T10:51:45Z"
 }
 ],
-"lastGood": "2026-11-27T09:51:40Z",
-"count": 15,
+"lastGood": "2026-11-27T10:51:45Z",
+"count": 14,
 "liveNote": true,
 "ok": true
 }
