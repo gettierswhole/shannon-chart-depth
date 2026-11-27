@@ -1,6 +1,6 @@
 {
 "v": 2,
-"checked": "2026-11-27T21:52:40Z",
+"checked": "2026-11-27T22:52:45Z",
 "source": "https://www.waterwaysireland.org/news?tabId=tabbedsection&tabName=marinenotices",
 "items": [
 {
@@ -53,8 +53,8 @@
 "baseline": true,
 "text": "Waterways Ireland advises masters of vessels that repairs to Roosky Bridge have been successfully completed and the bridge has returned to normal operation in accordance with winter operating hours.\n\nWaterways Ireland thanks its customers for their patience and understanding.\n\nPeter Harty\nInspector of Navigation\nInspectorate.Athlone@waterwaysireland.org",
 "textHash": "b0187e356f74f99f",
-"textAt": "2026-11-26T22:52:33Z",
-"textTried": "2026-11-26T22:52:33Z",
+"textAt": "2026-11-27T22:52:48Z",
+"textTried": "2026-11-27T22:52:48Z",
 "pageHeading": "Shannon Navigation Roosky Bridge Operational",
 "listed": true,
 "shannon": true,
@@ -284,7 +284,7 @@
 "delisted": "2026-11-27T10:51:45Z"
 }
 ],
-"lastGood": "2026-11-27T21:52:40Z",
+"lastGood": "2026-11-27T22:52:45Z",
 "count": 14,
 "liveNote": true,
 "ok": true
